@@ -23,7 +23,7 @@ import java.util.Optional;
 public class YahooConnectorImpl implements YahooConnector{
     private static final Logger log = LoggerFactory.getLogger(YahooConnectorImpl.class);
     private static final String FUNDAMENT_BASE_URL = "https://query%d.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=%s";
-    private static final String PRICE_BASE_URL = "https://query%d.finance.yahoo.com/v8/finance/chart/%s?symbol=%s&period1=%d&period2=%d&interval=%s";
+    private static final String PRICE_BASE_URL = "https://query%d.finance.yahoo.com/v8/finance/chart/%s?interval=1d&range=2d";
     private static final String SEARCH_BASE_URL = "https://query%d.finance.yahoo.com/v1/finance/search?q=%s&quotesCount=1&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query";
     private static final String DEFAULT_STATISTICS = "defaultKeyStatistics";
     private final HttpClient client;
@@ -84,12 +84,10 @@ public class YahooConnectorImpl implements YahooConnector{
     public Optional<BarSeries> queryIntraPriceChart(String keyword) throws IOException, InterruptedException {
         String ticker = findTicker(keyword)
                 .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
-        long unixTime = System.currentTimeMillis() / 1000;
-        unixTime -= (60 * 60 * 24); // One day backwards
-        String requestUrl = String.format(PRICE_BASE_URL, getLoadBalanceIndex(), ticker, ticker, unixTime, 9999999999L, "1m");
+        String requestUrl = String.format(PRICE_BASE_URL, getLoadBalanceIndex(), ticker);
         Optional<String> body = requestHttp(requestUrl);
         if(body.isPresent()) {
-            return Optional.of(ChartResult.buildChartResultFromJson(body.get()).getIntraBarSeries());
+            return Optional.of(ChartResult.buildChartResultFromJson(body.get()).getBarSeries());
         }
         return Optional.empty();
     }

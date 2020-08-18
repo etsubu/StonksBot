@@ -14,35 +14,22 @@ import java.util.Locale;
 @Getter
 public class AssetPriceIntraInfo {
     private String symbol;
+    private Num previousClose;
     private Num open;
     private Num high;
     private Num low;
     private Num current;
     private Num volume;
-    private Num priceVolume;
-    private Num vwap;
 
     public AssetPriceIntraInfo(BarSeries series) {
         symbol = series.getName();
-        open = series.getFirstBar().getOpenPrice();
-        high = series.getFirstBar().getHighPrice();
-        low = series.getFirstBar().getLowPrice();
+        previousClose = series.getFirstBar().getClosePrice();
+        System.out.println(previousClose.toString());
+        open = series.getLastBar().getOpenPrice();
+        high = series.getLastBar().getHighPrice();
+        low = series.getLastBar().getLowPrice();
         current = series.getLastBar().getClosePrice();
-        volume = PrecisionNum.valueOf(0);
-        vwap = PrecisionNum.valueOf(0);
-        for(Bar b : series.getBarData()) {
-            if(b.getHighPrice().isGreaterThan(high)) {
-                high = b.getHighPrice();
-            }
-            if(b.getLowPrice().isLessThan(low)) {
-                low = b.getLowPrice();
-            }
-            Num PV = (b.getLowPrice().plus(b.getHighPrice()).plus(b.getClosePrice())).dividedBy(PrecisionNum.valueOf(3)).multipliedBy(b.getVolume());
-            vwap = vwap.plus(PV);
-            volume = volume.plus(b.getVolume());
-        }
-        priceVolume = vwap;
-        vwap = vwap.dividedBy(volume);
+        volume = series.getLastBar().getVolume();
     }
 
     public double round(Num value, int decimals) {
@@ -60,7 +47,7 @@ public class AssetPriceIntraInfo {
     }
 
     public Num getChangePercent() {
-        return ((current.minus(open)).dividedBy(open)).multipliedBy(PrecisionNum.valueOf(100));
+        return ((current.minus(previousClose)).dividedBy(previousClose)).multipliedBy(PrecisionNum.valueOf(100));
     }
 
     @Override
@@ -68,10 +55,9 @@ public class AssetPriceIntraInfo {
         return "```\n" + symbol + "\n"
                 + "Price: " + round(current, 3) + "\n"
                 + "Change: " + round(getChangePercent(), 2) + "%\n"
+                + "Open: " + round(open, 2) + "\n"
                 + "High: " + round(high, 3) + "\n"
                 + "Low: " + round(low, 3) + "\n"
-                + "VWAP: " + round(vwap, 2) + "\n"
-                + "Volume: " + formatLong(volume) + "\n"
-                + "Price Volume: " + formatLong(priceVolume) + "\n```";
+                + "Volume: " + formatLong(volume) + "\n```";
     }
 }
