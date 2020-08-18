@@ -4,15 +4,16 @@ StonksBot is a discord bot developed for a private server with features includin
 
 ## Table of Contents
 
-  * [How to build](#How to build)
-    * [Prequisities](#Prequisities)
   * [Installation](#Installation)
+    * [Prerequisites](#Prerequisites)
+    * [Building](#Building)
+    * [Configuration](#Configuration)
   * [Contributing](#Contributing)
   * [Commands](#Commands)
 
-## How to build
+## Installation
 
-### Prequisities
+### Prerequisites
 You need to have Java 11 JDK installed on your system to run and compile the application.
 
 ### Building
@@ -24,7 +25,7 @@ cd StonksBot
 
 The application .jar file will be located in build/libs/
 
-## Installation
+## Configuration
 
 StonksBot requires you to provide discord oauth key in the configuration file. 
 Place config.yaml file in the same directory with the .jar file and place the oauth key in there. 
