@@ -1,5 +1,7 @@
 package Core.YahooAPI.DataStructures;
 
+import lombok.Getter;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -91,26 +93,44 @@ public class CalendarEvent {
     }
 
     public Optional<DataValue> getEarningsAverage() {
-        return Optional.ofNullable(earningsAverage);
+        if(earningsAverage != null && earningsAverage.getRaw() != null) {
+            return Optional.of(earningsAverage);
+        }
+        return Optional.empty();
     }
 
     public Optional<DataValue> getEarningsLow() {
-        return Optional.ofNullable(earningsLow);
+        if(earningsLow != null && earningsLow.getRaw() != null) {
+            return Optional.of(earningsLow);
+        }
+        return Optional.empty();
     }
 
     public Optional<DataValue> getEarningsHigh() {
-        return Optional.ofNullable(earningsHigh);
+        if(earningsHigh != null && earningsHigh.getRaw() != null) {
+            return Optional.of(earningsHigh);
+        }
+        return Optional.empty();
     }
 
     public Optional<DataValue> getRevenueAverage() {
-        return Optional.ofNullable(revenueAverage);
+        if(revenueAverage != null && revenueAverage.getRaw() != null) {
+            return Optional.of(revenueAverage);
+        }
+        return Optional.empty();
     }
 
     public Optional<DataValue> getRevenueLow() {
-        return Optional.ofNullable(revenueLow);
+        if(revenueLow != null && revenueLow.getRaw() != null) {
+            return Optional.of(revenueLow);
+        }
+        return Optional.empty();
     }
 
     public Optional<DataValue> getRevenueHigh() {
-        return Optional.ofNullable(revenueHigh);
+        if(revenueHigh != null && revenueHigh.getRaw() != null) {
+            return Optional.of(revenueHigh);
+        }
+        return Optional.empty();
     }
 }

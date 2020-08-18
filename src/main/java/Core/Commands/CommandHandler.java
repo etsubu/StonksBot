@@ -61,7 +61,7 @@ public class CommandHandler {
      */
     public CommandResult execute(String command) {
         if(!command.startsWith(COMMAND_PREFIX) || command.length() == COMMAND_PREFIX.length()) {
-            return new CommandResult("Command did not start with prefix \'" + COMMAND_PREFIX + "\'", false);
+            return new CommandResult("Command did not start with prefix '" + COMMAND_PREFIX + "'", false);
         }
         int index = command.indexOf(" ");
         index = (index == -1) ? command.length() : index;

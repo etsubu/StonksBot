@@ -26,6 +26,7 @@ public class YahooConnectorImpl implements YahooConnector{
     private static final String PRICE_BASE_URL = "https://query%d.finance.yahoo.com/v8/finance/chart/%s?interval=1d&range=2d";
     private static final String SEARCH_BASE_URL = "https://query%d.finance.yahoo.com/v1/finance/search?q=%s&quotesCount=1&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query";
     private static final String DEFAULT_STATISTICS = "defaultKeyStatistics";
+    public static final String CALENDAR_EVENTS = "calendarEvents";
     private final HttpClient client;
     private int loadBalanceIndex;
     private final TickerStorage tickerStorage;
@@ -96,7 +97,9 @@ public class YahooConnectorImpl implements YahooConnector{
         return queryIntraPriceChart(keyword).map(AssetPriceIntraInfo::new);
     }
 
-    public Optional<DataResponse> queryData(String ticker, String... typeList) throws IOException, InterruptedException {
+    public Optional<DataResponse> queryData(String keyword, String... typeList) throws IOException, InterruptedException {
+        String ticker = findTicker(keyword)
+                .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
         String modules = String.join("%2C", typeList);
         String requestUrl = String.format(FUNDAMENT_BASE_URL, getLoadBalanceIndex(), ticker, modules);
         return requestHttp(requestUrl).map(GeneralResponse::parseResponse);
