@@ -3,7 +3,12 @@
 StonksBot is a discord bot developed for a private server with features including fetching stock market data.
 
 ## Table of Contents
-TODO
+
+  * [How to build](#How to build)
+    * [Prequisities](#Prequisities)
+  * [Installation](#Installation)
+  * [Contributing](#Contributing)
+  * [Commands](#Commands)
 
 ## How to build
 
@@ -19,7 +24,7 @@ cd StonksBot
 
 The application .jar file will be located in build/libs/
 
-## How to run
+## Installation
 
 StonksBot requires you to provide discord oauth key in the configuration file. 
 Place config.yaml file in the same directory with the .jar file and place the oauth key in there. 
