@@ -40,7 +40,7 @@ public class Price extends Command {
             }
             return new CommandResult(info.get().toString(), true);
         } catch (IOException | InterruptedException e) {
-            return new CommandResult("Connection error to the API! Maybe the site is down?", false, e);
+            return new CommandResult("Did not find a stock with they keyword '" + command + "'", false, e);
         }
     }
 
