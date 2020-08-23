@@ -1,7 +1,6 @@
 package Core.YahooAPI.DataStructures;
 
 import lombok.Getter;
-import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.num.Num;
 import org.ta4j.core.num.PrecisionNum;
@@ -13,13 +12,13 @@ import java.util.Locale;
 
 @Getter
 public class AssetPriceIntraInfo {
-    private String symbol;
-    private Num previousClose;
-    private Num open;
-    private Num high;
-    private Num low;
-    private Num current;
-    private Num volume;
+    private final String symbol;
+    private final Num previousClose;
+    private final Num open;
+    private final Num high;
+    private final Num low;
+    private final Num current;
+    private final Num volume;
 
     public AssetPriceIntraInfo(BarSeries series) {
         symbol = series.getName();
