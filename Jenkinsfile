@@ -13,7 +13,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh './gradlew build'
+                sh './gradlew shadowJar'
             }
         }
         stage('Test') {
@@ -30,8 +30,8 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: 'build/libs/**/*.jar', fingerprint: true
-            junit 'build/reports/**/*.xml,build/reports/**/*.html'
+            archiveArtifacts artifacts: 'build/libs/**/*.jar,build/reports/**/*.html', fingerprint: true
+            junit 'build/reports/**/*.xml'
         }
     }
 }
