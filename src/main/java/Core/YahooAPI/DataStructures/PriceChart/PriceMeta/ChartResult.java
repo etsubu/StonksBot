@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public class ChartResult {
     private static final Gson gson = new Gson();
@@ -69,21 +70,7 @@ public class ChartResult {
     private void buildCandle(BarSeries series, ZoneId zoneId, List<String> open, List<String> high, List<String> low, List<String> close, List<String> volume, int i) throws IOException {
         Instant ins = Instant.ofEpochSecond(Long.parseLong(timestamp.get(i)));
         ZonedDateTime z = ZonedDateTime.ofInstant(ins, zoneId);
-        String vol = volume.get(i);
-        PrecisionNum v;
-        if(vol == null || vol.equals("0")) {
-            v = PrecisionNum.valueOf(0);
-            // No trading action during this minute, loop back
-            while(i > 0 && (vol == null || vol.equals("0"))) {
-                i--;
-                vol = (volume.get(i));
-            }
-            if(i == 0 && (vol == null || vol.equals("0"))) {
-                throw new IOException("Failed to backtrack 0 volume candle");
-            }
-        } else {
-            v = PrecisionNum.valueOf(volume.get(i));
-        }
+        PrecisionNum v = PrecisionNum.valueOf(Optional.ofNullable(volume.get(i)).orElse("0"));
         PrecisionNum o = PrecisionNum.valueOf(open.get(i));
         PrecisionNum h = PrecisionNum.valueOf(high.get(i));
         PrecisionNum l = PrecisionNum.valueOf(low.get(i));
