@@ -27,7 +27,6 @@ public class Lunch extends Command{
     private int getDayToQuery() {
         ZonedDateTime time = ZonedDateTime.now(TIMEZONE);
         int day = time.getDayOfMonth();
-        System.out.println(time.getHour());
         if(time.getHour() >= 18) {
             // Use tomorrows lunch list
             day = time.plusDays(1).getDayOfMonth();

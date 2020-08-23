@@ -32,11 +32,11 @@ public class YahooConnectorImpl implements YahooConnector{
     private final TickerStorage tickerStorage;
     private final Gson gson;
 
-    public YahooConnectorImpl() {
+    public YahooConnectorImpl(TickerStorage tickerStorage) {
         client = HttpClient.newHttpClient();
         loadBalanceIndex = 1;
-        tickerStorage = new TickerStorage();
         gson = new Gson();
+        this.tickerStorage = tickerStorage;
     }
 
     private int getLoadBalanceIndex() {
@@ -61,8 +61,8 @@ public class YahooConnectorImpl implements YahooConnector{
         return Optional.of(response.body());
     }
 
-    public Optional<String> findTicker(String keyword) throws IOException, InterruptedException {
-        Optional<String> ticker = tickerStorage.findTicker(keyword);
+    public Optional<StockName> findTicker(String keyword) throws IOException, InterruptedException {
+        Optional<StockName> ticker = tickerStorage.findTicker(keyword);
         if(ticker.isPresent()) {
             log.info("Found ticker from cache {}=>{}", keyword, ticker.get());
             return ticker;
@@ -76,32 +76,34 @@ public class YahooConnectorImpl implements YahooConnector{
                 return Optional.empty();
             }
             String queriedTicker = searchResults.getQuotes().get(0).getSymbol();
-            tickerStorage.setShortcut(keyword, queriedTicker);
-            return Optional.of(queriedTicker);
+            String queriedName = Optional.ofNullable(searchResults.getQuotes().get(0).getLongname()).orElse(queriedTicker);
+            StockName stockName = new StockName(queriedTicker, queriedName);
+            tickerStorage.setShortcut(keyword, stockName);
+            return Optional.of(stockName);
         }
         return Optional.empty();
     }
 
-    public Optional<BarSeries> queryIntraPriceChart(String keyword) throws IOException, InterruptedException {
-        String ticker = findTicker(keyword)
-                .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
+    public Optional<BarSeries> queryIntraPriceChart(String ticker) throws IOException, InterruptedException {
         String requestUrl = String.format(PRICE_BASE_URL, getLoadBalanceIndex(), ticker);
         Optional<String> body = requestHttp(requestUrl);
         if(body.isPresent()) {
-            return Optional.of(ChartResult.buildChartResultFromJson(body.get()).getBarSeries());
+            return Optional.ofNullable(ChartResult.buildChartResultFromJson(body.get()).getBarSeries());
         }
         return Optional.empty();
     }
 
     public Optional<AssetPriceIntraInfo> queryCurrentIntraPriceInfo(String keyword) throws IOException, InterruptedException {
-        return queryIntraPriceChart(keyword).map(AssetPriceIntraInfo::new);
+        StockName name = findTicker(keyword)
+                .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
+        return queryIntraPriceChart(name.getTicker()).map(x -> new AssetPriceIntraInfo(x, name));
     }
 
     public Optional<DataResponse> queryData(String keyword, String... typeList) throws IOException, InterruptedException {
-        String ticker = findTicker(keyword)
+        StockName ticker = findTicker(keyword)
                 .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
         String modules = String.join("%2C", typeList);
-        String requestUrl = String.format(FUNDAMENT_BASE_URL, getLoadBalanceIndex(), ticker, modules);
+        String requestUrl = String.format(FUNDAMENT_BASE_URL, getLoadBalanceIndex(), ticker.getTicker(), modules);
         return requestHttp(requestUrl).map(GeneralResponse::parseResponse);
     }
 }

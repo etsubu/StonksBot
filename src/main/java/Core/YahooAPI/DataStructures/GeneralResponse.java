@@ -9,7 +9,6 @@ public class GeneralResponse {
     public static DataResponse parseResponse(String json) {
         JSONObject root = new JSONObject(json);
         JSONObject data = root.getJSONObject("quoteSummary").getJSONArray("result").getJSONObject(0);
-        System.out.println(data.toString());
         return gson.fromJson(data.toString(), DataResponse.class);
     }
 }

@@ -1,5 +1,6 @@
 package Core.YahooAPI.DataStructures.PriceChart.PriceMeta;
 
+import Core.YahooAPI.StockName;
 import com.google.gson.Gson;
 import org.json.JSONObject;
 import org.ta4j.core.Bar;
