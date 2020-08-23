@@ -29,9 +29,18 @@ pipeline {
         }
         stage ('Deploy') {
             steps{
-                sshagent(credentials : ['bot-instance-key']) {
-                    sh 'find . -name *.jar -exec scp {} stonksbot@172.31.21.76:/opt/stonksbot/stonksbot.jar \\;'
-                    sh 'ssh stonksbot@172.31.21.76 sudo systemctl restart stonksbot'
+                script {
+                    def filePath = sh(script: 'ls build/libs/StonksBot*.jar', returnStdout: true)
+                    def remote = [:]
+                    remote.name = "stonksbot-instance"
+                    remote.host = "172.31.21.76"
+                    remote.allowAnyHosts = true
+                    withCredentials([sshUserPrivateKey(credentialsId: 'bot-instance-key', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
+                        remote.user = userName
+                        remote.identityFile = identity
+                        sshPut remote: remote, from: 'build/libs/StonksBot-1.0-SNAPSHOT-all.jar', into: '/opt/stonksbot/stonksbot.jar', override: true
+                        sshCommand remote: remote, command: 'sudo systemctl restart stonksbot'
+                    }
                 }
             }
         }
