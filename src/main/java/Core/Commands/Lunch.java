@@ -1,8 +1,9 @@
 package Core.Commands;
 
-import Core.Lunch.LunchDay;
-import Core.Lunch.LunchList;
+import Core.Lunch.LunchMenu;
 import Core.Lunch.LunchQuery;
+import Core.Lunch.MealComponents;
+import Core.Lunch.MealOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class Lunch extends Command{
@@ -24,32 +26,25 @@ public class Lunch extends Command{
         this.query = new LunchQuery();
     }
 
-    private int getDayToQuery() {
-        ZonedDateTime time = ZonedDateTime.now(TIMEZONE);
-        int day = time.getDayOfMonth();
-        if(time.getHour() >= 18) {
-            // Use tomorrows lunch list
-            day = time.plusDays(1).getDayOfMonth();
-        }
-        return day;
-    }
-
-    private String formatLunches(List<LunchList> lunches) {
-        int day = getDayToQuery();
+    private String formatLunches(List<LunchMenu> menus) {
         StringBuilder builder = new StringBuilder();
-        for(LunchList list : lunches) {
+        for(LunchMenu menu : menus) {
             builder.append("**")
-                    .append(list.getRestaurantName())
-                    .append("**").append('\n');
-            List<LunchDay> lunchList = list.getLunchDays(day);
-            if(!lunchList.isEmpty()) {
-                builder.append(lunchList.get(0).getDate().toLocalDate()).append('\n');
-            }
-            for(LunchDay lunch : lunchList) {
-                lunch.getLunchOptions().forEach(x -> {
-                    builder.append(x.getName()).append('\n');
-                    x.getComponents().forEach(y -> builder.append('\t').append(y).append('\n'));
-                });
+                    .append(menu.getRestaurantName())
+                    .append("**")
+                    .append('\n')
+                    .append(menu.getDayOfWeek())
+                    .append(' ')
+                    .append(menu.getDate())
+                    .append('\n');
+            for(MealOption meal : menu.getSetMenus()) {
+                builder.append(meal.getName()).append("\n");
+                for(MealComponents component : meal.getMeals()) {
+                    builder.append('\t').append(component.getName()).append(' ')
+                            .append(component.getDiets().stream()
+                                    .filter(x -> !x.equals("*")).collect(Collectors.joining(", ")))
+                            .append("\n");
+                }
             }
             builder.append('\n');
         }
@@ -59,7 +54,7 @@ public class Lunch extends Command{
     public CommandResult execute(String command) {
         log.info("Executing " + command);
         try {
-            List<LunchList> lunches = query.getLunchList(getDayToQuery());
+            List<LunchMenu> lunches = query.queryLunchList();
             return new CommandResult(formatLunches(lunches), true);
         } catch (IOException | InterruptedException e) {
             log.error("Core.Lunch query failed ", e);

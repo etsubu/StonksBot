@@ -13,9 +13,11 @@ import org.ta4j.core.BarSeries;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Optional;
 
@@ -68,7 +70,7 @@ public class YahooConnectorImpl implements YahooConnector{
             return ticker;
         }
         // Query from yahoo finance
-        String requestUrl = String.format(SEARCH_BASE_URL, getLoadBalanceIndex(), keyword);
+        String requestUrl = String.format(SEARCH_BASE_URL, getLoadBalanceIndex(), URLEncoder.encode(keyword, StandardCharsets.UTF_8));
         Optional<String> response = requestHttp(requestUrl);
         if(response.isPresent()) {
             SearchResponse searchResults = gson.fromJson(response.get(), SearchResponse.class);
@@ -85,7 +87,7 @@ public class YahooConnectorImpl implements YahooConnector{
     }
 
     public Optional<BarSeries> queryIntraPriceChart(String ticker) throws IOException, InterruptedException {
-        String requestUrl = String.format(PRICE_BASE_URL, getLoadBalanceIndex(), ticker);
+        String requestUrl = String.format(PRICE_BASE_URL, getLoadBalanceIndex(), URLEncoder.encode(ticker, StandardCharsets.UTF_8));
         Optional<String> body = requestHttp(requestUrl);
         if(body.isPresent()) {
             return Optional.ofNullable(ChartResult.buildChartResultFromJson(body.get()).getBarSeries());
@@ -103,7 +105,7 @@ public class YahooConnectorImpl implements YahooConnector{
         StockName ticker = findTicker(keyword)
                 .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
         String modules = String.join("%2C", typeList);
-        String requestUrl = String.format(FUNDAMENT_BASE_URL, getLoadBalanceIndex(), ticker.getTicker(), modules);
+        String requestUrl = String.format(FUNDAMENT_BASE_URL, getLoadBalanceIndex(), URLEncoder.encode(ticker.getTicker(), StandardCharsets.UTF_8), modules);
         return requestHttp(requestUrl).map(GeneralResponse::parseResponse);
     }
 }
