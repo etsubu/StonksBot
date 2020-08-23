@@ -1,5 +1,6 @@
 package Core.YahooAPI.DataStructures;
 
+import Core.YahooAPI.StockName;
 import lombok.Getter;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.num.Num;
@@ -12,7 +13,7 @@ import java.util.Locale;
 
 @Getter
 public class AssetPriceIntraInfo {
-    private final String symbol;
+    private final StockName name;
     private final Num previousClose;
     private final Num open;
     private final Num high;
@@ -20,10 +21,9 @@ public class AssetPriceIntraInfo {
     private final Num current;
     private final Num volume;
 
-    public AssetPriceIntraInfo(BarSeries series) {
-        symbol = series.getName();
+    public AssetPriceIntraInfo(BarSeries series, StockName name) {
+        this.name = name;
         previousClose = series.getFirstBar().getClosePrice();
-        System.out.println(previousClose.toString());
         open = series.getLastBar().getOpenPrice();
         high = series.getLastBar().getHighPrice();
         low = series.getLastBar().getLowPrice();
@@ -51,7 +51,7 @@ public class AssetPriceIntraInfo {
 
     @Override
     public String toString() {
-        return "```\n" + symbol + "\n"
+        return "```\n" + name.getFullname() + " - " + name.getTicker() + "\n"
                 + "Price: " + round(current, 3) + "\n"
                 + "Change: " + round(getChangePercent(), 2) + "%\n"
                 + "Open: " + round(open, 2) + "\n"

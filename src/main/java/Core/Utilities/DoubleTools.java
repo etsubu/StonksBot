@@ -1,12 +1,14 @@
 package Core.Utilities;
 
-import org.ta4j.core.num.Num;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+/**
+ * Common methods for working with floating point numbers
+ * @author etsubu
+ */
 public class DoubleTools {
 	public static double round(double value, int accuracy) {
 		double exp = Math.pow(10, accuracy);
