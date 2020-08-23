@@ -5,7 +5,6 @@ import Core.Utilities.TimeUtils;
 import Core.YahooAPI.DataStructures.CalendarEarnings;
 import Core.YahooAPI.DataStructures.CalendarEvent;
 import Core.YahooAPI.DataStructures.DataResponse;
-import Core.YahooAPI.DataStructures.GeneralResponse;
 import Core.YahooAPI.YahooConnectorImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @Component
-public class CalendarCommand extends Command{
+public class CalendarCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(CalendarCommand.class);
     private final YahooConnectorImpl yahooConnector;
     /**
@@ -60,6 +59,8 @@ public class CalendarCommand extends Command{
 
     @Override
     public String help() {
-        return null;
+        return "Lists upcoming calendar events such as dividends, earnings date, and analyst forecasts if available\n"
+                + "Usage: !calendar [stockname/ticker]\n"
+                + "Example: !calendar msft";
     }
 }

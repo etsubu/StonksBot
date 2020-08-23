@@ -23,19 +23,25 @@ public class EventCore extends ListenerAdapter
 {
     private static final Logger log = LoggerFactory.getLogger(EventCore.class);
     private final CommandHandler commandHandler;
+    private final JDA jda;
 
     /**
      * Initializes EventCore
      */
     public EventCore(CommandHandler commandHandler, ConfigLoader configLoader) throws LoginException {
-        JDA jda = JDABuilder.createDefault(configLoader.getConfig().getOauth()).build();
+        this.jda = JDABuilder.createDefault(configLoader.getConfig().getOauth()).build();
         jda.addEventListener(this);
         this.commandHandler = commandHandler;
+        log.info("Discord name: {}", jda.getSelfUser().getName());
     }
     
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
     {
+        if(event.getAuthor().isBot() || event.getAuthor().getName().equalsIgnoreCase(jda.getSelfUser().getName())) {
+            // Skip messages sent by bots or ourselves
+            return;
+        }
         if (this.commandHandler.isCommand(event.getMessage().getContentDisplay())) {
         	CommandResult result = commandHandler.execute(event.getMessage().getContentDisplay());
             event.getChannel().sendMessage(result.getResponse()).queue();

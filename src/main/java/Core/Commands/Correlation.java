@@ -12,7 +12,6 @@ import java.util.Arrays;
 /**
  * Correlation command calculates the correlation between two assets for the given timeframe
  */
-@Component
 public class Correlation extends Command {
     private static final Logger log = LoggerFactory.getLogger(Correlation.class);
     private final YahooConnectorImpl api;

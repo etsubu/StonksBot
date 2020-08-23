@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Contains all the executable commands and handles execution of those commands on demand
@@ -30,10 +31,11 @@ public class CommandHandler {
      * Initializes CommandHandler
      * @param api AlphaVantageConnector for searching asset prices
      */
-    public CommandHandler(YahooConnectorImpl api, List<Command> commandList) {
+    public CommandHandler(YahooConnectorImpl api, List<Command> commandList, HelpCommand helpCommand) {
         this.commandMap = new HashMap<>();
         this.api = api;
         commandList.forEach(x -> commandMap.put(x.getName(), x));
+        commandMap.put(helpCommand.getName(), helpCommand);
         log.info("Initialized command handler");
     }
 
@@ -42,8 +44,8 @@ public class CommandHandler {
      * @param name Name of the command to retrieve
      * @return Command object that has the given name
      */
-    public Command getCommand(String name) {
-        return this.commandMap.get(name);
+    public Optional<Command> getCommand(String name) {
+        return Optional.ofNullable(commandMap.get(name));
     }
     /**
      * 

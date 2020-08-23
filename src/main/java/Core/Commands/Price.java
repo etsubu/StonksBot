@@ -46,7 +46,7 @@ public class Price extends Command {
 
     @Override
     public String help() {
-        return "Usage !price asset\nExample: !price nokia";
+        return "Displays intraday price data for the given stock\nUsage !" + super.name + " [stockname/ticker]\nExample: !price msft";
     }
 
 }

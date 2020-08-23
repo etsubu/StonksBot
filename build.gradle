@@ -39,6 +39,7 @@ targetCompatibility = 11
 
 jar {
     manifest {
+        attributes "Version" : project.version
         attributes "Main-Class": "Core.Main"
     }
 }
