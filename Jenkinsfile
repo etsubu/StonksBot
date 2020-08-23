@@ -5,10 +5,33 @@ pipeline {
         }
     }
     stages {
+        stage("Presteps") {
+            steps {
+                sh 'chmod +x gradlew'
+                sh './gradlew clean'
+            }
+        }
         stage('Build') {
             steps {
-                sh './gradlew clean build'
+                sh './gradlew build'
             }
+        }
+        stage('Test') {
+            steps {
+                sh './gradlew test'
+            }
+        }
+        stage('Verify') {
+            steps {
+                sh './gradlew spotbugsMain'
+                sh './gradlew dependencyCheckAnalyze'
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: 'build/libs/**/*.jar', fingerprint: true
+            junit 'build/reports/**/*.xml,build/reports/**/*.html'
         }
     }
 }
