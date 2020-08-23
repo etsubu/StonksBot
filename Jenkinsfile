@@ -30,7 +30,7 @@ pipeline {
         stage ('Deploy') {
             steps{
                 sshagent(credentials : ['bot-instance-key']) {
-                    sh 'find . -name *.jar -exec scp {} stonksbot@172.31.21.76:/opt/stonksbot/stonksbot.jar \;'
+                    sh 'find . -name *.jar -exec scp {} stonksbot@172.31.21.76:/opt/stonksbot/stonksbot.jar \\;'
                     sh 'ssh stonksbot@172.31.21.76 sudo systemctl restart stonksbot'
             }
         }
