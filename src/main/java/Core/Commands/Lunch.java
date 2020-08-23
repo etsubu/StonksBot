@@ -69,6 +69,6 @@ public class Lunch extends Command{
 
     @Override
     public String help() {
-        return "Returns the current days lunch list. Usage !lunch";
+        return "Returns the current days lunch list. \nUsage !lunch";
     }
 }

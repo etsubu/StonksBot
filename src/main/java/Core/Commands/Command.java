@@ -17,7 +17,7 @@ public abstract class Command {
      * @param name Command name that follows the prefix
      */
     public Command(String name) {
-        this.name = name;
+        this.name = name.replaceAll("!", "");
     }
     
     /**
