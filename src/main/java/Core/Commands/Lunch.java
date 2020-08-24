@@ -21,7 +21,7 @@ public class Lunch extends Command{
     private final LunchQuery query;
 
     public Lunch() {
-        super("lunch");
+        super(List.of("lunch", "lounas"));
         // Temporary hard coding. Moving this to config file later
         this.query = new LunchQuery();
     }
@@ -64,6 +64,6 @@ public class Lunch extends Command{
 
     @Override
     public String help() {
-        return "Returns the current days lunch list. \nUsage !lunch";
+        return "Returns the current days lunch list. \nUsage !" + String.join("/", super.names);
     }
 }

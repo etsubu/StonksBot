@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -16,7 +17,7 @@ public class ListCommand extends Command implements ApplicationContextAware {
      * Initializes Command
      */
     public ListCommand() {
-        super("list");
+        super(List.of("commands", "komennot"));
     }
 
     @Override
@@ -28,7 +29,7 @@ public class ListCommand extends Command implements ApplicationContextAware {
         StringBuilder builder = new StringBuilder();
         for(Command cmd : cmds.values()) {
             builder.append('!')
-                    .append(cmd.getName())
+                    .append(String.join("/", cmd.getNames()))
                     .append('\n');
         }
         return new CommandResult(builder.toString(), true);
@@ -36,7 +37,7 @@ public class ListCommand extends Command implements ApplicationContextAware {
 
     @Override
     public String help() {
-        return "Lists all available commands\nUsage: !list";
+        return "Lists all available commands\nUsage: !" + String.join("/", super.names);
     }
 
     @Override

@@ -1,5 +1,8 @@
 package Core.YahooAPI.DataStructures;
 
+import com.google.gson.annotations.SerializedName;
+
+import javax.xml.crypto.Data;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
@@ -16,12 +19,15 @@ public class DefaultKeyStatistics {
     private DataValue dateShortInterest;
     private DataValue sharesPercentSharesOut;
     private DataValue heldPercentInsiders;
-    private DataValue heldPercentInsiderInstitutions;
+    private DataValue heldPercentInstitutions;
     private DataValue shortRatio;
     private DataValue shortPercentOfFloat;
     private DataValue beta;
     private DataValue bookValue;
-    private DataValue priteToBook;
+    private DataValue priceToBook;
+    private DataValue enterpriseToEbitda;
+    @SerializedName("52WeekChange")
+    private DataValue priceChange;
 
     public Optional<Double> getShortRateChange() {
         if(sharesShort == null || sharesShortPriorMonth == null) {
@@ -42,37 +48,48 @@ public class DefaultKeyStatistics {
         }
     }
 
+    private Optional<String> getValue(DataValue value) {
+        if(value != null && value.getRaw() != null) {
+            return Optional.of(value.getRaw());
+        }
+        return Optional.empty();
+    }
+
     public int getMaxAge() { return maxAge; }
 
-    public DataValue getPriceHint() { return priceHint; }
+    public Optional<String> getPriceHint() { return getValue(priceHint); }
 
-    public DataValue getForwardPE() { return forwardPE; }
+    public Optional<String> getForwardPE() { return getValue(forwardPE); }
 
-    public DataValue getProfitMargins() { return profitMargins; }
+    public Optional<String> getProfitMargins() { return getValue(profitMargins); }
 
-    public DataValue getFloatShares() { return floatShares; }
+    public Optional<String> getFloatShares() { return getValue(floatShares); }
 
-    public DataValue getSharesOutstanding() { return sharesOutstanding; }
+    public Optional<String> getSharesOutstanding() { return getValue(sharesOutstanding); }
 
-    public DataValue getSharesShort() { return sharesOutstanding; }
+    public Optional<String> getSharesShort() { return getValue(sharesShort); }
 
-    public DataValue getSharesShortPriorMonth() { return sharesOutstanding; }
+    public Optional<String> getSharesShortPriorMonth() { return getValue(sharesShortPriorMonth); }
 
-    public DataValue getDateShortInterest() { return dateShortInterest; }
+    public Optional<String> getDateShortInterest() { return getValue(dateShortInterest); }
 
-    public DataValue getSharesPercentSharesOut() { return sharesPercentSharesOut; }
+    public Optional<String> getSharesPercentSharesOut() { return getValue(sharesPercentSharesOut); }
 
-    public DataValue getHeldPercentInsiders() { return heldPercentInsiders; }
+    public Optional<String> getHeldPercentInsiders() { return getValue(heldPercentInsiders); }
 
-    public DataValue getHeldPercentInsiderInstitutions() { return heldPercentInsiderInstitutions; }
+    public Optional<String> getHeldPercentInstitutions() { return getValue(heldPercentInstitutions); }
 
-    public DataValue getShortRatio() { return shortRatio; }
+    public Optional<String> getShortRatio() { return getValue(shortRatio); }
 
-    public DataValue getShortPercentOfFloat() { return shortPercentOfFloat; }
+    public Optional<String> getShortPercentOfFloat() { return getValue(shortPercentOfFloat); }
 
-    public DataValue getBeta() { return beta; }
+    public Optional<String> getBeta() { return getValue(beta); }
 
-    public DataValue getBookValue() { return bookValue; }
+    public Optional<String> getBookValue() { return getValue(bookValue); }
 
-    public DataValue getPriteToBook() { return priteToBook; }
+    public Optional<String> getPriceToBook() { return getValue(priceToBook); }
+
+    public Optional<String> getEvEbitda() { return getValue(enterpriseToEbitda); }
+
+    public Optional<String> getPriceChange() { return getValue(priceChange); }
 }

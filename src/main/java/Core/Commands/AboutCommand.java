@@ -5,17 +5,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class AboutCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(AboutCommand.class);
-    private static final String name = "about";
     private final CommandResult result;
 
     /**
      * Initializes the author command
      */
     public AboutCommand() {
-        super(name);
+        super(List.of("about", "tietoja"));
         result = new CommandResult("StonksBot - " + ArchiveTools.getApplicationVersion().orElse("Unknown version") +
                 "\nAuthor Jarre Leskinen"
                 + "\nSource code and documentation: https://github.com/etsubu/StonksBot", true);
@@ -30,6 +31,6 @@ public class AboutCommand extends Command {
     @Override
     public String help() {
         return "Displays the application name, version number, author and link to source code"
-                + "\n\tUsage: !" + name;
+                + "\n\tUsage: !" + String.join("/", super.names);
     }
 }

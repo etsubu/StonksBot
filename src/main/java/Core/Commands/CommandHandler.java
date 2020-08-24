@@ -34,8 +34,8 @@ public class CommandHandler {
     public CommandHandler(YahooConnectorImpl api, List<Command> commandList, HelpCommand helpCommand) {
         this.commandMap = new HashMap<>();
         this.api = api;
-        commandList.forEach(x -> commandMap.put(x.getName(), x));
-        commandMap.put(helpCommand.getName(), helpCommand);
+        commandList.forEach(x -> x.getNames().forEach(y -> commandMap.put(y, x)));
+        helpCommand.getNames().forEach(x -> commandMap.put(x, helpCommand));
         log.info("Initialized command handler");
     }
 

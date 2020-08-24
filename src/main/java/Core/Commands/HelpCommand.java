@@ -8,6 +8,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 public class HelpCommand extends Command implements ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(HelpCommand.class);
@@ -17,7 +19,7 @@ public class HelpCommand extends Command implements ApplicationContextAware {
      * Initializes Help command
      */
     public HelpCommand() {
-        super("help");
+        super(List.of("help", "apua"));
         log.info("Constructed Help bean");
     }
 
