@@ -106,6 +106,6 @@ public class YahooConnectorImpl implements YahooConnector{
                 .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
         String modules = String.join("%2C", typeList);
         String requestUrl = String.format(FUNDAMENT_BASE_URL, getLoadBalanceIndex(), URLEncoder.encode(ticker.getTicker(), StandardCharsets.UTF_8), modules);
-        return requestHttp(requestUrl).map(GeneralResponse::parseResponse);
+        return requestHttp(requestUrl).map(x -> GeneralResponse.parseResponse(x, ticker));
     }
 }

@@ -5,6 +5,7 @@ import Core.Utilities.TimeUtils;
 import Core.YahooAPI.DataStructures.CalendarEarnings;
 import Core.YahooAPI.DataStructures.CalendarEvent;
 import Core.YahooAPI.DataStructures.DataResponse;
+import Core.YahooAPI.StockName;
 import Core.YahooAPI.YahooConnectorImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,11 @@ public class CalendarCommand extends Command {
         log.info("Initialized calendar command");
     }
 
-    private String buildResponse(CalendarEarnings earnings) {
+    private String buildResponse(CalendarEarnings earnings, StockName name) {
         StringBuilder builder = new StringBuilder();
         CalendarEvent event = earnings.getEarnings().get();
+        builder.append("```");
+        builder.append(name.getFullname()).append(" - ").append(name.getTicker()).append('\n');
         builder.append("Earnings date: ")
                 .append(TimeUtils.formatEpocSeconds(Long.parseLong(event.earningsDate().get().get(0).getRaw())))
                 .append('\n');
@@ -40,6 +43,7 @@ public class CalendarCommand extends Command {
         event.getRevenueLow().ifPresent(x -> builder.append("Forecast Revenue low: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
         earnings.getExDividendDate().ifPresent(x -> builder.append("Previous dividend date: ").append(TimeUtils.formatEpocSeconds(Long.parseLong(x.getRaw()))).append('\n'));
         earnings.getDividendDate().ifPresent(x -> builder.append("Next dividend date: ").append(TimeUtils.formatEpocSeconds(Long.parseLong(x.getRaw()))).append('\n'));
+        builder.append("```");
         return builder.toString();
     }
 
@@ -49,7 +53,7 @@ public class CalendarCommand extends Command {
             Optional<DataResponse> response = yahooConnector.queryData(command, YahooConnectorImpl.CALENDAR_EVENTS);
             if(response.isPresent() && response.get().getCalendarEvents().isPresent()) {
                 CalendarEarnings event = response.get().getCalendarEvents().get();
-                return new CommandResult(buildResponse(event), true);
+                return new CommandResult(buildResponse(event, response.get().getName()), true);
             }
         } catch (IOException | InterruptedException e) {
             log.error("Failed to retrieve calendar events for ticker", e);
