@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -25,7 +26,7 @@ public class Price extends Command {
      * @param api AlphaVantageConnector for querying information
      */
     public Price(YahooConnectorImpl api) {
-        super("price");
+        super(List.of("price", "hinta"));
         this.api = api;
         log.info("Initialized price command");
     }
@@ -46,7 +47,8 @@ public class Price extends Command {
 
     @Override
     public String help() {
-        return "Displays intraday price data for the given stock\nUsage !" + super.name + " [stockname/ticker]\nExample: !price msft";
+        return "Displays intraday price data for the given stock\nUsage !" + String.join("/", super.names)
+                + " [stockname/ticker]\nExample: !price msft";
     }
 
 }

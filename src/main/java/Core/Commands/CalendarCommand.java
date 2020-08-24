@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -22,7 +23,7 @@ public class CalendarCommand extends Command {
      * Initializes Command
      */
     public CalendarCommand(YahooConnectorImpl yahooConnector) {
-        super("calendar");
+        super(List.of("calendar", "kalenteri"));
         this.yahooConnector = yahooConnector;
         log.info("Initialized calendar command");
     }
@@ -64,7 +65,7 @@ public class CalendarCommand extends Command {
     @Override
     public String help() {
         return "Lists upcoming calendar events such as dividends, earnings date, and analyst forecasts if available\n"
-                + "Usage: !calendar [stockname/ticker]\n"
+                + "Usage: !" + String.join("/", super.names) + " [stockname/ticker]\n"
                 + "Example: !calendar msft";
     }
 }

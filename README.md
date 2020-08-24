@@ -49,7 +49,7 @@ Make sure the code compiles, tests pass, and verification plugins pass, before o
 
 Stock names are resolved by using search functionality in yahoo finance and the result is cached. This 
 means that you can either use the stock ticker for searching or the prefix of the full stock name.
-* `!price [stock]`
+* `!price/hinta [stock]`
     * This will query the intraday price data for the given stock
     * Example: `!price msft`
         * This will query price data for Microsoft
@@ -63,7 +63,7 @@ means that you can either use the stock ticker for searching or the prefix of th
           Low: 212.85
           Volume: 36 152 200
           ```
-* `!calendar [stock]`
+* `!calendar/kalenteri [stock]`
     * This command will query calendar event such earnings date, dividend date and EPS forecasts
     Note that only fields that are available are displayed
     * Example: `!calendar msft`
@@ -80,7 +80,55 @@ means that you can either use the stock ticker for searching or the prefix of th
           Previous dividend date: 19-08-2020
           Next dividend date: 10-09-2020
           ```
-* `!lunch`
+* `!commands/komennot`
+   * This command lists all available commands in the bot. 
+   * Example: `!commands`
+        * Example response:
+            ```
+          !about/tietoja
+          !calendar/kalenteri
+          !help/apua
+          !commands/komennot
+          !lunch/lounas
+          !price/hinta
+          !stats/tilastot
+          ```
+* `!help/apua [command name]`
+   * Displays help text for the given command, describing what it does and how to use it.
+   * Example: `!help price`
+        * Example response:
+            ```
+          Displays intraday price data for the given stock
+          Usage !price/hinta [stockname/ticker]
+          Example: !price msft
+          ```
+* `!about/tietoja`
+   * Displays name and version number of the bot, author name and link to the github project.
+   * Example: `!about`
+        * Example response:
+            ```
+          StonksBot - 1.0-SNAPSHOT
+          Author Jarre Leskinen
+          Source code and documentation: https://github.com/etsubu/StonksBot
+          ```
+* `!stats/tilastot`
+   * Displays key statistics about the given stock
+   * Example: `!stats msft`
+        * Example response:
+            ```
+          Microsoft Corporation - MSFT
+          EV/EBITDA: 23.87
+          Forward P/E: 29.02
+          P/B: 13.63
+          Beta: 0.9
+          Profit margin: 30.96%
+          Short percent of float: 0.49%
+          Recent change in short ratio: -15.44%
+          Held by insiders: 1.42%
+          Held by institutions: 74.09%
+          52 week price change: 57.27%
+          ```
+* `!lunch/lounas`
     * This command will display the lunch list for a couple of restaurants at University of Jyväskylä. 
     As mentioned previously, some of the bot's features are really niche. Before 18PM EEST the command 
     returns the current days lunch list, and after 18PM it displays next days lunch list.

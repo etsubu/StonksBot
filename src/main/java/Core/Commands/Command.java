@@ -1,5 +1,8 @@
 package Core.Commands;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Command class defines behaviour for a single command
  * @author etsubu
@@ -10,22 +13,26 @@ public abstract class Command {
     /**
      * Contains the name of the command that follows prefix
      */
-    protected String name;
+    protected final List<String> names;
     
     /**
      * Initializes Command
      * @param name Command name that follows the prefix
      */
     public Command(String name) {
-        this.name = name.replaceAll("!", "");
+        names = Collections.unmodifiableList(List.of(name.trim().toLowerCase().replaceAll("!", "")));
+    }
+
+    public Command(List<String> names) {
+        this.names = Collections.unmodifiableList(names);
     }
     
     /**
      * 
      * @return Name of the command
      */
-    public String getName() {
-        return this.name;
+    public List<String> getNames() {
+        return names;
     }
     
     /**

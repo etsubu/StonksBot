@@ -27,7 +27,7 @@ public class YahooConnectorImpl implements YahooConnector{
     private static final String FUNDAMENT_BASE_URL = "https://query%d.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=%s";
     private static final String PRICE_BASE_URL = "https://query%d.finance.yahoo.com/v8/finance/chart/%s?interval=1d&range=2d";
     private static final String SEARCH_BASE_URL = "https://query%d.finance.yahoo.com/v1/finance/search?q=%s&quotesCount=1&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query";
-    private static final String DEFAULT_STATISTICS = "defaultKeyStatistics";
+    public static final String DEFAULT_STATISTICS = "defaultKeyStatistics";
     public static final String CALENDAR_EVENTS = "calendarEvents";
     private final HttpClient client;
     private int loadBalanceIndex;
