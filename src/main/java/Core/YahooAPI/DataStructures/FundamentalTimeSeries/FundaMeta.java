@@ -1,4 +1,4 @@
-package Core.YahooAPI.DataStructures.Fundamentals;
+package Core.YahooAPI.DataStructures.FundamentalTimeSeries;
 
 import java.util.List;
 import java.util.Optional;
