@@ -2,7 +2,6 @@ package Core.Commands;
 
 import Core.InderesAPI.DataStructures.RecommendationEntry;
 import Core.InderesAPI.InderesConnector;
-import Core.InderesAPI.InderesConnectorImpl;
 import Core.Utilities.DoubleTools;
 import Core.YahooAPI.DataStructures.AssetPriceIntraInfo;
 import Core.YahooAPI.YahooConnectorImpl;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.ta4j.core.num.PrecisionNum;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +21,7 @@ public class RecommendationCommand extends Command {
     private final YahooConnectorImpl yahooConnector;
 
     public RecommendationCommand(InderesConnector inderesConnector, YahooConnectorImpl yahooConnector) {
-        super(List.of("recommendation", "suositus"));
+        super(List.of("suositus", "recommendation"));
         this.inderesConnector = inderesConnector;
         this.yahooConnector = yahooConnector;
     }
@@ -39,7 +37,7 @@ public class RecommendationCommand extends Command {
     private String buildRecommendationDisplay(RecommendationEntry entry) {
         Optional<AssetPriceIntraInfo> price = Optional.empty();
         try {
-            price = yahooConnector.queryCurrentIntraPriceInfo(entry.getName());
+            price = yahooConnector.queryCurrentIntraPriceInfo(entry.getIsin());
         } catch (IOException e) {
             log.error("Connection to yahoo finance failed", e);
         } catch (InterruptedException e) {
@@ -85,6 +83,8 @@ public class RecommendationCommand extends Command {
 
     @Override
     public String help() {
-        return null;
+        return "Queries price targets and recommendations for a stock followed by inderes\n"
+                + "Usage: !" + String.join("/", super.names) + " [stockname]\n"
+                + "Example: !" + super.names.get(0) + " neste";
     }
 }
