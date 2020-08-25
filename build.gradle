@@ -11,6 +11,12 @@ repositories {
     mavenCentral()
 }
 
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 dependencies {
     implementation 'org.springframework:spring-core:5.2.8.RELEASE'
     implementation 'org.springframework:spring-beans:5.2.8.RELEASE'
