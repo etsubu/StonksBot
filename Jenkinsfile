@@ -9,7 +9,7 @@ pipeline {
             steps {
                 sh 'chmod +x gradlew'
                 sh './gradlew clean'
-                echo ${env.BRANCH_NAME}
+                echo "Running on branch ${env.BRANCH_NAME}"
             }
         }
         stage('Build') {
