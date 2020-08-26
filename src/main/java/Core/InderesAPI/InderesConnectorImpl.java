@@ -19,7 +19,7 @@ public class InderesConnectorImpl implements InderesConnector {
     private static final Logger log = LoggerFactory.getLogger(InderesConnectorImpl.class);
     private static final Gson gson = new Gson();
     private static final String INDERES_RECOMMENDATION_URL = "https://www.inderes.fi/fi/rest/inderes_numbers_recommendations.json";
-    private static final long CACHE_TTL = 1000 * 60 * 60 * 24; // 1 day cache for recommendations
+    private static final long CACHE_TTL = 1000 * 60 * 60; // 1 hour cache for recommendations
     private final List<RecommendationEntry> entries;
     private long lastQueried;
 

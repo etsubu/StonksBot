@@ -128,6 +128,21 @@ means that you can either use the stock ticker for searching or the prefix of th
           Held by institutions: 74.09%
           52 week price change: 57.27%
           ```
+* `!suositus/recommendation`
+   * Displays price target and recommendation for the given stock by [Inderes](https://www.inderes.fi/). 
+   Note that the stock needs to be followed by inderes so stocks that are not listed in OMXH or First North 
+   don't have the information available.
+   * Example: `!suositus neste`
+        * Example response:
+            ```
+          (Inderes)
+          Nimi: Neste
+          Suosituksen päivämäärä: 24.7.2020
+          Tavoitehinta: 40€
+          Nykyinen hinta: 43.88€
+          Nousuvara: -8.84%
+          Suositus: vähennä
+          ```
 * `!lunch/lounas`
     * This command will display the lunch list for a couple of restaurants at University of Jyväskylä. 
     As mentioned previously, some of the bot's features are really niche. Before 18PM EEST the command 
