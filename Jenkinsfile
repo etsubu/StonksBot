@@ -2,6 +2,7 @@ pipeline {
     agent {
         docker {
             image 'adoptopenjdk/openjdk11:jdk-11.0.8_10-alpine'
+            args '-v $HOME/.gradle:/root/.gradle'
         }
     }
     stages {
@@ -9,6 +10,7 @@ pipeline {
             steps {
                 sh 'chmod +x gradlew'
                 sh './gradlew clean'
+                echo "Running on branch ${env.BRANCH_NAME}"
             }
         }
         stage('Build') {
@@ -28,6 +30,9 @@ pipeline {
             }
         }
         stage ('Deploy') {
+            when {
+                branch 'master'
+            }
             steps{
                 script {
                     def filePath = sh(script: 'ls build/libs/StonksBot*.jar', returnStdout: true)
