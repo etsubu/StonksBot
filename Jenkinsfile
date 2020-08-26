@@ -9,6 +9,7 @@ pipeline {
             steps {
                 sh 'chmod +x gradlew'
                 sh './gradlew clean'
+                echo ${env.BRANCH_NAME}
             }
         }
         stage('Build') {
@@ -28,6 +29,9 @@ pipeline {
             }
         }
         stage ('Deploy') {
+            when {
+                branch 'master'
+            }
             steps{
                 script {
                     def filePath = sh(script: 'ls build/libs/StonksBot*.jar', returnStdout: true)
