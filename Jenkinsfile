@@ -2,6 +2,7 @@ pipeline {
     agent {
         docker {
             image 'adoptopenjdk/openjdk11:jdk-11.0.8_10-alpine'
+            args '-v $HOME/.gradle:/root/.gradle'
         }
     }
     stages {
