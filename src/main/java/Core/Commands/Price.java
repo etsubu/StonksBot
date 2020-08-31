@@ -26,7 +26,7 @@ public class Price extends Command {
      * @param api AlphaVantageConnector for querying information
      */
     public Price(YahooConnectorImpl api) {
-        super(List.of("price", "hinta"));
+        super(List.of("price", "hinta", "p"));
         this.api = api;
         log.info("Initialized price command");
     }

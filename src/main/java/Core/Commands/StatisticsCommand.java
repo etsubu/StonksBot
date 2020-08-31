@@ -21,7 +21,7 @@ public class StatisticsCommand extends Command{
      * Initializes Command
      */
     public StatisticsCommand(YahooConnectorImpl yahooConnector) {
-        super(List.of("stats", "tilastot"));
+        super(List.of("stats", "tilastot", "s"));
         this.yahooConnector = yahooConnector;
     }
 
