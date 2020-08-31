@@ -21,7 +21,7 @@ public class RecommendationCommand extends Command {
     private final YahooConnectorImpl yahooConnector;
 
     public RecommendationCommand(InderesConnector inderesConnector, YahooConnectorImpl yahooConnector) {
-        super(List.of("suositus", "recommendation", "s"));
+        super(List.of("suositus", "recommendation"));
         this.inderesConnector = inderesConnector;
         this.yahooConnector = yahooConnector;
     }

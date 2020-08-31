@@ -49,7 +49,7 @@ Make sure the code compiles, tests pass, and verification plugins pass, before o
 
 Stock names are resolved by using search functionality in yahoo finance and the result is cached. This 
 means that you can either use the stock ticker for searching or the prefix of the full stock name.
-* `!price/hinta [stock]`
+* `!price/hinta/p [stock]`
     * This will query the intraday price data for the given stock
     * Example: `!price msft`
         * This will query price data for Microsoft
@@ -63,7 +63,7 @@ means that you can either use the stock ticker for searching or the prefix of th
           Low: 212.85
           Volume: 36 152 200
           ```
-* `!calendar/kalenteri [stock]`
+* `!calendar/kalenteri/c [stock]`
     * This command will query calendar event such earnings date, dividend date and EPS forecasts
     Note that only fields that are available are displayed
     * Example: `!calendar msft`
@@ -111,7 +111,7 @@ means that you can either use the stock ticker for searching or the prefix of th
           Author Jarre Leskinen
           Source code and documentation: https://github.com/etsubu/StonksBot
           ```
-* `!stats/tilastot`
+* `!stats/tilastot/s`
    * Displays key statistics about the given stock
    * Example: `!stats msft`
         * Example response:
