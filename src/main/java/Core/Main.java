@@ -20,7 +20,6 @@ public class Main {
      * @param args not used
      */
     public static void main(String[] args) {
-        System.out.println(Charset.defaultCharset().name());
         log.info("Starting up");
         new AnnotationConfigApplicationContext(Main.class);
     }

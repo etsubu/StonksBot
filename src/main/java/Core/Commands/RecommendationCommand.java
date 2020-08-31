@@ -21,7 +21,7 @@ public class RecommendationCommand extends Command {
     private final YahooConnectorImpl yahooConnector;
 
     public RecommendationCommand(InderesConnector inderesConnector, YahooConnectorImpl yahooConnector) {
-        super(List.of("suositus", "recommendation"));
+        super(List.of("suositus", "recommendation", "s"));
         this.inderesConnector = inderesConnector;
         this.yahooConnector = yahooConnector;
     }
@@ -70,7 +70,7 @@ public class RecommendationCommand extends Command {
             } else {
                 Optional<RecommendationEntry> entry = filterEntry(entries, command);
                 return entry.map(x -> new CommandResult(buildRecommendationDisplay(x), true))
-                        .orElseGet(() -> new CommandResult("Could not find recommendation for the requested stock '" + command + "'", false));
+                        .orElseGet(() -> new CommandResult("Could not find recommendation for the requested stock '" + command + "'. Probably not followed by inderes?", false));
             }
         } catch (IOException e) {
             log.error("Connection to inderes failed", e);

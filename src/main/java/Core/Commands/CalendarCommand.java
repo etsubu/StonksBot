@@ -23,7 +23,7 @@ public class CalendarCommand extends Command {
      * Initializes Command
      */
     public CalendarCommand(YahooConnectorImpl yahooConnector) {
-        super(List.of("calendar", "kalenteri"));
+        super(List.of("calendar", "kalenteri", "c"));
         this.yahooConnector = yahooConnector;
         log.info("Initialized calendar command");
     }
