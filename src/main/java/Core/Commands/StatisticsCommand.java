@@ -29,9 +29,14 @@ public class StatisticsCommand extends Command{
         StringBuilder builder = new StringBuilder();
         builder.append("```\n").append(name.getFullname()).append(" - ").append(name.getTicker()).append('\n');
         statistics.getEvEbitda().ifPresent(x -> builder.append("EV/EBITDA: ").append(DoubleTools.round(x, 2)).append('\n'));
+        statistics.getEvRevenue().ifPresent(x -> builder.append("EV/Revenue: ").append(DoubleTools.round(x, 2)).append('\n'));
         statistics.getForwardPE().ifPresent(x -> builder.append("Forward P/E: ").append(DoubleTools.round(x, 2)).append('\n'));
+        statistics.getPegRatio().ifPresent(x -> builder.append("PEG: ").append(DoubleTools.round(x, 2)).append('\n'));
         statistics.getPriceToBook().ifPresent(x -> builder.append("P/B: ").append(DoubleTools.round(x, 2)).append('\n'));
         statistics.getBeta().ifPresent(x -> builder.append("Beta: ").append(DoubleTools.round(x, 2)).append('\n'));
+        statistics.getTrailingEps().ifPresent(x -> builder.append("Trailing EPS: ").append(DoubleTools.round(x, 2)).append('\n'));
+        statistics.getForwardEps().ifPresent(x -> builder.append("Forward EPS: ").append(DoubleTools.round(x, 2)).append('\n'));
+        statistics.getForecastedEpsChange().ifPresent(x -> builder.append("Forecasted EPS Growth: ").append(DoubleTools.round(x * 100)).append("%\n"));
         statistics.getProfitMargins().ifPresent(x -> builder.append("Profit margin: ").append(DoubleTools.roundNumberToPercent(x)).append("%\n"));
         statistics.getShortPercentOfFloat().ifPresent(x -> builder.append("Short percent of float: ").append(DoubleTools.roundNumberToPercent(x)).append("%\n"));
         statistics.getShortRateChange().ifPresent(x -> builder.append("Recent change in short ratio: ").append(DoubleTools.round(x * 100)).append("%\n"));

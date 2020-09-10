@@ -1,5 +1,6 @@
 package Core.YahooAPI.DataStructures;
 
+import Core.Utilities.DoubleTools;
 import com.google.gson.annotations.SerializedName;
 
 import javax.xml.crypto.Data;
@@ -25,6 +26,10 @@ public class DefaultKeyStatistics {
     private DataValue beta;
     private DataValue bookValue;
     private DataValue priceToBook;
+    private DataValue trailingEps;
+    private DataValue forwardEps;
+    private DataValue pegRatio;
+    private DataValue enterpriseToRevenue;
     private DataValue enterpriseToEbitda;
     @SerializedName("52WeekChange")
     private DataValue priceChange;
@@ -88,6 +93,32 @@ public class DefaultKeyStatistics {
     public Optional<String> getBookValue() { return getValue(bookValue); }
 
     public Optional<String> getPriceToBook() { return getValue(priceToBook); }
+
+    public Optional<String> getTrailingEps() { return getValue(trailingEps); }
+
+    public Optional<String> getForwardEps() { return getValue(forwardEps); }
+
+    public Optional<String> getPegRatio() { return getValue(pegRatio); }
+
+    public Optional<String> getEvRevenue() { return getValue(enterpriseToRevenue); }
+
+    public Optional<Double> getForecastedEpsChange() {
+        if(getValue(trailingEps).isEmpty() && getValue(forwardEps).isEmpty()) {
+            return Optional.empty();
+        }
+        try {
+            BigDecimal fEps = new BigDecimal(forwardEps.getRaw());
+            BigDecimal tEps = new BigDecimal(trailingEps.getRaw());
+            // Let's not divide by zero
+            if(tEps.compareTo(BigDecimal.ZERO) == 0) {
+                return Optional.empty();
+            }
+            BigDecimal forecastedEpsGrowth = (fEps.subtract(tEps)).divide(tEps, 4, RoundingMode.HALF_UP);
+            return Optional.of(forecastedEpsGrowth.doubleValue());
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
 
     public Optional<String> getEvEbitda() { return getValue(enterpriseToEbitda); }
 

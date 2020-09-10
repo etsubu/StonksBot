@@ -5,8 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.nio.charset.Charset;
-
 /**
  * @author etsubu
  * @version 26 Jul 2018
