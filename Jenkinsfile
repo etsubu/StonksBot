@@ -8,6 +8,8 @@ pipeline {
     /* Run each day at 2AM */
     triggers { cron(env.BRANCH_NAME == "master" ? "H 2 * * *" : "") }
 
+    options { buildDiscarder(logRotator(numToKeepStr: '5')) }
+
     stages {
         stage("Presteps") {
             steps {
