@@ -31,7 +31,6 @@ pipeline {
         stage('Verify') {
             steps {
                 sh './gradlew spotbugsMain'
-                sh './gradlew dependencyCheckAnalyze'
             }
         }
         stage ('Deploy') {
