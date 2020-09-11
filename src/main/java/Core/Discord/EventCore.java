@@ -46,12 +46,12 @@ public class EventCore extends ListenerAdapter
             // Skip messages sent by bots or ourselves
             return;
         }
-        if(!permissionManager.isReplyAllowed(event)) {
-            log.info("Prevented reply for {}  on channel {}", event.getAuthor().getName(), event.getChannel().getName());
-            event.getChannel().sendMessage("Please use whitelisted channel for performing commands").queue();
-            return;
-        }
         if (this.commandHandler.isCommand(event.getMessage().getContentDisplay())) {
+            if(!permissionManager.isReplyAllowed(event)) {
+                log.info("Prevented reply for {}  on channel {}", event.getAuthor().getName(), event.getChannel().getName());
+                event.getChannel().sendMessage("Please use whitelisted channel for performing commands").queue();
+                return;
+            }
         	CommandResult result = commandHandler.execute(event.getMessage().getContentDisplay());
             event.getChannel().sendMessage(result.getResponse()).queue();
         	if(result.getSucceeded()) {
