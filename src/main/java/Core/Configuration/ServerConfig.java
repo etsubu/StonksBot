@@ -10,6 +10,7 @@ import java.util.List;
 public class ServerConfig {
     private String name;
     private List<String> whitelistedChannels;
+    private List<Reaction> reactions;
     private String adminGroup;
     private String trustedGroup;
 }

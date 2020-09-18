@@ -27,15 +27,17 @@ public class EventCore extends ListenerAdapter
     private final CommandHandler commandHandler;
     private final JDA jda;
     private final PermissionManager permissionManager;
+    private final MessageReacter reacter;
 
     /**
      * Initializes EventCore
      */
-    public EventCore(CommandHandler commandHandler, ConfigLoader configLoader, PermissionManager permissionManager) throws LoginException {
+    public EventCore(CommandHandler commandHandler, ConfigLoader configLoader, PermissionManager permissionManager, MessageReacter reacter) throws LoginException {
         this.jda = JDABuilder.createDefault(configLoader.getConfig().getOauth()).build();
         jda.addEventListener(this);
         this.commandHandler = commandHandler;
         this.permissionManager = permissionManager;
+        this.reacter = reacter;
         log.info("Discord name: {}", jda.getSelfUser().getName());
     }
     
@@ -46,6 +48,8 @@ public class EventCore extends ListenerAdapter
             // Skip messages sent by bots or ourselves
             return;
         }
+        reacter.react(event).ifPresent(x -> event.getMessage().addReaction(x).queue());
+
         if (this.commandHandler.isCommand(event.getMessage().getContentDisplay())) {
             if(!permissionManager.isReplyAllowed(event)) {
                 log.info("Prevented reply for {}  on channel {}", event.getAuthor().getName(), event.getChannel().getName());
