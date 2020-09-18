@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
+import java.util.Optional;
 
 @Component
 public class ConfigLoader {
@@ -34,6 +35,7 @@ public class ConfigLoader {
             throw new RuntimeException("Could not load configuration file");
         }
         lastModified = Instant.now();
+        config.getServers().forEach(x -> Optional.ofNullable(x.getReactions()).ifPresent(y -> y.forEach(Reaction::buildPattern)));
     }
 
     public Config getConfig() {
