@@ -45,12 +45,13 @@ public class PermissionManager {
         boolean isInServerTrustedGroup = userRoles.map(x -> x.stream()
                 .anyMatch(y -> y.getName().trim().equalsIgnoreCase(serverConfig.get().getTrustedGroup())))
                 .orElse(false);
+        log.debug("Is admin: {}, is trusted: {}", isInServerAdminGroup, isInServerTrustedGroup);
         if(isInServerAdminGroup || isInServerTrustedGroup) {
             return true;
         }
         // If no special permissions then check if the channel is allowed
         // Allow if no channel is whitelisted
         return Optional.ofNullable(serverConfig.get().getWhitelistedChannels())
-                .map(x -> x.stream().anyMatch(y -> y.trim().equalsIgnoreCase(channel.getName()))).orElse(true);
+                .map(x -> x.stream().anyMatch(y -> y.trim().equalsIgnoreCase(channel.getName()))).orElse(false);
     }
 }
