@@ -20,7 +20,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh './gradlew shadowJar'
+                sh './gradlew shadowJar -x test'
             }
         }
         stage('Test') {
@@ -39,7 +39,7 @@ pipeline {
             }
             steps{
                 script {
-                    def filePath = sh(script: 'ls build/libs/StonksBot*.jar', returnStdout: true)
+                    def filePath = sh(script: 'ls build/libs/StonksBot*-all.jar', returnStdout: true)
                     def remote = [:]
                     remote.name = "stonksbot-instance"
                     remote.host = "172.31.21.76"
