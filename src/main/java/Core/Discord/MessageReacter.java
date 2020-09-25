@@ -22,6 +22,10 @@ public class MessageReacter {
     }
 
     public Optional<Emote> react(MessageReceivedEvent event) {
+        // No reactions to DMs
+        if(event.getChannelType() != ChannelType.TEXT) {
+            return Optional.empty();
+        }
         String serverName = event.getGuild().getName().trim().toLowerCase();
         Optional<ServerConfig> serverConfig = configLoader.getConfig().getServerConfig(serverName);
         if(serverConfig.isEmpty()) {
