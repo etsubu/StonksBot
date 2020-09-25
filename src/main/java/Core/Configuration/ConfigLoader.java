@@ -9,6 +9,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
@@ -18,17 +19,22 @@ import java.util.Optional;
 public class ConfigLoader {
     private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
     private Config config;
-    private final String configFileName = "config.yaml";
+    private Path configFile;
     private Instant lastModified;
 
     public ConfigLoader() {
+        this(Paths.get("config.yaml"));
+    }
+
+    public ConfigLoader(Path path) {
+        this.configFile = path;
         loadConfigs();
     }
 
     private void loadConfigs() {
         Yaml yaml = new Yaml(new Constructor(Config.class));
         try {
-            config = yaml.load(Files.readString(Paths.get("config.yaml")));
+            config = yaml.load(Files.readString(configFile));
             log.info("Configs loaded");
         } catch (IOException e) {
             log.error("Failed to load configuration");
@@ -40,7 +46,7 @@ public class ConfigLoader {
 
     public Config getConfig() {
         try {
-            FileTime time = Files.getLastModifiedTime(Paths.get(configFileName));
+            FileTime time = Files.getLastModifiedTime(configFile);
             if(time.toInstant().isAfter(lastModified)) {
                 log.info("Changes in config files, reloading.");
                 loadConfigs();
