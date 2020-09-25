@@ -1,0 +1,13 @@
+# Example configuration file which is also used for testing
+oauth: test_oauth
+globalAdmins:
+  - nagrodus
+servers:
+  - name: test_server
+    whitelistedChannels:
+      - whitelisted_channel
+    reactions:
+      - message: .*test.*
+        react: testReaction
+    adminGroup: some_admin_group
+    trustedGroup: some_trusted_group
