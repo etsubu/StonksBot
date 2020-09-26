@@ -10,6 +10,11 @@ pipeline {
 
     options { buildDiscarder(logRotator(numToKeepStr: '5')) }
 
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('AWS_CREDENTIAL_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_CREDENTIAL_SECRET')
+    }
+
     stages {
         stage("Presteps") {
             steps {
@@ -20,7 +25,7 @@ pipeline {
         }
         stage('Build') {
             steps {
-                sh './gradlew shadowJar'
+                sh './gradlew shadowJar -x test'
             }
         }
         stage('Test') {
@@ -39,10 +44,10 @@ pipeline {
             }
             steps{
                 script {
-                    def filePath = sh(script: 'ls build/libs/StonksBot*.jar', returnStdout: true)
+                    def filePath = sh(script: 'ls build/libs/StonksBot*-all.jar', returnStdout: true)
                     def remote = [:]
                     remote.name = "stonksbot-instance"
-                    remote.host = "172.31.21.76"
+                    remote.host = sh(script: "aws ec2 describe-instances --filters Name=tag-value,Values=stonksbot --query 'Reservations[*].Instances[*].{ip:PrivateIpAddress}' --output text", returnStdout: true)
                     remote.allowAnyHosts = true
                     withCredentials([sshUserPrivateKey(credentialsId: 'bot-instance-key', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
                         remote.user = userName
