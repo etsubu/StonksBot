@@ -2,16 +2,24 @@ package Core.YahooAPI;
 
 import Core.YahooAPI.DataStructures.AssetPriceIntraInfo;
 import Core.YahooAPI.DataStructures.DataResponse;
+import Core.YahooAPI.DataStructures.DataValue;
+import Core.YahooAPI.DataStructures.FundamentalTimeSeries.FundaValue;
+import Core.YahooAPI.DataStructures.FundamentalTimeSeries.FundamentEntry;
 import Core.YahooAPI.DataStructures.GeneralResponse;
 import Core.YahooAPI.DataStructures.PriceChart.PriceMeta.ChartResult;
 import Core.YahooAPI.DataStructures.SearchStructures.SearchResponse;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.BarSeries;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -19,6 +27,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -27,7 +39,7 @@ public class YahooConnectorImpl implements YahooConnector{
     private static final String FUNDAMENT_BASE_URL = "https://query%d.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=%s";
     private static final String PRICE_BASE_URL = "https://query%d.finance.yahoo.com/v8/finance/chart/%s?interval=1d&range=2d";
     private static final String SEARCH_BASE_URL = "https://query%d.finance.yahoo.com/v1/finance/search?q=%s&quotesCount=1&enableFuzzyQuery=false&quotesQueryId=tss_match_phrase_query";
-    private static final String FUNDAMENTAL_TIME_SERIES = "https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/JPM?region=US&symbol=JPM&padTimeSeries=true&type=trailingFreeCashFlow%2CtrailingMarketCap&period1=0&period2=%d";
+    private static final String FUNDAMENTAL_TIMESERIES_URL = "https://query%d.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/%s?&type=%s&period1=0&period2=%d";
     public static final String DEFAULT_STATISTICS = "defaultKeyStatistics";
     public static final String CALENDAR_EVENTS = "calendarEvents";
     public static final String TRAILING_FREE_CASH_FLOW = "trailingFreeCashFlow";
@@ -110,5 +122,49 @@ public class YahooConnectorImpl implements YahooConnector{
         String modules = String.join("%2C", typeList);
         String requestUrl = String.format(FUNDAMENT_BASE_URL, getLoadBalanceIndex(), URLEncoder.encode(ticker.getTicker(), StandardCharsets.UTF_8), modules);
         return requestHttp(requestUrl).map(x -> GeneralResponse.parseResponse(x, ticker));
+    }
+
+    private Map<String, FundamentEntry> parseFundamentalTimeSeries(String json) throws IllegalArgumentException{
+        JSONObject root = new JSONObject(json);
+        root = root.getJSONObject("timeseries");
+        if(root.get("error") != null && !root.get("error").toString().equalsIgnoreCase("null")) {
+            log.error("Received error from yahoo finance rest api '{}', {}", root.get("error").toString(), json);
+            throw new IllegalArgumentException("Yahoo finance returned error " + root.get("error").toString());
+        }
+        JSONArray result = root.getJSONArray("result");
+        Map<String, FundamentEntry> fundamentEntryMap = new HashMap<>();
+        for(int i = 0; i < result.length(); i++) {
+            JSONObject jsonEntry = result.getJSONObject(i);
+            FundamentEntry entry = gson.fromJson(jsonEntry.toString(), FundamentEntry.class);
+            Optional<String> type = entry.getMeta().getType();
+            if(type.isEmpty()) {
+                log.info("Type was not available");
+                continue;
+            }
+            log.info("Parsed type {}", type.get());
+            try {
+                JSONArray timeseries = jsonEntry.getJSONArray(type.get());
+                Type valueEntryList = new TypeToken<ArrayList<FundaValue>>() {}.getType();
+                // Set the value entry list manually
+                entry.setValue(gson.fromJson(timeseries.toString(), valueEntryList));
+                fundamentEntryMap.put(type.get(), entry);
+            } catch (JSONException e) {
+                log.info("No entries for type {}", type);
+            }
+        }
+        return fundamentEntryMap;
+    }
+
+    public Map<String, FundamentEntry> queryFundamentTimeSeries(String keyword, String... fundaments) throws IOException, InterruptedException {
+        StockName name = findTicker(keyword)
+                .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
+        String types = String.join("%2C", fundaments);
+        String url = String.format(FUNDAMENTAL_TIMESERIES_URL, getLoadBalanceIndex(), name.getTicker(), types, Instant.now().getEpochSecond());
+        Optional<String> response = requestHttp(url);
+        if(response.isEmpty()) {
+            log.error("No fundamental data for {}", name.getTicker());
+            return new HashMap<>();
+        }
+        return parseFundamentalTimeSeries(response.get());
     }
 }

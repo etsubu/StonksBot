@@ -21,19 +21,49 @@ You need to have Java 11 JDK installed on your system to run and compile the app
 ```
 git clone git@github.com:etsubu/StonksBot.git
 cd StonksBot
-./gradlew clean build
+./gradlew shadowJar
 ```
 
-The application .jar file will be located in build/libs/
+The application .jar file will be located in build/libs/ with -all.jar suffix
+
+For example build/libs/StonksBot-1.0-SNAPSHOT-all.jar
 
 ## Configuration
 
 StonksBot requires you to provide discord oauth key in the configuration file. 
 Place config.yaml file in the same directory with the .jar file and place the oauth key in there. 
+About the available configs:
+* globalAdmins:
+  * This list of user names defines admin users across all servers, the bot does not check server specific
+     permissions for these users and allows them to send DM messages and commands as well
+* servers:
+  * This list contains separate configurations for different servers where the bot has joined
+  * whitelistedChannels:
+    * This list defines what channels users can use for running commands with the bot
+  * reactions:
+    * This list contains regex patterns which are compared to all messages sent in the server and if matched the bot will
+    add a reaction to that message
+  * adminGroup:
+    * This list defines server specific admins which can bypass the whitelistedChannels restriction
+  * trustedGroup:
+    * Less permissive version of the adminGroup allows to bypass whitelistedChannels restriction
+    
 Example: 
 
 ```
-oauth: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+# Example configuration file which is also used for testing
+oauth: AAAAAAAAAAAAAAAAAAAAAAAAAAA
+globalAdmins:
+  - nagrodus
+servers:
+  - name: NagrodusDev
+    whitelistedChannels:
+      - bot-kyselyt
+    reactions:
+      - message: .*test.*
+        react: STONKS
+    adminGroup: admin
+    trustedGroup: trusted
 ```
 
 ## Contributing

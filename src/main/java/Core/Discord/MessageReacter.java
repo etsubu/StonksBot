@@ -33,12 +33,14 @@ public class MessageReacter {
             return Optional.empty();
         }
         List<Reaction> reactions = serverConfig.get().getReactions();
-        for(Reaction reaction : reactions) {
-            if(reaction.getPattern().matcher(event.getMessage().getContentDisplay().toLowerCase()).matches()) {
-                log.info("Matched message {} with emote {}", event.getMessage().getContentDisplay(), reaction.getReact());
-                List<Emote> emotes = event.getGuild().getEmotesByName(reaction.getReact(), true);
-                if(emotes.size() >= 1) {
-                    return Optional.of(emotes.get(0));
+        if(reactions != null) {
+            for (Reaction reaction : reactions) {
+                if (reaction.getPattern().matcher(event.getMessage().getContentDisplay().toLowerCase()).matches()) {
+                    log.info("Matched message {} with emote {}", event.getMessage().getContentDisplay(), reaction.getReact());
+                    List<Emote> emotes = event.getGuild().getEmotesByName(reaction.getReact(), true);
+                    if (emotes.size() >= 1) {
+                        return Optional.of(emotes.get(0));
+                    }
                 }
             }
         }
