@@ -25,7 +25,6 @@ dependencies {
     implementation 'org.springframework:spring-core:5.2.8.RELEASE'
     implementation 'org.springframework:spring-beans:5.2.8.RELEASE'
     implementation 'org.springframework:spring-context:5.2.8.RELEASE'
-    implementation 'org.xerial:sqlite-jdbc:3.32.3.2'
     implementation 'org.yaml:snakeyaml:1.26'
     implementation 'org.ta4j:ta4j-core:0.13'
     implementation 'com.google.code.gson:gson:2.8.6'

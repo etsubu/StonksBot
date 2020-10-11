@@ -41,7 +41,9 @@ public class ConfigLoader {
             throw new RuntimeException("Could not load configuration file");
         }
         lastModified = Instant.now();
-        config.getServers().forEach(x -> Optional.ofNullable(x.getReactions()).ifPresent(y -> y.forEach(Reaction::buildPattern)));
+        Optional.ofNullable(config.getServers()).ifPresent(x -> {
+            x.forEach(y -> Optional.ofNullable(y.getReactions()).ifPresent(z -> z.forEach(Reaction::buildPattern)));
+        });
     }
 
     public Config getConfig() {
