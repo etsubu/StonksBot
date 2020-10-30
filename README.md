@@ -10,6 +10,7 @@ StonksBot is a discord bot developed for a private server with features includin
     * [Configuration](#Configuration)
   * [Contributing](#Contributing)
   * [Commands](#Commands)
+  * [Search](#Search)
 
 ## Installation
 
@@ -213,3 +214,16 @@ means that you can either use the stock ticker for searching or the prefix of th
               Mansikkarahkaa (A ,G ,L)
           ```
         
+## Search
+
+The commands are able to fetch stock data by either their name, ticker or ISIN code, the search functionality uses 
+yahoo finance's search API with exception being !recommendation command which uses inderes API.
+Using ticker or ISIN is the most precise way to define what stock should be queried but using prefix of the name 
+is also supported but the results might be unexpected. 
+
+The bot should prefer home region stocks in the search results and stocks over other asset types for commands like !stats 
+which cannot be calculated for ETFs and such.
+
+By default OMXH stocks should be preferred and in future this should be configurable in configs.
+Query results are cached in the bot instance so that search keywords can be looked up instantly avoiding 
+the need to run new search query. 
