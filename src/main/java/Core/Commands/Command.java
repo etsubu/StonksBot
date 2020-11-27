@@ -43,6 +43,9 @@ public abstract class Command {
             // Allow global admins to use any command
             return true;
         }
+        if(serverName == null) {
+            return allowByDefault;
+        }
         Optional<ServerConfig> serverConfig = configLoader.getConfig().getServerConfig(serverName);
         if(serverConfig.isPresent()) {
             Optional<Map<String, CommandConfig>> commandConfigs = Optional.ofNullable(serverConfig.get().getCommands());
