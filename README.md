@@ -1,6 +1,7 @@
 # StonksBot
 
-StonksBot is a discord bot developed for a private server with features including fetching stock market data.
+StonksBot is a discord bot developed for community server of investors and traders. 
+The features focus on fetching stock market related data and calculating different key ratios or values.
 
 ## Table of Contents
 
@@ -174,6 +175,24 @@ means that you can either use the stock ticker for searching or the prefix of th
           Nousuvara: -8.84%
           Suositus: vähennä
           ```
+* `!fscore/fluku/f`
+  * Display [Piotroski Score](https://www.investopedia.com/terms/p/piotroski-score.asp), also known as F-score for the given stock.
+  * Example: `!fscore msft`
+       * Example response:
+            ```
+            Microsoft Corporation - MSFT
+            Positive net income: 1
+            Positive operating cash flow: 1
+            Operating cash flow > net income: 1
+            Positive ROA: 1
+            Decrease of long term debt: 1
+            Higher current ratio: 0
+            No new shares issued: 1
+            Higher gross profit margin: 1
+            Higher asset turnover ratio: 0
+            Score: 7
+            Checked criterias: 9
+            ```
 * `!lunch/lounas`
     * This command will display the lunch list for a couple of restaurants at University of Jyväskylä. 
     As mentioned previously, some of the bot's features are really niche. Before 18PM EEST the command 

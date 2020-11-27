@@ -13,7 +13,7 @@ public class FundaValue {
 
     public Optional<String> getDataId() { return Optional.ofNullable(dataId); }
 
-    public Optional<String> getAsOfDate() { return Optional.ofNullable(asOfDate); }
+    public String getAsOfDate() { return asOfDate; }
 
     public Optional<String> getPeriodType() { return Optional.ofNullable(periodType); }
 
