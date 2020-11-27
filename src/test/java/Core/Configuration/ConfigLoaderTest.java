@@ -48,5 +48,13 @@ public class ConfigLoaderTest {
         Reaction r = testServer.get().getReactions().get(0);
         assertEquals(".*test.*", r.getMessage());
         assertEquals("testReaction", r.getReact());
+        // Verify command permissions
+        assertNotNull(serverConfigList.get(0).getCommands());
+        assertTrue(serverConfigList.get(0).getCommands().containsKey("fscore"));
+        CommandConfig fscoreConfig = serverConfigList.get(0).getCommands().get("fscore");
+        assertNotNull(fscoreConfig.getAllowedGroups());
+        assertEquals(2, fscoreConfig.getAllowedGroups().size());
+        assertTrue(fscoreConfig.getAllowedGroups().contains("test_group"));
+        assertTrue(fscoreConfig.getAllowedGroups().contains("test_group2"));
     }
 }

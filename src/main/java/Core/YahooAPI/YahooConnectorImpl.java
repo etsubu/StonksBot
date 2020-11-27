@@ -1,5 +1,6 @@
 package Core.YahooAPI;
 
+import Core.Utilities.Pair;
 import Core.YahooAPI.DataStructures.AssetPriceIntraInfo;
 import Core.YahooAPI.DataStructures.DataResponse;
 import Core.YahooAPI.DataStructures.DataValue;
@@ -28,10 +29,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 public class YahooConnectorImpl implements YahooConnector{
@@ -147,6 +145,7 @@ public class YahooConnectorImpl implements YahooConnector{
                 Type valueEntryList = new TypeToken<ArrayList<FundaValue>>() {}.getType();
                 // Set the value entry list manually
                 entry.setValue(gson.fromJson(timeseries.toString(), valueEntryList));
+                entry.getValue().sort(Comparator.comparing(FundaValue::getAsOfDate).reversed());
                 fundamentEntryMap.put(type.get(), entry);
             } catch (JSONException e) {
                 log.info("No entries for type {}", type);
@@ -166,5 +165,18 @@ public class YahooConnectorImpl implements YahooConnector{
             return new HashMap<>();
         }
         return parseFundamentalTimeSeries(response.get());
+    }
+
+    public Pair<StockName, Map<String, FundamentEntry>> queryFundamentTimeSeries(String keyword, List<String> fundaments) throws IOException, InterruptedException {
+        StockName name = findTicker(keyword)
+                .orElseThrow(() -> new IOException("Could not find any assets with keyword " + keyword));
+        String types = String.join("%2C", fundaments);
+        String url = String.format(FUNDAMENTAL_TIMESERIES_URL, getLoadBalanceIndex(), name.getTicker(), types, Instant.now().getEpochSecond());
+        Optional<String> response = requestHttp(url);
+        if(response.isEmpty()) {
+            log.error("No fundamental data for {}", name.getTicker());
+            return new Pair<>(name, new HashMap<>());
+        }
+        return new Pair<>(name, parseFundamentalTimeSeries(response.get()));
     }
 }

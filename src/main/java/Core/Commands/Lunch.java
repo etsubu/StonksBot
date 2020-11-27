@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.Lunch.LunchMenu;
 import Core.Lunch.LunchQuery;
 import Core.Lunch.MealComponents;
@@ -20,8 +21,8 @@ public class Lunch extends Command{
     private static final ZoneId TIMEZONE = ZoneId.of("Europe/Helsinki");
     private final LunchQuery query;
 
-    public Lunch() {
-        super(List.of("lunch", "lounas"));
+    public Lunch(ConfigLoader configLoader) {
+        super(List.of("lunch", "lounas"), configLoader, true);
         // Temporary hard coding. Moving this to config file later
         this.query = new LunchQuery();
     }
@@ -51,7 +52,7 @@ public class Lunch extends Command{
         return builder.toString();
     }
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         log.info("Executing " + command);
         try {
             List<LunchMenu> lunches = query.queryLunchList();

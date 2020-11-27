@@ -1,14 +1,13 @@
 package Core.Commands;
 
 import Core.YahooAPI.YahooConnectorImpl;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Contains all the executable commands and handles execution of those commands on demand
@@ -58,10 +57,11 @@ public class CommandHandler {
     
     /**
      * Parses the command name and executes the corresponding command object
-     * @param command Command the user typed
+     * @param event MessageReceivedEvent that was sent by user
      * @return CommandResult of the command object
      */
-    public CommandResult execute(String command) {
+    public CommandResult execute(MessageReceivedEvent event) {
+        String command = event.getMessage().getContentDisplay();
         if(!command.startsWith(COMMAND_PREFIX) || command.length() == COMMAND_PREFIX.length()) {
             return new CommandResult("Command did not start with prefix '" + COMMAND_PREFIX + "'", false);
         }
@@ -73,8 +73,11 @@ public class CommandHandler {
             log.info("Failed to find command for user input: " + command.replaceAll("\n", ""));
             return new CommandResult("Unknown command!", false);
         }
+        User user = event.getAuthor();
+        String serverName = event.getGuild().getName().trim().toLowerCase();
+        Optional<List<Role>> userRoles = Optional.ofNullable(event.getMember()).map(Member::getRoles);
         if(index < command.length() - 1)
-            return cmd.execute(command.substring(index + 1));
-        return cmd.execute("");
+            return cmd.execute(command.substring(index + 1), user.getName(), userRoles.orElse(new LinkedList<>()), serverName);
+        return cmd.execute("", user.getName(), userRoles.orElse(new LinkedList<>()), serverName);
     }
 }

@@ -50,13 +50,13 @@ public class EventCore extends ListenerAdapter
         }
         reacter.react(event).ifPresent(x -> event.getMessage().addReaction(x).queue());
 
-        if (this.commandHandler.isCommand(event.getMessage().getContentDisplay())) {
+        if (this.commandHandler.isCommand(event.getMessage().getContentDisplay()) && event.getMessage().getContentDisplay().length() > 1) {
             if(!permissionManager.isReplyAllowed(event)) {
                 log.info("Prevented reply for {}  on channel {}", event.getAuthor().getName(), event.getChannel().getName());
                 event.getChannel().sendMessage("Please use whitelisted channel for performing commands").queue();
                 return;
             }
-        	CommandResult result = commandHandler.execute(event.getMessage().getContentDisplay());
+        	CommandResult result = commandHandler.execute(event);
             event.getChannel().sendMessage(result.getResponse()).queue();
         	if(result.getSucceeded()) {
         	    log.info("Successfully executed user command: {}", event.getMessage().getContentDisplay().replaceAll("\n", ""));
