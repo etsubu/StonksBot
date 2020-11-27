@@ -30,7 +30,7 @@ public class HelpCommand extends Command implements ApplicationContextAware {
             return new CommandResult("Still initializing commands, try again in a bit", true);
         }
         try {
-            if(!command.contains(" ")) {
+            if(command == null || command.isEmpty() || command.isBlank()) {
                 return new CommandResult(help(), false);
             }
             CommandHandler commandHandler = applicationContext.getBean(CommandHandler.class);
