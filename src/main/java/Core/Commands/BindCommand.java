@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.YahooAPI.StockName;
 import Core.YahooAPI.TickerStorage;
 import Core.YahooAPI.YahooConnectorImpl;
@@ -17,15 +18,15 @@ public class BindCommand extends Command {
     private final YahooConnectorImpl yahooConnector;
     private final TickerStorage storage;
 
-    public BindCommand(YahooConnectorImpl yahooConnector, TickerStorage storage) {
-        super(List.of("bind", "sido"));
+    public BindCommand(YahooConnectorImpl yahooConnector, TickerStorage storage, ConfigLoader configLoader) {
+        super(List.of("bind", "sido"), configLoader, false);
         this.yahooConnector = yahooConnector;
         this.storage = storage;
         log.info("Bind command initialized");
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         String[] parts = command.split(" ");
         if(parts.length < 2) {
             return new CommandResult("You need to provide ticker and keyword for the command. See !help bind for more info", false);

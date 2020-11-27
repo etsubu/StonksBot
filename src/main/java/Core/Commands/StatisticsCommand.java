@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.Utilities.DoubleTools;
 import Core.YahooAPI.DataStructures.DataResponse;
 import Core.YahooAPI.DataStructures.DefaultKeyStatistics;
@@ -20,8 +21,8 @@ public class StatisticsCommand extends Command{
     /**
      * Initializes Command
      */
-    public StatisticsCommand(YahooConnectorImpl yahooConnector) {
-        super(List.of("stats", "tilastot", "s"));
+    public StatisticsCommand(YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+        super(List.of("stats", "tilastot", "s"), configLoader, true);
         this.yahooConnector = yahooConnector;
     }
 
@@ -48,7 +49,7 @@ public class StatisticsCommand extends Command{
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         log.info("Requesting statistics for {}", command);
         try {
             Optional<DataResponse> response = yahooConnector.queryData(command, YahooConnectorImpl.DEFAULT_STATISTICS);

@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.Utilities.DoubleTools;
 import Core.YahooAPI.DataStructures.DataValue;
 import Core.YahooAPI.DataStructures.FundamentalTimeSeries.FundamentEntry;
@@ -23,8 +24,8 @@ public class RatiosCommand extends Command {
 
     private final YahooConnectorImpl yahooConnector;
 
-    public RatiosCommand(YahooConnectorImpl yahooConnector) {
-        super("ratios");
+    public RatiosCommand(YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+        super("ratios", configLoader, true);
         this.yahooConnector = yahooConnector;
     }
 
@@ -47,7 +48,7 @@ public class RatiosCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         log.info("Requesting statistics for {}", command);
         try {
             Map<String, FundamentEntry> response = yahooConnector.queryFundamentTimeSeries(command, ENTERPRISE_VALUE, PRICE_TO_SALES, EBIT, FREE_CASH_FLOW, EBITDA);

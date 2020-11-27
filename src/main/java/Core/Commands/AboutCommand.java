@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.Utilities.ArchiveTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,8 +16,8 @@ public class AboutCommand extends Command {
     /**
      * Initializes the author command
      */
-    public AboutCommand() {
-        super(List.of("about", "tietoja"));
+    public AboutCommand(ConfigLoader configLoader) {
+        super(List.of("about", "tietoja"), configLoader, true);
         result = new CommandResult("StonksBot - " + ArchiveTools.getApplicationVersion().orElse("Unknown version") +
                 "\nAuthor Jarre Leskinen"
                 + "\nSource code and documentation: https://github.com/etsubu/StonksBot", true);
@@ -24,7 +25,7 @@ public class AboutCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         return result;
     }
 

@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.InderesAPI.DataStructures.RecommendationEntry;
 import Core.InderesAPI.InderesConnector;
 import Core.Utilities.DoubleTools;
@@ -20,8 +21,8 @@ public class RecommendationCommand extends Command {
     private final InderesConnector inderesConnector;
     private final YahooConnectorImpl yahooConnector;
 
-    public RecommendationCommand(InderesConnector inderesConnector, YahooConnectorImpl yahooConnector) {
-        super(List.of("suositus", "recommendation"));
+    public RecommendationCommand(InderesConnector inderesConnector, YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+        super(List.of("suositus", "recommendation"), configLoader, true);
         this.inderesConnector = inderesConnector;
         this.yahooConnector = yahooConnector;
     }
@@ -58,7 +59,7 @@ public class RecommendationCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         if(command.isEmpty()) {
             return new CommandResult("You must provide OMXH/first north stock name that inderes follows", false);
         }

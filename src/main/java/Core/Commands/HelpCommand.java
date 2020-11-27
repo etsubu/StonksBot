@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,17 +19,20 @@ public class HelpCommand extends Command implements ApplicationContextAware {
     /**
      * Initializes Help command
      */
-    public HelpCommand() {
-        super(List.of("help", "apua"));
+    public HelpCommand(ConfigLoader configLoader) {
+        super(List.of("help", "apua"), configLoader, true);
         log.info("Constructed Help bean");
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         if(applicationContext == null) {
             return new CommandResult("Still initializing commands, try again in a bit", true);
         }
         try {
+            if(!command.contains(" ")) {
+                return new CommandResult(help(), false);
+            }
             CommandHandler commandHandler = applicationContext.getBean(CommandHandler.class);
             return commandHandler.getCommand(command.toLowerCase())
                     .map(x -> new CommandResult(x.help(), true))

@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.Utilities.Pair;
 import Core.YahooAPI.DataStructures.DataValue;
 import Core.YahooAPI.DataStructures.FundamentalTimeSeries.FundaValue;
@@ -49,8 +50,8 @@ public class FscoreCommand extends Command{
 
     private final YahooConnectorImpl yahooConnector;
 
-    public FscoreCommand(YahooConnectorImpl yahooConnector) {
-        super(List.of("fscore", "fluku", "f"));
+    public FscoreCommand(YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+        super(List.of("fscore", "fluku", "f"), configLoader, false);
         this.yahooConnector = yahooConnector;
         log.info("Initialized f-score command");
     }
@@ -233,7 +234,7 @@ public class FscoreCommand extends Command{
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         log.info("Requesting statistics for {}", command);
         try {
             Pair<StockName, Map<String, FundamentEntry>> response = yahooConnector.queryFundamentTimeSeries(command, SCORE_COMPONENTS);

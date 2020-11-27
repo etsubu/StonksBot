@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.YahooAPI.DataStructures.AssetPriceIntraInfo;
 import Core.YahooAPI.YahooConnectorImpl;
 import org.slf4j.Logger;
@@ -25,14 +26,14 @@ public class Price extends Command {
      * Initializes Price
      * @param api AlphaVantageConnector for querying information
      */
-    public Price(YahooConnectorImpl api) {
-        super(List.of("price", "hinta", "p"));
+    public Price(YahooConnectorImpl api, ConfigLoader configLoader) {
+        super(List.of("price", "hinta", "p"), configLoader, true);
         this.api = api;
         log.info("Initialized price command");
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         log.info("Querying asset with: " + command);
         try {
             Optional<AssetPriceIntraInfo> info = api.queryCurrentIntraPriceInfo(command);

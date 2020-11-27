@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import Core.Utilities.DoubleTools;
 import Core.Utilities.TimeUtils;
 import Core.YahooAPI.DataStructures.CalendarEarnings;
@@ -22,8 +23,8 @@ public class CalendarCommand extends Command {
     /**
      * Initializes Command
      */
-    public CalendarCommand(YahooConnectorImpl yahooConnector) {
-        super(List.of("calendar", "kalenteri", "c"));
+    public CalendarCommand(YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+        super(List.of("calendar", "kalenteri", "c"), configLoader, true);
         this.yahooConnector = yahooConnector;
         log.info("Initialized calendar command");
     }
@@ -49,7 +50,7 @@ public class CalendarCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         try {
             Optional<DataResponse> response = yahooConnector.queryData(command, YahooConnectorImpl.CALENDAR_EVENTS);
             if(response.isPresent() && response.get().getCalendarEvents().isPresent()) {

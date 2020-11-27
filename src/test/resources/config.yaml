@@ -9,5 +9,10 @@ servers:
     reactions:
       - message: .*test.*
         react: testReaction
+    commands:
+      fscore:
+        allowedGroups:
+          - test_group
+          - test_group2
     adminGroup: some_admin_group
     trustedGroup: some_trusted_group

@@ -1,5 +1,6 @@
 package Core.Commands;
 
+import Core.Configuration.ConfigLoader;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -16,12 +17,12 @@ public class ListCommand extends Command implements ApplicationContextAware {
     /**
      * Initializes Command
      */
-    public ListCommand() {
-        super(List.of("commands", "komennot"));
+    public ListCommand(ConfigLoader configLoader) {
+        super(List.of("commands", "komennot"), configLoader, true);
     }
 
     @Override
-    public CommandResult execute(String command) {
+    public CommandResult exec(String command) {
         if(applicationContext == null) {
             return new CommandResult("Not yet initialized, wait a moment and try again", true);
         }
