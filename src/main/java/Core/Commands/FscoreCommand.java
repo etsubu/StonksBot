@@ -134,7 +134,7 @@ public class FscoreCommand extends Command{
         }
         if(quarterlyLongTermDebt.isPresent() && quarterlyLongTermDebt.get().getValue() != null && quarterlyLongTermDebt.get().getValue().size() >= 4) {
             Optional<DataValue> currentValue = quarterlyLongTermDebt.get().getValue().get(0).getReportedValue();
-            Optional<DataValue> previousValue = quarterlyLongTermDebt.get().getValue().get(3).getReportedValue();
+            Optional<DataValue> previousValue = quarterlyLongTermDebt.get().getValue().get(4).getReportedValue();
             if(currentValue.isPresent() && previousValue.isPresent()) {
                 Num currentDebt = PrecisionNum.valueOf(currentValue.get().getRaw());
                 Num previousDebt = PrecisionNum.valueOf(previousValue.get().getRaw());
@@ -165,9 +165,9 @@ public class FscoreCommand extends Command{
                 && Optional.ofNullable(quarterlyCurrentAssets.get().getValue()).map(x -> x.size() >= 4).orElse(false)
                 && Optional.ofNullable(quarterlyCurrentLiabilities.get().getValue()).map(x -> x.size() >= 4).orElse(false)) {
             Optional<DataValue> currentAssets = quarterlyCurrentAssets.get().getValue().get(0).getReportedValue();
-            Optional<DataValue> previousAssets = quarterlyCurrentAssets.get().getValue().get(3).getReportedValue();
+            Optional<DataValue> previousAssets = quarterlyCurrentAssets.get().getValue().get(4).getReportedValue();
             Optional<DataValue> currentLiabilities = quarterlyCurrentLiabilities.get().getValue().get(0).getReportedValue();
-            Optional<DataValue> previousLiabilities = quarterlyCurrentLiabilities.get().getValue().get(3).getReportedValue();
+            Optional<DataValue> previousLiabilities = quarterlyCurrentLiabilities.get().getValue().get(4).getReportedValue();
             if(currentAssets.isPresent() && previousAssets.isPresent() && currentLiabilities.isPresent() && previousLiabilities.isPresent()) {
                 Num previousCurrentRatio = PrecisionNum.valueOf(previousAssets.get().getRaw()).dividedBy(PrecisionNum.valueOf(previousLiabilities.get().getRaw()));
                 Num currentCurrentRatio = PrecisionNum.valueOf(previousAssets.get().getRaw()).dividedBy(PrecisionNum.valueOf(previousLiabilities.get().getRaw()));
@@ -183,7 +183,7 @@ public class FscoreCommand extends Command{
         }
         if(quarterlyShareIssued.isPresent() && quarterlyShareIssued.get().getValue() != null && quarterlyShareIssued.get().getValue().size() >= 4) {
             Optional<DataValue> currentSharesIssued = quarterlyShareIssued.get().getValue().get(0).getReportedValue();
-            Optional<DataValue> previousSharesIssued = quarterlyShareIssued.get().getValue().get(3).getReportedValue();
+            Optional<DataValue> previousSharesIssued = quarterlyShareIssued.get().getValue().get(4).getReportedValue();
             if(currentSharesIssued.isPresent() && previousSharesIssued.isPresent()) {
                 total++;
                 if(PrecisionNum.valueOf(currentSharesIssued.get().getRaw()).isLessThanOrEqual(PrecisionNum.valueOf(previousSharesIssued.get().getRaw()))) {
@@ -215,9 +215,9 @@ public class FscoreCommand extends Command{
         if(quarterlyTotalRevenue.isPresent() && quarterlyTotalRevenue.get().getValue() != null && quarterlyTotalRevenue.get().getValue().size() >= 4
                 && quarterlyTotalAssets.isPresent() && quarterlyTotalAssets.get().getValue() != null && quarterlyTotalAssets.get().getValue().size() >= 4) {
             Optional<DataValue> currentTotalRevenue = quarterlyTotalRevenue.get().getValue().get(0).getReportedValue();
-            Optional<DataValue> previousTotalRevenue = quarterlyTotalRevenue.get().getValue().get(3).getReportedValue();
+            Optional<DataValue> previousTotalRevenue = quarterlyTotalRevenue.get().getValue().get(4).getReportedValue();
             Optional<DataValue> currentTotalAssets = quarterlyTotalAssets.get().getValue().get(0).getReportedValue();
-            Optional<DataValue> previousTotalAssets = quarterlyTotalAssets.get().getValue().get(3).getReportedValue();
+            Optional<DataValue> previousTotalAssets = quarterlyTotalAssets.get().getValue().get(4).getReportedValue();
             if(currentTotalRevenue.isPresent() && previousTotalRevenue.isPresent() && currentTotalAssets.isPresent() && previousTotalAssets.isPresent()) {
                 Num currentAssetTurnover = PrecisionNum.valueOf(currentTotalRevenue.get().getRaw()).dividedBy(PrecisionNum.valueOf(currentTotalAssets.get().getRaw()));
                 Num previousAssetTurnover = PrecisionNum.valueOf(previousTotalRevenue.get().getRaw()).dividedBy(PrecisionNum.valueOf(previousTotalAssets.get().getRaw()));
