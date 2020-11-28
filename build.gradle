@@ -1,8 +1,10 @@
 plugins {
-    id "io.freefair.lombok" version "5.1.1"
-    id "org.owasp.dependencycheck" version "5.3.2.1"
-    id "com.github.spotbugs" version "4.5.0"
-    id "com.github.johnrengelman.shadow" version "6.0.0"
+    id "io.freefair.lombok" version "5.3.0"
+    id "org.owasp.dependencycheck" version "6.0.3"
+    id "com.github.spotbugs" version "4.6.0"
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+    id "com.github.ben-manes.versions" version "0.36.0"
+    id 'se.patrikerdes.use-latest-versions' version '0.2.15'
     id "java"
 }
 
@@ -22,24 +24,24 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-core:5.2.8.RELEASE'
-    implementation 'org.springframework:spring-beans:5.2.8.RELEASE'
-    implementation 'org.springframework:spring-context:5.2.8.RELEASE'
-    implementation 'org.yaml:snakeyaml:1.26'
+    implementation 'org.springframework:spring-core:5.3.1'
+    implementation 'org.springframework:spring-beans:5.3.1'
+    implementation 'org.springframework:spring-context:5.3.1'
+    implementation 'org.yaml:snakeyaml:1.27'
     implementation 'org.ta4j:ta4j-core:0.13'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'org.json:json:20200518'
-    implementation ('net.dv8tion:JDA:4.2.0_194') {
+    implementation 'org.json:json:20201115'
+    implementation ('net.dv8tion:JDA:4.2.0_222') {
         exclude module: 'opus-java'
     }
-    implementation 'org.slf4j:slf4j-api:1.7.30'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.13.3'
-    implementation 'org.apache.logging.log4j:log4j-core:2.13.3'
-    implementation 'org.apache.logging.log4j:log4j-api:2.13.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
-    testImplementation 'org.mockito:mockito-core:3.5.5'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.5.5'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.14.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation 'org.mockito:mockito-core:3.6.28'
+    testImplementation 'org.mockito:mockito-junit-jupiter:3.6.28'
 }
 
 group = 'org.stonksbot'
