@@ -50,6 +50,9 @@ public class StatisticsCommand extends Command{
 
     @Override
     public CommandResult exec(String command) {
+        if(command.isBlank()) {
+            return new CommandResult("You need to specify stock name to query, see !help price", false);
+        }
         log.info("Requesting statistics for {}", command);
         try {
             Optional<DataResponse> response = yahooConnector.queryData(command, YahooConnectorImpl.DEFAULT_STATISTICS);

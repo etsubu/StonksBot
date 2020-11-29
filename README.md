@@ -160,6 +160,18 @@ means that you can either use the stock ticker for searching or the prefix of th
           Held by institutions: 74.09%
           52 week price change: 57.27%
           ```
+* `!ratios/suhdeluvut/r`
+   * Display key ratios about liquidity and value of the requested stock
+   * Example: `!ratios msft`
+       * Example response:
+          ```
+         Microsoft Corporation - MSFT
+         Current ratio: 2.53
+         ROA: 15.78%
+         FCF yield: 33.05 / 3.03%
+         Gross Profit Margin: 68.27%
+         P/S: 11.21
+         ```
 * `!suositus/recommendation`
    * Displays price target and recommendation for the given stock by [Inderes](https://www.inderes.fi/). 
    Note that the stock needs to be followed by inderes so stocks that are not listed in OMXH or First North 

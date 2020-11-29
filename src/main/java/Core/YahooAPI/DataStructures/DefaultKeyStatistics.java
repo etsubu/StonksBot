@@ -109,8 +109,8 @@ public class DefaultKeyStatistics {
         try {
             BigDecimal fEps = new BigDecimal(forwardEps.getRaw());
             BigDecimal tEps = new BigDecimal(trailingEps.getRaw());
-            // Let's not divide by zero
-            if(tEps.compareTo(BigDecimal.ZERO) == 0) {
+            // Let's not divide by zero or negative numbers (misleading)
+            if(tEps.compareTo(BigDecimal.ZERO) <= 0) {
                 return Optional.empty();
             }
             BigDecimal forecastedEpsGrowth = (fEps.subtract(tEps)).divide(tEps, 4, RoundingMode.HALF_UP);

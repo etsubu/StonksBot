@@ -4,6 +4,7 @@ import Core.Configuration.CommandConfig;
 import Core.Configuration.Config;
 import Core.Configuration.ConfigLoader;
 import Core.Configuration.ServerConfig;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.dv8tion.jda.api.entities.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,11 +23,11 @@ public class CommandTest {
     private static final String USERNAME = "test_user";
     private static final String SERVER_NAME = "server_name";
     @Mock
+    private Config config;
+    @Mock
     private ConfigLoader configLoader;
     @Mock
     private ServerConfig serverConfig;
-    @Mock
-    private Config config;
     @Mock
     private Role role;
 
@@ -80,6 +81,7 @@ public class CommandTest {
         verify(config, times(2)).getServerConfig("asd");
     }
 
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test
     public void testNoCommandConfigs() {
         when(config.getServerConfig(anyString())).thenReturn(Optional.of(serverConfig));
@@ -95,6 +97,7 @@ public class CommandTest {
         verify(serverConfig, times(2)).getCommands();
     }
 
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test
     public void testCommandNotAllowed() {
         CommandConfig commandConfig = new CommandConfig();
@@ -113,6 +116,7 @@ public class CommandTest {
         verify(serverConfig, times(2)).getCommands();
     }
 
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test
     public void testCommandAllowed() {
         CommandConfig commandConfig = new CommandConfig();
@@ -129,6 +133,7 @@ public class CommandTest {
         verify(role, times(1)).getName();
     }
 
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test
     public void testNoRoles() {
         when(config.getGlobalAdmins()).thenReturn(new LinkedList<>());
