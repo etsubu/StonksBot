@@ -34,6 +34,9 @@ public class Price extends Command {
 
     @Override
     public CommandResult exec(String command) {
+        if(command.isBlank()) {
+            return new CommandResult("You need to specify stock name to query, see !help price", false);
+        }
         log.info("Querying asset with: " + command);
         try {
             Optional<AssetPriceIntraInfo> info = api.queryCurrentIntraPriceInfo(command);

@@ -12,6 +12,10 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Reacts to different messages with emotes in the server based on configuration
+ * @author etsubu
+ */
 @Component
 public class MessageReacter {
     private static final Logger log = LoggerFactory.getLogger(MessageReacter.class);
@@ -21,6 +25,11 @@ public class MessageReacter {
         this.configLoader = configLoader;
     }
 
+    /**
+     * Checks if the sent message should reacted to
+     * @param event Event that was received on server
+     * @return Emote that should be used to react to the message
+     */
     public Optional<Emote> react(MessageReceivedEvent event) {
         // No reactions to DMs
         if(event.getChannelType() != ChannelType.TEXT) {

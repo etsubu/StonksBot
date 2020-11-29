@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
+import java.util.Optional;
 
 /**
  * @author etsubu
@@ -61,8 +62,10 @@ public class EventCore extends ListenerAdapter
         	if(result.getSucceeded()) {
         	    log.info("Successfully executed user command: {}", event.getMessage().getContentDisplay().replaceAll("\n", ""));
             } else {
-        	    log.error("Failed to execute user command: " + result.getResponse() + " - " +
-                        ((result.getException() != null) ? result.getException().getMessage() : ""));
+        	    log.error("Failed to execute user command: " + result.getResponse() + " - "
+                        + Optional.ofNullable(result.getException())
+                        .map(Exception::getMessage)
+                        .orElse(""));
             }
         }
     }

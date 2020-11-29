@@ -1,6 +1,5 @@
 package Core.Commands;
 
-import Core.YahooAPI.YahooConnectorImpl;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
@@ -19,8 +18,7 @@ import java.util.*;
 public class CommandHandler {
     private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
     private final Map<String, Command> commandMap;
-    private final YahooConnectorImpl api;
-    
+
     /**
      * Defines the prefix which a command must begin with
      */
@@ -28,11 +26,9 @@ public class CommandHandler {
     
     /**
      * Initializes CommandHandler
-     * @param api AlphaVantageConnector for searching asset prices
      */
-    public CommandHandler(YahooConnectorImpl api, List<Command> commandList, HelpCommand helpCommand) {
+    public CommandHandler(List<Command> commandList, HelpCommand helpCommand) {
         this.commandMap = new HashMap<>();
-        this.api = api;
         commandList.forEach(x -> x.getNames().forEach(y -> commandMap.put(y, x)));
         helpCommand.getNames().forEach(x -> commandMap.put(x, helpCommand));
         log.info("Initialized command handler");

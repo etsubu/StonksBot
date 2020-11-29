@@ -14,6 +14,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Connector that integrates to Inderes API for fetching different OMXH stock recommendations
+ * @author etsubu
+ */
 @Component
 public class InderesConnectorImpl implements InderesConnector {
     private static final Logger log = LoggerFactory.getLogger(InderesConnectorImpl.class);

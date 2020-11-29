@@ -51,6 +51,9 @@ public class CalendarCommand extends Command {
 
     @Override
     public CommandResult exec(String command) {
+        if(command.isBlank()) {
+            return new CommandResult("You need to specify stock name to query, see !help price", false);
+        }
         try {
             Optional<DataResponse> response = yahooConnector.queryData(command, YahooConnectorImpl.CALENDAR_EVENTS);
             if(response.isPresent() && response.get().getCalendarEvents().isPresent()) {

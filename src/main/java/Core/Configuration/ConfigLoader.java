@@ -1,6 +1,5 @@
 package Core.Configuration;
 
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -19,7 +18,7 @@ import java.util.Optional;
 public class ConfigLoader {
     private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
     private Config config;
-    private Path configFile;
+    private final Path configFile;
     private Instant lastModified;
 
     public ConfigLoader() {
