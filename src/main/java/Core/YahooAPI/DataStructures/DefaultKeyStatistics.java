@@ -103,7 +103,7 @@ public class DefaultKeyStatistics {
     public Optional<String> getEvRevenue() { return getValue(enterpriseToRevenue); }
 
     public Optional<Double> getForecastedEpsChange() {
-        if(getValue(trailingEps).isEmpty() && getValue(forwardEps).isEmpty()) {
+        if(forwardEps.getRaw() == null || trailingEps.getRaw() == null || getValue(trailingEps).isEmpty() && getValue(forwardEps).isEmpty()) {
             return Optional.empty();
         }
         try {
