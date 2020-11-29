@@ -31,18 +31,22 @@ public class CalendarCommand extends Command {
 
     private String buildResponse(CalendarEarnings earnings, StockName name) {
         StringBuilder builder = new StringBuilder();
-        CalendarEvent event = earnings.getEarnings().get();
         builder.append("```");
         builder.append(name.getFullname()).append(" - ").append(name.getTicker()).append('\n');
-        builder.append("Earnings date: ")
-                .append(TimeUtils.formatEpocSeconds(Long.parseLong(event.earningsDate().get().get(0).getRaw())))
-                .append('\n');
-        event.getEarningsAverage().ifPresent(x -> builder.append("Forecast EPS avg: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
-        event.getEarningsHigh().ifPresent(x -> builder.append("Forecast EPS high: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
-        event.getEarningsLow().ifPresent(x -> builder.append("Forecast EPS low: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
-        event.getRevenueAverage().ifPresent(x -> builder.append("Forecast Revenue avg: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
-        event.getRevenueHigh().ifPresent(x -> builder.append("Forecast Revenue high: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
-        event.getRevenueLow().ifPresent(x -> builder.append("Forecast Revenue low: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
+        if(earnings.getEarnings().isPresent()) {
+            CalendarEvent event = earnings.getEarnings().get();
+            if(event.earningsDate().isPresent() && event.earningsDate().get().size() > 0) {
+                builder.append("Earnings date: ")
+                        .append(TimeUtils.formatEpocSeconds(Long.parseLong(event.earningsDate().get().get(0).getRaw())))
+                        .append('\n');
+            }
+            event.getEarningsAverage().ifPresent(x -> builder.append("Forecast EPS avg: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
+            event.getEarningsHigh().ifPresent(x -> builder.append("Forecast EPS high: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
+            event.getEarningsLow().ifPresent(x -> builder.append("Forecast EPS low: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
+            event.getRevenueAverage().ifPresent(x -> builder.append("Forecast Revenue avg: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
+            event.getRevenueHigh().ifPresent(x -> builder.append("Forecast Revenue high: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
+            event.getRevenueLow().ifPresent(x -> builder.append("Forecast Revenue low: ").append(DoubleTools.formatLong(x.getRaw())).append('\n'));
+        }
         earnings.getExDividendDate().ifPresent(x -> builder.append("Previous dividend date: ").append(TimeUtils.formatEpocSeconds(Long.parseLong(x.getRaw()))).append('\n'));
         earnings.getDividendDate().ifPresent(x -> builder.append("Next dividend date: ").append(TimeUtils.formatEpocSeconds(Long.parseLong(x.getRaw()))).append('\n'));
         builder.append("```");
