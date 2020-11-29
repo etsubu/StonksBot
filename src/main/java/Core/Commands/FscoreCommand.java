@@ -132,7 +132,7 @@ public class FscoreCommand extends Command{
                 builder.append("Positive ROA: 0\n");
             }
         }
-        if(quarterlyLongTermDebt.isPresent() && quarterlyLongTermDebt.get().getValue() != null && quarterlyLongTermDebt.get().getValue().size() >= 4) {
+        if(quarterlyLongTermDebt.isPresent() && quarterlyLongTermDebt.get().getValue() != null && quarterlyLongTermDebt.get().getValue().size() >= 5) {
             Optional<DataValue> currentValue = quarterlyLongTermDebt.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousValue = quarterlyLongTermDebt.get().getValue().get(4).getReportedValue();
             if(currentValue.isPresent() && previousValue.isPresent()) {
@@ -162,15 +162,15 @@ public class FscoreCommand extends Command{
             }
         }
         if(quarterlyCurrentAssets.isPresent() && quarterlyCurrentLiabilities.isPresent()
-                && Optional.ofNullable(quarterlyCurrentAssets.get().getValue()).map(x -> x.size() >= 4).orElse(false)
-                && Optional.ofNullable(quarterlyCurrentLiabilities.get().getValue()).map(x -> x.size() >= 4).orElse(false)) {
+                && Optional.ofNullable(quarterlyCurrentAssets.get().getValue()).map(x -> x.size() >= 5).orElse(false)
+                && Optional.ofNullable(quarterlyCurrentLiabilities.get().getValue()).map(x -> x.size() >= 5).orElse(false)) {
             Optional<DataValue> currentAssets = quarterlyCurrentAssets.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousAssets = quarterlyCurrentAssets.get().getValue().get(4).getReportedValue();
             Optional<DataValue> currentLiabilities = quarterlyCurrentLiabilities.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousLiabilities = quarterlyCurrentLiabilities.get().getValue().get(4).getReportedValue();
             if(currentAssets.isPresent() && previousAssets.isPresent() && currentLiabilities.isPresent() && previousLiabilities.isPresent()) {
                 Num previousCurrentRatio = PrecisionNum.valueOf(previousAssets.get().getRaw()).dividedBy(PrecisionNum.valueOf(previousLiabilities.get().getRaw()));
-                Num currentCurrentRatio = PrecisionNum.valueOf(previousAssets.get().getRaw()).dividedBy(PrecisionNum.valueOf(previousLiabilities.get().getRaw()));
+                Num currentCurrentRatio = PrecisionNum.valueOf(currentAssets.get().getRaw()).dividedBy(PrecisionNum.valueOf(currentLiabilities.get().getRaw()));
                 total++;
                 if(currentCurrentRatio.isGreaterThan(previousCurrentRatio)) {
                     score++;
@@ -181,7 +181,7 @@ public class FscoreCommand extends Command{
             }
 
         }
-        if(quarterlyShareIssued.isPresent() && quarterlyShareIssued.get().getValue() != null && quarterlyShareIssued.get().getValue().size() >= 4) {
+        if(quarterlyShareIssued.isPresent() && quarterlyShareIssued.get().getValue() != null && quarterlyShareIssued.get().getValue().size() >= 5) {
             Optional<DataValue> currentSharesIssued = quarterlyShareIssued.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousSharesIssued = quarterlyShareIssued.get().getValue().get(4).getReportedValue();
             if(currentSharesIssued.isPresent() && previousSharesIssued.isPresent()) {
@@ -212,8 +212,8 @@ public class FscoreCommand extends Command{
                 }
             }
         }
-        if(quarterlyTotalRevenue.isPresent() && quarterlyTotalRevenue.get().getValue() != null && quarterlyTotalRevenue.get().getValue().size() >= 4
-                && quarterlyTotalAssets.isPresent() && quarterlyTotalAssets.get().getValue() != null && quarterlyTotalAssets.get().getValue().size() >= 4) {
+        if(quarterlyTotalRevenue.isPresent() && quarterlyTotalRevenue.get().getValue() != null && quarterlyTotalRevenue.get().getValue().size() >= 5
+                && quarterlyTotalAssets.isPresent() && quarterlyTotalAssets.get().getValue() != null && quarterlyTotalAssets.get().getValue().size() >= 5) {
             Optional<DataValue> currentTotalRevenue = quarterlyTotalRevenue.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousTotalRevenue = quarterlyTotalRevenue.get().getValue().get(4).getReportedValue();
             Optional<DataValue> currentTotalAssets = quarterlyTotalAssets.get().getValue().get(0).getReportedValue();
