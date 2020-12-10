@@ -11,6 +11,7 @@ import java.util.Optional;
 @Setter
 public class Config {
     private String oauth;
+    private OmxNordicNewsConfig omxhNews;
     private List<String> globalAdmins;
     private List<ServerConfig> servers;
 

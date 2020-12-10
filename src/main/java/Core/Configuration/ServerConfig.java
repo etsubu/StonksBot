@@ -15,4 +15,5 @@ public class ServerConfig {
     private String adminGroup;
     private String trustedGroup;
     private Map<String, CommandConfig> commands;
+    private String newsChannel;
 }

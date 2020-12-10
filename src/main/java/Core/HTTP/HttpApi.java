@@ -47,4 +47,19 @@ public class HttpApi {
         }
         return Optional.of(response.body());
     }
+
+    public static Optional<byte[]> downloadFile(String url) throws IOException, InterruptedException {
+        log.info("Sending GET request to URL {}", url);
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(Duration.ofSeconds(30))
+                .GET()
+                .build();
+        HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        if(response.statusCode() != 200) {
+            log.error("Request returned invalid status code {}", response.statusCode());
+            return Optional.empty();
+        }
+        return Optional.of(response.body());
+    }
 }

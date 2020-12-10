@@ -4,9 +4,13 @@ import Core.Commands.CommandHandler;
 import Core.Commands.CommandResult;
 import Core.Configuration.ConfigLoader;
 import Core.Permissions.PermissionManager;
+import Core.Schedulers.OmxNordic.Model.AttachmentFile;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberUpdateEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GenericGuildMemberUpdateEvent;
@@ -15,12 +19,14 @@ import net.dv8tion.jda.api.events.user.UserTypingEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateOnlineStatusEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import javax.security.auth.login.LoginException;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -46,31 +52,31 @@ public class EventCore extends ListenerAdapter
         this.commandHandler = commandHandler;
         this.permissionManager = permissionManager;
         this.reacter = reacter;
-        log.info("Discord name: {}", jda.getSelfUser().getName());
     }
 
-    @Override
-    public void onUserUpdateOnlineStatus(UserUpdateOnlineStatusEvent event) {
-        log.info(event.getNewOnlineStatus().name());
-    }
-
-    @Override
-    public void onUserTyping(UserTypingEvent event) {
-        log.info(event.getMember().getNickname());
-    }
-    @Override
-    public void onGuildMemberUpdate(GuildMemberUpdateEvent event) {
-        log.info(event.toString());
-    }
-
-    @Override
-    public void onGuildMemberRoleAdd(@Nonnull GuildMemberRoleAddEvent event) {
-        log.info(event.getMember().getEffectiveName());
-    }
-
-    @Override
-    public void onGenericGuildMemberUpdate(@Nonnull GenericGuildMemberUpdateEvent event) {
-        log.info(event.toString());
+    /**
+     * Sends text message to the requested channel on server
+     * @param channelList
+     * @param message
+     * @return
+     */
+    public boolean sendMessage(List<ServerChannel> channelList, String message, List<AttachmentFile> attachmentFiles) {
+        boolean sent = false;
+        for(ServerChannel channel : channelList) {
+            for(Guild guild : jda.getGuildsByName(channel.getServerName(), true)) {
+                for(TextChannel textChannel: guild.getTextChannelsByName(channel.getChannelName(), true)) {
+                    MessageAction msg = textChannel.sendMessage(message);
+                    if(attachmentFiles != null) {
+                        for(AttachmentFile file : attachmentFiles) {
+                            msg = msg.addFile(file.getFile(), file.getFilename());
+                        }
+                    }
+                    msg.queue();
+                    sent = true;
+                }
+            }
+        }
+        return sent;
     }
     
     @Override
