@@ -57,15 +57,15 @@ public class OmxNewsItem {
     public String toString() {
         if(isValid()) {
             StringBuilder builder = new StringBuilder();
-            builder.append("```Otsikko: ")
+            builder.append("**Otsikko**: `")
                     .append(headline)
-                    .append("\nYhtiö: ")
+                    .append("`\n**Yhtiö**: `")
                     .append(company)
-                    .append("\nTapahtumalaji: ")
+                    .append("`\n**Tapahtumalaji**: `")
                     .append(cnsCategory)
-                    .append("\nIlmoitus: ")
+                    .append("`\n**Ilmoitus**: ")
                     .append(messageUrl)
-                    .append("\n```");
+                    .append("\n````");
             return builder.toString();
         } else {
             return "Missing news item info";

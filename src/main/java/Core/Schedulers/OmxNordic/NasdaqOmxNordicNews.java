@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,7 +29,8 @@ import java.util.stream.Collectors;
 public class NasdaqOmxNordicNews implements Schedulable {
     private static final Logger log = LoggerFactory.getLogger(NasdaqOmxNordicNews.class);
     private final int DELAY_IN_TASK = 60; // 1min
-    private int latestId;
+    private int latestIdOmxh;
+    private int latestIdFirstNorth;
     private final Gson gson;
     private final EventCore eventCore;
     private final ConfigLoader configLoader;
@@ -37,7 +39,8 @@ public class NasdaqOmxNordicNews implements Schedulable {
         this.configLoader = configLoader;
         this.eventCore = eventCore;
         gson = new Gson();
-        latestId = -1;
+        latestIdOmxh = -1;
+        latestIdFirstNorth = -1;
         log.info("Registering scheduled task {}", getClass().getName());
         schedulerService.registerTask(this, DELAY_IN_TASK);
 
@@ -93,6 +96,26 @@ public class NasdaqOmxNordicNews implements Schedulable {
         }
     }
 
+    private List<OmxNewsItem> listNewsItems(Optional<String> omxhResponse, int latestId) {
+        if(omxhResponse.isEmpty()) {
+            return new LinkedList<>();
+        }
+        Optional<List<OmxNewsItem>> items = parseResponse(omxhResponse.get());
+        if(items.isEmpty()) {
+            log.error("Failed to process api.news.eu.nasdaq.com response");
+        } else {
+            List<OmxNewsItem> omxhNews = items.get();
+            if(latestId != -1) {
+                // Filter only latest news
+                return omxhNews.stream().filter(x ->
+                        Optional.ofNullable(x.getDisclosureId()).map(y -> y > latestId).orElse(false) &&
+                                Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false))
+                        .collect(Collectors.toList());
+            }
+        }
+        return new LinkedList<>();
+    }
+
     @Override
     public void invoke() {
         if(configLoader.getConfig().getOmxhNews() == null ||
@@ -102,27 +125,19 @@ public class NasdaqOmxNordicNews implements Schedulable {
             return;
         }
         try {
-            Optional<String> response = HttpApi.sendGet("https://api.news.eu.nasdaq.com/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&market=Main%20Market%2C+Helsinki&cnscategory=&company=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=fi&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
-            if(response.isEmpty()) {
-                log.error("Did not receive response from api.news.eu.nasdaq.com");
-            } else {
-                Optional<List<OmxNewsItem>> items = parseResponse(response.get());
-                if(items.isEmpty()) {
-                    log.error("Failed to process api.news.eu.nasdaq.com response");
-                } else {
-                    List<OmxNewsItem> news = items.get();
-                    if(latestId != -1) {
-                        // Filter only latest news
-                        news = news.stream().filter(x ->
-                                Optional.ofNullable(x.getDisclosureId()).map(y -> y > latestId).orElse(false) &&
-                                Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false))
-                                .collect(Collectors.toList());
-                        if(news.size() > 0) {
-                            sendNewsPosts(news);
-                        }
-                    }
-                    latestId = Optional.ofNullable(news.get(0).getDisclosureId()).orElse(-1);
-                }
+            Optional<String> omxhResponse = HttpApi.sendGet("https://api.news.eu.nasdaq.com/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&market=Main%20Market%2C+Helsinki&cnscategory=&company=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=fi&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
+            Optional<String> firstNorthResponse = HttpApi.sendGet("https://api.news.eu.nasdaq.com/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=First%20North+Finland&cnscategory=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicFirstNorth&displayLanguage=en&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
+            List<OmxNewsItem> omxhItems = listNewsItems(omxhResponse, latestIdOmxh);
+            List<OmxNewsItem> firstNorthItems = listNewsItems(firstNorthResponse, latestIdFirstNorth);
+            if(omxhItems.size() > 0) {
+                latestIdOmxh = omxhItems.get(0).getDisclosureId();
+            }
+            if(firstNorthItems.size() > 0) {
+                latestIdFirstNorth = firstNorthItems.get(0).getDisclosureId();
+            }
+            if((omxhItems.size() + firstNorthItems.size()) > 0) {
+                omxhItems.addAll(firstNorthItems);
+                sendNewsPosts(omxhItems);
             }
         } catch (IOException | InterruptedException e) {
             log.error("HTTP request to api.news.eu.nasdaq.com failed", e);
