@@ -101,17 +101,14 @@ public class NasdaqOmxNordicNews implements Schedulable {
             return new LinkedList<>();
         }
         Optional<List<OmxNewsItem>> items = parseResponse(omxhResponse.get());
-        if(items.isEmpty()) {
-            log.error("Failed to process api.news.eu.nasdaq.com response");
+        if(items.isPresent()) {
+            // Filter only latest news
+            return items.get().stream().filter(x ->
+                    Optional.ofNullable(x.getDisclosureId()).map(y -> y > latestId).orElse(false) &&
+                            Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false))
+                    .collect(Collectors.toList());
         } else {
-            List<OmxNewsItem> omxhNews = items.get();
-            if(latestId != -1) {
-                // Filter only latest news
-                return omxhNews.stream().filter(x ->
-                        Optional.ofNullable(x.getDisclosureId()).map(y -> y > latestId).orElse(false) &&
-                                Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false))
-                        .collect(Collectors.toList());
-            }
+            log.error("Failed to process api.news.eu.nasdaq.com response");
         }
         return new LinkedList<>();
     }
@@ -129,15 +126,22 @@ public class NasdaqOmxNordicNews implements Schedulable {
             Optional<String> firstNorthResponse = HttpApi.sendGet("https://api.news.eu.nasdaq.com/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=First%20North+Finland&cnscategory=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicFirstNorth&displayLanguage=en&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
             List<OmxNewsItem> omxhItems = listNewsItems(omxhResponse, latestIdOmxh);
             List<OmxNewsItem> firstNorthItems = listNewsItems(firstNorthResponse, latestIdFirstNorth);
+            List<OmxNewsItem> totalNewsItems = new ArrayList<>(omxhItems.size() + firstNorthItems.size());
+            if(latestIdOmxh != -1) {
+                totalNewsItems.addAll(omxhItems);
+            }
+            if(latestIdFirstNorth != -1) {
+                totalNewsItems.addAll(firstNorthItems);
+            }
             if(omxhItems.size() > 0) {
                 latestIdOmxh = omxhItems.get(0).getDisclosureId();
             }
             if(firstNorthItems.size() > 0) {
                 latestIdFirstNorth = firstNorthItems.get(0).getDisclosureId();
             }
-            if((omxhItems.size() + firstNorthItems.size()) > 0) {
-                omxhItems.addAll(firstNorthItems);
-                sendNewsPosts(omxhItems);
+            if(totalNewsItems.size() > 0) {
+                omxhItems.addAll(totalNewsItems);
+                sendNewsPosts(totalNewsItems);
             }
         } catch (IOException | InterruptedException e) {
             log.error("HTTP request to api.news.eu.nasdaq.com failed", e);
