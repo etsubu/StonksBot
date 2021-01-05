@@ -42,16 +42,22 @@ public class EventCore extends ListenerAdapter
     private final JDA jda;
     private final PermissionManager permissionManager;
     private final MessageReacter reacter;
+    private final FilterHandler filterHandler;
 
     /**
      * Initializes EventCore
      */
-    public EventCore(CommandHandler commandHandler, ConfigLoader configLoader, PermissionManager permissionManager, MessageReacter reacter) throws LoginException {
+    public EventCore(CommandHandler commandHandler,
+                     ConfigLoader configLoader,
+                     PermissionManager permissionManager,
+                     MessageReacter reacter,
+                     FilterHandler filterHandler) throws LoginException {
         this.jda = JDABuilder.createDefault(configLoader.getConfig().getOauth()).build();
         jda.addEventListener(this);
         this.commandHandler = commandHandler;
         this.permissionManager = permissionManager;
         this.reacter = reacter;
+        this.filterHandler = filterHandler;
     }
 
     /**
@@ -87,6 +93,9 @@ public class EventCore extends ListenerAdapter
             return;
         }
         reacter.react(event).ifPresent(x -> event.getMessage().addReaction(x).queue());
+        if(filterHandler.shouldBeFiltered(event)) {
+            return;
+        }
 
         if (this.commandHandler.isCommand(event.getMessage().getContentDisplay()) && event.getMessage().getContentDisplay().length() > 1) {
             if(!permissionManager.isReplyAllowed(event)) {
