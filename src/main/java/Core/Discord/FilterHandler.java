@@ -48,9 +48,8 @@ public class FilterHandler {
                 if(channels.size() > 0) {
                     // Remove the message
                     event.getMessage().delete().queue();
-                    // Mute user
                     // Send notification to admin channel
-                    channels.get(0).sendMessage(String.format("Filtered message:\n```%s```\nUser: %s, id=%s, channel=%s",
+                    channels.get(0).sendMessage(String.format("Filtered message:%n```%s```%nnUser: %s, id=%s, channel=%s",
                             event.getMessage().getContentDisplay().replaceAll("`", ""),
                             event.getAuthor().getName(),
                             event.getAuthor().getId(),
