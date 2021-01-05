@@ -37,7 +37,7 @@ public class FilterHandler {
             // Ignore global admins
             return false;
         }
-        if(serverConfig.get().getFilters().getRegexPatterns().stream().anyMatch(x -> x.matcher(event.getMessage().getContentDisplay()).matches())) {
+        if(serverConfig.get().getFilters().getRegexPatterns().stream().anyMatch(x -> x.matcher(event.getMessage().getContentDisplay().toLowerCase()).matches())) {
             // Filter pattern matches
             log.info("Filtering message '{}' by '{}' id='{}'",
                     event.getMessage().getContentDisplay().replaceAll("\n",""),
