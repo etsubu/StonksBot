@@ -40,9 +40,11 @@ public class ConfigLoader {
             throw new RuntimeException("Could not load configuration file");
         }
         lastModified = Instant.now();
-        Optional.ofNullable(config.getServers()).ifPresent(x -> {
-            x.forEach(y -> Optional.ofNullable(y.getReactions()).ifPresent(z -> z.forEach(Reaction::buildPattern)));
-        });
+        // Compile all regex patterns
+        Optional.ofNullable(config.getServers()).ifPresent(x -> x.forEach(y -> {
+            Optional.ofNullable(y.getReactions()).ifPresent(z -> z.forEach(Reaction::buildPattern));
+            Optional.ofNullable(y.getFilters()).ifPresent(FilterConfig::update);
+        }));
     }
 
     public Config getConfig() {
