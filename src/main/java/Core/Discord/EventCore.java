@@ -2,6 +2,7 @@ package Core.Discord;
 
 import Core.Commands.CommandHandler;
 import Core.Commands.CommandResult;
+import Core.Configuration.Config;
 import Core.Configuration.ConfigLoader;
 import Core.Permissions.PermissionManager;
 import Core.Schedulers.OmxNordic.Model.AttachmentFile;
@@ -39,10 +40,11 @@ public class EventCore extends ListenerAdapter
 {
     private static final Logger log = LoggerFactory.getLogger(EventCore.class);
     private final CommandHandler commandHandler;
-    private final JDA jda;
+    private JDA jda;
     private final PermissionManager permissionManager;
     private final MessageReacter reacter;
     private final FilterHandler filterHandler;
+    private final ConfigLoader configLoader;
 
     /**
      * Initializes EventCore
@@ -52,12 +54,31 @@ public class EventCore extends ListenerAdapter
                      PermissionManager permissionManager,
                      MessageReacter reacter,
                      FilterHandler filterHandler) throws LoginException {
-        this.jda = JDABuilder.createDefault(configLoader.getConfig().getOauth()).build();
-        jda.addEventListener(this);
+        this.configLoader = configLoader;
         this.commandHandler = commandHandler;
         this.permissionManager = permissionManager;
         this.reacter = reacter;
         this.filterHandler = filterHandler;
+        new Thread(this::start).start();
+    }
+
+    public boolean start() {
+        if(jda != null) {
+            jda.shutdown();
+        }
+        Config config = configLoader.getConfig();
+        if(config == null || config.getOauth() == null) {
+            log.error("No oath token present");
+            return false;
+        }
+        try {
+            this.jda = JDABuilder.createDefault(config.getOauth()).build();
+        } catch (LoginException e) {
+            log.error("Login failed, check the network connection and oath token");
+            return false;
+        }
+        jda.addEventListener(this);
+        return true;
     }
 
     /**

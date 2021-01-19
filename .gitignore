@@ -48,5 +48,5 @@ cmake-build-*/
 # IntelliJ
 out/
 
-./config.yaml
+config2.yaml
 logs/

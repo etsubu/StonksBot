@@ -8,6 +8,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
@@ -35,16 +36,15 @@ public class ConfigLoader {
         try {
             config = yaml.load(Files.readString(configFile));
             log.info("Configs loaded");
+            // Compile all regex patterns
+            Optional.ofNullable(config.getServers()).ifPresent(x -> x.forEach(y -> {
+                Optional.ofNullable(y.getReactions()).ifPresent(z -> z.forEach(Reaction::buildPattern));
+                Optional.ofNullable(y.getFilters()).ifPresent(FilterConfig::update);
+            }));
         } catch (IOException e) {
             log.error("Failed to load configuration");
-            throw new RuntimeException("Could not load configuration file");
         }
         lastModified = Instant.now();
-        // Compile all regex patterns
-        Optional.ofNullable(config.getServers()).ifPresent(x -> x.forEach(y -> {
-            Optional.ofNullable(y.getReactions()).ifPresent(z -> z.forEach(Reaction::buildPattern));
-            Optional.ofNullable(y.getFilters()).ifPresent(FilterConfig::update);
-        }));
     }
 
     public Config getConfig() {
@@ -54,7 +54,11 @@ public class ConfigLoader {
                 log.info("Changes in config files, reloading.");
                 loadConfigs();
             }
-        } catch (IOException e) {
+        } catch (NoSuchFileException e) {
+            log.error("No config file present");
+            return new Config();
+        }
+        catch (IOException e) {
             log.error("Failed to get last modified time for config file. Assuming it has not changed", e);
         }
         return config;
