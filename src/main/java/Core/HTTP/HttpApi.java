@@ -33,8 +33,6 @@ public class HttpApi {
      * @throws IOException If there was an connection error
      */
     public static Optional<String> sendGet(String url) throws IOException, InterruptedException {
-
-        log.info("Sending GET request to URL {}", url);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofSeconds(30))
@@ -49,7 +47,6 @@ public class HttpApi {
     }
 
     public static Optional<byte[]> downloadFile(String url) throws IOException, InterruptedException {
-        log.info("Sending GET request to URL {}", url);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
                 .timeout(Duration.ofSeconds(30))
