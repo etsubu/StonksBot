@@ -48,5 +48,6 @@ cmake-build-*/
 # IntelliJ
 out/
 
-config2.yaml
 logs/
+# Configuration files of the bot
+*.yaml
