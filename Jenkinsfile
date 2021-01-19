@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'adoptopenjdk/openjdk11:jdk-11.0.8_10-alpine'
-            args '-v $HOME/.gradle:/root/.gradle'
-        }
-    }
+    agent any
     /* Run each day at 2AM */
     triggers { cron(env.BRANCH_NAME == "master" ? "H 2 * * *" : "") }
 
@@ -43,19 +38,7 @@ pipeline {
                 branch 'master'
             }
             steps{
-                script {
-                    def filePath = sh(script: 'ls build/libs/StonksBot*-all.jar', returnStdout: true)
-                    def remote = [:]
-                    remote.name = "stonksbot-instance"
-                    remote.host = sh(script: "aws ec2 describe-instances --filters Name=tag-value,Values=stonksbot --query 'Reservations[*].Instances[*].{ip:PrivateIpAddress}' --output text", returnStdout: true)
-                    remote.allowAnyHosts = true
-                    withCredentials([sshUserPrivateKey(credentialsId: 'bot-instance-key', keyFileVariable: 'identity', passphraseVariable: '', usernameVariable: 'userName')]) {
-                        remote.user = userName
-                        remote.identityFile = identity
-                        sshPut remote: remote, from: 'build/libs/StonksBot-1.0-SNAPSHOT-all.jar', into: '/opt/stonksbot/stonksbot.jar', override: true
-                        sshCommand remote: remote, command: 'sudo systemctl restart stonksbot'
-                    }
-                }
+                echo 'Deploy'
             }
         }
     }
