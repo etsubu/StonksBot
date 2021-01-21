@@ -5,6 +5,8 @@ import Core.Configuration.Config;
 import Core.Configuration.ConfigLoader;
 import Core.Configuration.ServerConfig;
 import net.dv8tion.jda.api.entities.Role;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -19,9 +21,7 @@ public abstract class Command {
      * Contains the name of the command that follows prefix
      */
     protected final List<String> names;
-
     protected final ConfigLoader configLoader;
-
     protected boolean allowByDefault;
     
     /**
@@ -31,7 +31,7 @@ public abstract class Command {
     public Command(String name, ConfigLoader configLoader, boolean allowByDefault) {
         this.configLoader = configLoader;
         this.allowByDefault = allowByDefault;
-        names = Collections.unmodifiableList(List.of(name.trim().toLowerCase().replaceAll("!", "")));
+        names = List.of(name.trim().toLowerCase().replaceAll("!", ""));
     }
 
     public Command(List<String> names, ConfigLoader configLoader, boolean allowByDefault) {

@@ -1,22 +1,22 @@
 package Core.YahooAPI.DataStructures;
 
 import Core.YahooAPI.StockName;
+import lombok.AllArgsConstructor;
 
 import java.util.Optional;
 
+@AllArgsConstructor
 public class DataResponse {
     private StockName name;
     private final CalendarEarnings calendarEvents;
     private final DefaultKeyStatistics defaultKeyStatistics;
-
-    public DataResponse(CalendarEarnings calendarEvents, DefaultKeyStatistics defaultKeyStatistics) {
-        this.calendarEvents = calendarEvents;
-        this.defaultKeyStatistics = defaultKeyStatistics;
-    }
+    private final AssetProfile assetProfile;
 
     public Optional<CalendarEarnings> getCalendarEvents() { return Optional.ofNullable(calendarEvents); }
 
     public Optional<DefaultKeyStatistics> getDefaultKeyStatistics() { return Optional.ofNullable(defaultKeyStatistics); }
+
+    public Optional<AssetProfile> getAssetProfile() { return Optional.ofNullable(assetProfile); }
 
     public StockName getName() { return name; }
 
