@@ -40,6 +40,7 @@ public class YahooConnectorImpl implements YahooConnector{
     private static final String FUNDAMENTAL_TIMESERIES_URL = "https://query%d.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/%s?&type=%s&period1=0&period2=%d";
     public static final String DEFAULT_STATISTICS = "defaultKeyStatistics";
     public static final String CALENDAR_EVENTS = "calendarEvents";
+    public static final String ASSET_PROFILE = "assetProfile";
     public static final String TRAILING_FREE_CASH_FLOW = "trailingFreeCashFlow";
     public static final String TRAILING_MARKET_CAP = "trailingMarketCap";
     private final HttpClient client;
