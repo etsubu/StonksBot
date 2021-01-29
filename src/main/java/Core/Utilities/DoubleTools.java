@@ -34,6 +34,10 @@ public class DoubleTools {
 		return round(value, 2);
 	}
 
+	public static String roundToFormat(double value) {
+		return String.format("%.02f", round(value, 2));
+	}
+
 	public static double roundNumberToPercent(String value) {
 		try {
 			return round(Double.parseDouble(value) * 100);

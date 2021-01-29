@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.BarSeries;
+import org.ta4j.core.num.Num;
+import org.ta4j.core.num.PrecisionNum;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -75,6 +77,28 @@ public class YahooConnectorImpl implements YahooConnector{
             return Optional.empty();
         }
         return Optional.of(response.body());
+    }
+
+    public static Optional<Num> sumLastFourQuarters(Optional<FundamentEntry> entry) {
+        if(entry.isEmpty()) {
+            log.info("Argument was empty, returning empty");
+            return Optional.empty();
+        }
+        List<FundaValue> values = entry.get().getValue();
+        if(values == null || values.size() < 4) {
+            log.info("Value does not have enough quarters available to calculate TTM");
+            return Optional.empty();
+        }
+        Num sum = PrecisionNum.valueOf(0);
+        for(int i = 0; i < 4; i++) {
+            Optional<DataValue> reportedValue = values.get(i).getReportedValue();
+            if(reportedValue.isEmpty()){
+                log.error("Missing reported value");
+                return Optional.empty();
+            }
+            sum = sum.plus(PrecisionNum.valueOf(reportedValue.get().getRaw()));
+        }
+        return Optional.of(sum);
     }
 
     public Optional<StockName> findTicker(String keyword) throws IOException, InterruptedException {

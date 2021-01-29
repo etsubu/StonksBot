@@ -24,6 +24,7 @@ import java.util.Optional;
 public class RatiosCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(RatiosCommand.class);
     private static final String MARKET_CAP = "trailingMarketCap";
+    private static final String ENTERPRISE_VALUE = "trailingMarketCap";
     private static final String QUARTERLY_NET_INCOME = "quarterlyNetIncome";
     private static final String QUARTERLY_CURRENT_ASSETS = "quarterlyCurrentAssets";
     private static final String QUARTERLY_CURRENT_LIABILITIES = "quarterlyCurrentLiabilities";
@@ -31,10 +32,16 @@ public class RatiosCommand extends Command {
     private static final String QUARTERLY_TOTAL_ASSETS = "quarterlyTotalAssets";
     private static final String QUARTERLY_TOTAL_REVENUE = "quarterlyTotalRevenue";
     private static final String TRAILING_SALES = "trailingPsRatio";
+    private static final String TRAILING_PE = "trailingPeRatio";
+    private static final String TRAILING_PB = "trailingPbRatio";
     private static final String QUARTERLY_FREE_CASH_FLOW = "quarterlyFreeCashFlow";
+    private static final String QUARTERLY_EBIT = "quarterlyEBIT";
+    private static final String QUARTERLY_EBITDA = "quarterlyNormalizedEBITDA";
 
-    private static final List<String> SCORE_COMPONENTS = Collections.unmodifiableList(List.of(
+
+    private static final List<String> SCORE_COMPONENTS = List.of(
             MARKET_CAP,
+            ENTERPRISE_VALUE,
             QUARTERLY_NET_INCOME,
             QUARTERLY_CURRENT_ASSETS,
             QUARTERLY_CURRENT_LIABILITIES,
@@ -42,8 +49,11 @@ public class RatiosCommand extends Command {
             QUARTERLY_TOTAL_ASSETS,
             QUARTERLY_TOTAL_REVENUE,
             QUARTERLY_FREE_CASH_FLOW,
-            TRAILING_SALES)
-    );
+            TRAILING_SALES,
+            TRAILING_PE,
+            TRAILING_PB,
+            QUARTERLY_EBIT,
+            QUARTERLY_EBITDA);
     private final YahooConnectorImpl yahooConnector;
 
     public RatiosCommand(YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
@@ -51,47 +61,65 @@ public class RatiosCommand extends Command {
         this.yahooConnector = yahooConnector;
     }
 
-
-    private Optional<Num> sumLastFourQuarters(Optional<FundamentEntry> entry) {
+    private Optional<Num> getLatestValue(Optional<FundamentEntry> entry) {
         if(entry.isEmpty()) {
-            log.info("Argument was empty, returning empty");
             return Optional.empty();
         }
-        List<FundaValue> values = entry.get().getValue();
-        if(values == null || values.size() < 4) {
-            log.info("Value does not have enough quarters available to calculate TTM");
+        Optional<List<FundaValue>> values = Optional.ofNullable(entry.get().getValue());
+        if(values.map(List::isEmpty).orElse(true) || values.get().get(0).getReportedValue().isEmpty()) {
             return Optional.empty();
         }
-        Num sum = PrecisionNum.valueOf(0);
-        for(int i = 0; i < 4; i++) {
-            Optional<DataValue> reportedValue = values.get(i).getReportedValue();
-            if(reportedValue.isEmpty()) {
-                log.info("Quarter's reported value was empty");
-                return Optional.empty();
-            }
-            sum = sum.plus(PrecisionNum.valueOf(reportedValue.get().getRaw()));
+        String rawValue = values.get().get(0).getReportedValue().get().getRaw();
+        if(rawValue == null) {
+            return Optional.empty();
         }
-        return Optional.of(sum);
+        return Optional.of(PrecisionNum.valueOf(rawValue));
+    }
+
+    private void calculateRatio(Num base, Num value, StringBuilder response, String ratioName) {
+        response.append(ratioName).append(DoubleTools.roundToFormat(base.dividedBy(value).doubleValue()))
+                .append(" - ").append(DoubleTools.roundToFormat(value.dividedBy(base).multipliedBy(PrecisionNum.valueOf(100)).doubleValue()))
+                .append("%\n");
     }
 
     private CommandResult buildResponse(Pair<StockName, Map<String, FundamentEntry>> response) {
         var entries = response.getSecond();
-        Optional<Num> netIncomeTTM = sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_NET_INCOME)));
-        Optional<Num> grossProfitTTM = sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_GROSS_PROFIT)));
-        Optional<Num> revenueTTM = sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_TOTAL_REVENUE)));
-        Optional<Num> freeCashFlow = sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_FREE_CASH_FLOW)));
-        Optional<FundamentEntry> marketcap = Optional.ofNullable(entries.get(MARKET_CAP));
-        //Optional<Num> totalAssets = sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_TOTAL_ASSETS)));
+        Optional<Num> netIncomeTTM = YahooConnectorImpl.sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_NET_INCOME)));
+        Optional<Num> grossProfitTTM = YahooConnectorImpl.sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_GROSS_PROFIT)));
+        Optional<Num> revenueTTM = YahooConnectorImpl.sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_TOTAL_REVENUE)));
+        Optional<Num> freeCashFlow = YahooConnectorImpl.sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_FREE_CASH_FLOW)));
+        Optional<Num> ebit = YahooConnectorImpl.sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_EBIT)));
+        Optional<Num> ebitda = YahooConnectorImpl.sumLastFourQuarters(Optional.ofNullable(entries.get(QUARTERLY_EBITDA)));
+        Optional<Num> marketcap = getLatestValue(Optional.ofNullable(entries.get(MARKET_CAP)));
+        Optional<Num> enterpriseValue = getLatestValue(Optional.ofNullable(entries.get(ENTERPRISE_VALUE)));
+        Optional<Num> peRatio = getLatestValue(Optional.ofNullable(entries.get(TRAILING_PE)));
+        Optional<Num> pbRatio = getLatestValue(Optional.ofNullable(entries.get(TRAILING_PB)));
+        Optional<Num> psRatio = getLatestValue(Optional.ofNullable(entries.get(TRAILING_SALES)));
         Optional<FundamentEntry> quarterlyTotalAssets = Optional.ofNullable(entries.get(QUARTERLY_TOTAL_ASSETS));
         Optional<FundamentEntry> quarterlyCurrentAssets = Optional.ofNullable(entries.get(QUARTERLY_CURRENT_ASSETS));
         Optional<FundamentEntry> quarterlyCurrentLiabilities = Optional.ofNullable(entries.get(QUARTERLY_CURRENT_LIABILITIES));
+
         StringBuilder builder = new StringBuilder("```\n").append(response.getFirst().getFullname()).append(" - ").append(response.getFirst().getTicker()).append('\n');
-        if(quarterlyCurrentAssets.isPresent() && quarterlyCurrentLiabilities.isPresent()
+
+        enterpriseValue.ifPresent(num -> {
+            revenueTTM.ifPresent(x -> calculateRatio(num, x, builder, "EV/Revenue:          "));
+            ebitda.ifPresent(x -> calculateRatio(num, x, builder,     "EV/EBITDA:           "));
+            ebit.ifPresent(x -> calculateRatio(num, x, builder,       "EV/EBIT:             "));
+        });
+        marketcap.ifPresent(num -> freeCashFlow.ifPresent(x -> calculateRatio(num, x, builder, "MCAP/FCF:            ")));
+
+        if (grossProfitTTM.isPresent() && revenueTTM.isPresent()) {
+            builder.append("Gross Profit Margin: ")
+                    .append(DoubleTools.round(grossProfitTTM.get().dividedBy(revenueTTM.get()).multipliedBy(PrecisionNum.valueOf(100)).doubleValue(), 2))
+                    .append("%\n");
+        }
+
+        if (quarterlyCurrentAssets.isPresent() && quarterlyCurrentLiabilities.isPresent()
                 && Optional.ofNullable(quarterlyCurrentAssets.get().getValue()).map(x -> x.size() >= 4).orElse(false)
                 && Optional.ofNullable(quarterlyCurrentLiabilities.get().getValue()).map(x -> x.size() >= 4).orElse(false)) {
             Optional<DataValue> currentAssets = quarterlyCurrentAssets.get().getValue().get(0).getReportedValue();
             Optional<DataValue> currentLiabilities = quarterlyCurrentLiabilities.get().getValue().get(0).getReportedValue();
-            if(currentAssets.isPresent() && currentLiabilities.isPresent()) {
+            if (currentAssets.isPresent() && currentLiabilities.isPresent()) {
                 builder.append("Current ratio: ")
                         .append(DoubleTools.round(PrecisionNum.valueOf(currentAssets.get().getRaw())
                                 .dividedBy(PrecisionNum.valueOf(currentLiabilities.get().getRaw()))
@@ -99,30 +127,19 @@ public class RatiosCommand extends Command {
                         .append('\n');
             }
         }
-        if(netIncomeTTM.isPresent() && quarterlyTotalAssets.isPresent()
+        if (netIncomeTTM.isPresent() && quarterlyTotalAssets.isPresent()
                 && Optional.ofNullable(quarterlyTotalAssets.get().getValue())
-                    .map(x -> x.size() > 0).orElse(false)) {
+                .map(x -> x.size() > 0).orElse(false)) {
             Optional<DataValue> assets = quarterlyTotalAssets.get().getValue().get(0).getReportedValue();
             assets.ifPresent(value -> builder.append("ROA: ").append(DoubleTools.round(netIncomeTTM.get()
                     .dividedBy(PrecisionNum.valueOf(value.getRaw()))
                     .multipliedBy(PrecisionNum.valueOf(100)).doubleValue(), 2))
                     .append("%\n"));
         }
-        if(marketcap.isPresent() && freeCashFlow.isPresent()
-                && Optional.ofNullable(marketcap.get().getValue())
-                .map(x -> x.size() > 0).orElse(false)) {
-            Optional<DataValue> marketcapValue = marketcap.get().getValue().get(0).getReportedValue();
-            marketcapValue.ifPresent(x -> builder.append("FCF yield: ")
-                    .append(DoubleTools.round(PrecisionNum.valueOf(x.getRaw()).dividedBy(freeCashFlow.get()).doubleValue(), 2))
-                    .append(" / ").append(DoubleTools.round(freeCashFlow.get().dividedBy(PrecisionNum.valueOf(x.getRaw())).multipliedBy(PrecisionNum.valueOf(100)).doubleValue(), 2))
-                    .append("%\n"));
-        }
-        if(grossProfitTTM.isPresent() && revenueTTM.isPresent()) {
-            builder.append("Gross Profit Margin: ")
-                    .append(DoubleTools.round(grossProfitTTM.get().dividedBy(revenueTTM.get()).multipliedBy(PrecisionNum.valueOf(100)).doubleValue(), 2))
-                    .append("%\n");
-        }
-        Optional.ofNullable(entries.get(TRAILING_SALES)).ifPresent(x -> builder.append("P/S: ").append(x.getValue().get(0).getReportedValue().get().getFmt()).append('\n'));
+
+        psRatio.ifPresent(x -> builder.append("P/S: ").append(DoubleTools.roundToFormat(x.doubleValue())).append('\n'));
+        peRatio.ifPresent(x -> builder.append("P/E: ").append(DoubleTools.roundToFormat(x.doubleValue())).append('\n'));
+        pbRatio.ifPresent(x -> builder.append("P/B: ").append(DoubleTools.roundToFormat(x.doubleValue())).append('\n'));
         builder.append("```");
         return new CommandResult(builder.toString(), true);
     }
