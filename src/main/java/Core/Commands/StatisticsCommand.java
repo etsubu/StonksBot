@@ -29,11 +29,8 @@ public class StatisticsCommand extends Command{
     private CommandResult buildResponse(DefaultKeyStatistics statistics, StockName name) {
         StringBuilder builder = new StringBuilder();
         builder.append("```\n").append(name.getFullname()).append(" - ").append(name.getTicker()).append('\n');
-        statistics.getEvEbitda().ifPresent(x -> builder.append("EV/EBITDA: ").append(DoubleTools.round(x, 2)).append('\n'));
-        statistics.getEvRevenue().ifPresent(x -> builder.append("EV/Revenue: ").append(DoubleTools.round(x, 2)).append('\n'));
         statistics.getForwardPE().ifPresent(x -> builder.append("Forward P/E: ").append(DoubleTools.round(x, 2)).append('\n'));
         statistics.getPegRatio().ifPresent(x -> builder.append("PEG: ").append(DoubleTools.round(x, 2)).append('\n'));
-        statistics.getPriceToBook().ifPresent(x -> builder.append("P/B: ").append(DoubleTools.round(x, 2)).append('\n'));
         statistics.getBeta().ifPresent(x -> builder.append("Beta: ").append(DoubleTools.round(x, 2)).append('\n'));
         statistics.getTrailingEps().ifPresent(x -> builder.append("Trailing EPS: ").append(DoubleTools.round(x, 2)).append('\n'));
         statistics.getForwardEps().ifPresent(x -> builder.append("Forward EPS: ").append(DoubleTools.round(x, 2)).append('\n'));
