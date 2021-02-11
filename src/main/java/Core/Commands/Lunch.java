@@ -13,8 +13,13 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Retrieves lunch list from "semma" for university of jyväskylä. Piato and Maija restaurants are displayed
+ * @author etsubu
+ */
 @Component
 public class Lunch extends Command{
     private static final Logger log = LoggerFactory.getLogger(Lunch.class);
@@ -28,6 +33,10 @@ public class Lunch extends Command{
     }
 
     private String formatLunches(List<LunchMenu> menus) {
+        if(Optional.ofNullable(menus).map(List::isEmpty).orElse(true)) {
+            // Empty lunch list
+            return "No lunch list available. Better cook your own food. I recommend chili";
+        }
         StringBuilder builder = new StringBuilder();
         for(LunchMenu menu : menus) {
             builder.append("**")
@@ -39,12 +48,11 @@ public class Lunch extends Command{
                     .append(menu.getDate())
                     .append('\n');
             for(MealOption meal : menu.getSetMenus()) {
-                builder.append(meal.getName()).append("\n");
+                builder.append(meal.getName()).append('\n');
                 for(MealComponents component : meal.getMeals()) {
                     builder.append('\t').append(component.getName()).append(' ')
-                            .append(component.getDiets().stream()
-                                    .filter(x -> !x.equals("*")).collect(Collectors.joining(", ")))
-                            .append("\n");
+                            .append(String.join(", ", component.getDiets()))
+                            .append('\n');
                 }
             }
             builder.append('\n');
@@ -58,7 +66,7 @@ public class Lunch extends Command{
             List<LunchMenu> lunches = query.queryLunchList();
             return new CommandResult(formatLunches(lunches), true);
         } catch (IOException | InterruptedException e) {
-            log.error("Core.Lunch query failed ", e);
+            log.error("Lunch query failed ", e);
             return new CommandResult("Failed to query lunch " + e.getMessage(), false);
         }
     }

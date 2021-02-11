@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Command for binding keywords to tickers
+ */
 @Component
 public class BindCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(BindCommand.class);

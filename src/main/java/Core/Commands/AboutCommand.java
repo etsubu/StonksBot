@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Command for retrieving "about" text of this bot
+ * @author etsubu
+ */
 @Component
 public class AboutCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(AboutCommand.class);

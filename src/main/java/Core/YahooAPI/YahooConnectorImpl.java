@@ -89,6 +89,7 @@ public class YahooConnectorImpl implements YahooConnector{
             log.info("Value does not have enough quarters available to calculate TTM");
             return Optional.empty();
         }
+        values.sort(Comparator.comparing(FundaValue::getAsOfDate).reversed());
         Num sum = PrecisionNum.valueOf(0);
         for(int i = 0; i < 4; i++) {
             Optional<DataValue> reportedValue = values.get(i).getReportedValue();

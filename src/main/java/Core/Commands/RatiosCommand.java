@@ -77,8 +77,8 @@ public class RatiosCommand extends Command {
     }
 
     private void calculateRatio(Num base, Num value, StringBuilder response, String ratioName) {
-        response.append(ratioName).append(DoubleTools.roundToFormat(base.dividedBy(value).doubleValue()))
-                .append(" - ").append(DoubleTools.roundToFormat(value.dividedBy(base).multipliedBy(PrecisionNum.valueOf(100)).doubleValue()))
+        response.append(ratioName).append(DoubleTools.roundToFormat((base.dividedBy(value)).doubleValue()))
+                .append(" - ").append(DoubleTools.roundToFormat((value.dividedBy(base)).multipliedBy(PrecisionNum.valueOf(100)).doubleValue()))
                 .append("%\n");
     }
 
