@@ -55,8 +55,10 @@ public class LunchQuery {
             String url = String.format(restaurant.first, asciiDate);
             HttpApi.sendGet(url).ifPresent(x -> {
                 LunchMenu menu = gson.fromJson(x, LunchResponse.class).getMenu();
-                menu.setRestaurantName(restaurant.second);
-                menus.add(menu);
+                if(menu != null) {
+                    menu.setRestaurantName(restaurant.second);
+                    menus.add(menu);
+                }
             });
         }
         return Collections.unmodifiableList(menus);
