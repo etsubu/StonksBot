@@ -124,15 +124,24 @@ public class EventCore extends ListenerAdapter
                 event.getChannel().sendMessage("Please use whitelisted channel for performing commands").queue();
                 return;
             }
-        	CommandResult result = commandHandler.execute(event);
-            event.getChannel().sendMessage(result.getResponse()).queue();
-        	if(result.getSucceeded()) {
-        	    log.info("Successfully executed user command: {}", event.getMessage().getContentDisplay().replaceAll("\n", ""));
-            } else {
-        	    log.error("Failed to execute user command: " + result.getResponse() + " - "
-                        + Optional.ofNullable(result.getException())
-                        .map(Exception::getMessage)
-                        .orElse(""));
+            try {
+                CommandResult result = commandHandler.execute(event);
+                event.getChannel().sendMessage(result.getResponse()).queue();
+                if(result.getResponse().isEmpty() || result.getResponse().isBlank()) {
+                    log.error("Command returned blank response");
+                    event.getChannel().sendMessage("Oops, this command returned blank response. Developer should probably take a look at logs.").queue();
+                }
+                if (result.getSucceeded()) {
+                    log.info("Successfully executed user command: {}", event.getMessage().getContentDisplay().replaceAll("\n", ""));
+                } else {
+                    log.error("Failed to execute user command: " + result.getResponse() + " - "
+                            + Optional.ofNullable(result.getException())
+                            .map(Exception::getMessage)
+                            .orElse(""));
+                }
+            } catch (Exception e) {
+                log.error("Uncaught exception", e);
+                event.getChannel().sendMessage("Oops, this command caused unexpected exception. Developer should probably take a look at logs.").queue();
             }
         }
     }
