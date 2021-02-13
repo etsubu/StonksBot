@@ -102,6 +102,23 @@ public class YahooConnectorImpl implements YahooConnector{
         return Optional.of(sum);
     }
 
+    public static Optional<Num> getLatestValue(Optional<FundamentEntry> entry) {
+        if(entry.isEmpty()) {
+            log.info("Argument was empty, returning empty");
+            return Optional.empty();
+        }
+        List<FundaValue> values = entry.get().getValue();
+        if(values == null || values.isEmpty()) {
+            log.info("Value does not have enough quarters");
+            return Optional.empty();
+        }
+        values.sort(Comparator.comparing(FundaValue::getAsOfDate).reversed());
+        if(values.get(0).getReportedValue().isPresent() && values.get(0).getReportedValue().get().getRaw() != null) {
+            return Optional.of(PrecisionNum.valueOf(values.get(0).getReportedValue().get().getRaw()));
+        }
+        return Optional.empty();
+    }
+
     public Optional<StockName> findTicker(String keyword) throws IOException, InterruptedException {
         Optional<StockName> ticker = tickerStorage.findTicker(keyword);
         if(ticker.isPresent()) {
