@@ -31,15 +31,15 @@ dependencies {
     implementation 'org.ta4j:ta4j-core:0.13'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.json:json:20201115'
-    implementation ('net.dv8tion:JDA:4.2.0_227') {
+    implementation ('net.dv8tion:JDA:4.2.0_228') {
         exclude module: 'opus-java'
     }
-    implementation 'org.slf4j:slf4j-api:1.7.30'
-    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.14.0'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+    implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
     implementation 'org.apache.logging.log4j:log4j-api:2.14.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0-M1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.0-M1'
     testImplementation 'org.mockito:mockito-core:3.7.7'
     testImplementation 'org.mockito:mockito-junit-jupiter:3.7.7'
 }
