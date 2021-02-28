@@ -8,10 +8,7 @@ import Core.Permissions.PermissionManager;
 import Core.Schedulers.OmxNordic.Model.AttachmentFile;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberUpdateEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GenericGuildMemberUpdateEvent;
@@ -67,12 +64,13 @@ public class EventCore extends ListenerAdapter
             jda.shutdown();
         }
         Config config = configLoader.getConfig();
-        if(config == null || config.getOauth() == null) {
+        Optional<String> oauth = Optional.ofNullable(config.getOauth());
+        if(oauth.isEmpty()) {
             log.error("No oath token present");
             return false;
         }
         try {
-            this.jda = JDABuilder.createDefault(config.getOauth()).build();
+            this.jda = JDABuilder.createDefault(oauth.get()).build();
         } catch (LoginException e) {
             log.error("Login failed, check the network connection and oath token");
             return false;
@@ -83,24 +81,25 @@ public class EventCore extends ListenerAdapter
 
     /**
      * Sends text message to the requested channel on server
-     * @param channelList
+     * @param channelIds
      * @param message
      * @return
      */
-    public boolean sendMessage(List<ServerChannel> channelList, String message, List<AttachmentFile> attachmentFiles) {
+    public boolean sendMessage(List<Long> channelIds, String message, List<AttachmentFile> attachmentFiles) {
         boolean sent = false;
-        for(ServerChannel channel : channelList) {
-            for(Guild guild : jda.getGuildsByName(channel.getServerName(), true)) {
-                for(TextChannel textChannel: guild.getTextChannelsByName(channel.getChannelName(), true)) {
-                    MessageAction msg = textChannel.sendMessage(message);
-                    if(attachmentFiles != null) {
-                        for(AttachmentFile file : attachmentFiles) {
-                            msg = msg.addFile(file.getFile(), file.getFilename());
-                        }
+        for(long channelId : channelIds) {
+            GuildChannel guildChannel = jda.getGuildChannelById(channelId);
+            if(guildChannel instanceof TextChannel) {
+                MessageAction msg = ((TextChannel)guildChannel).sendMessage(message);
+                if(attachmentFiles != null && !attachmentFiles.isEmpty()) {
+                    for(AttachmentFile file : attachmentFiles) {
+                        msg = msg.addFile(file.getFile(), file.getFilename());
                     }
-                    msg.queue();
-                    sent = true;
                 }
+                msg.queue();
+                sent = true;
+            } else {
+                log.warn("Failed to find text channel with id {}", channelId);
             }
         }
         return sent;

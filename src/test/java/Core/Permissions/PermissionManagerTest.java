@@ -22,11 +22,11 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 public class PermissionManagerTest {
-    private static final String NAME = "nagrodus";
-    private static final String GUILD_NAME = "test_guild";
-    private static final String TRUSTED_ROLE = "trusted_role";
-    private static final String ADMIN_ROLE = "admin_role";
-    private static final String WHITELISTED_CHANNEL = "whitelisted_channel";
+    private static final String NAME_ID = "123456";
+    private static final String GUILD_ID= "1234567";
+    private static final String TRUSTED_ROLE = "123";
+    private static final String ADMIN_ROLE = "12";
+    private static final String WHITELISTED_CHANNEL = "12345";
     @Mock
     private ConfigLoader configLoader;
     @Mock
@@ -56,14 +56,14 @@ public class PermissionManagerTest {
      */
     @Test
     public void testRespondsToGlobalAdmins() {
-        when(user.getName()).thenReturn(NAME);
+        when(user.getId()).thenReturn(NAME_ID);
         when(event.getAuthor()).thenReturn(user);
         // Verify that blocked by default
         assertFalse(permissionManager.isReplyAllowed(event));
-        config.setGlobalAdmins(List.of("asdasd"));
+        config.setGlobalAdmins(List.of("000"));
         // Should not respond if sender is not admin
         assertFalse(permissionManager.isReplyAllowed(event));
-        config.setGlobalAdmins(List.of("asdasd", NAME));
+        config.setGlobalAdmins(List.of("000", NAME_ID));
         // Sender is global admin, should respond
         assertTrue(permissionManager.isReplyAllowed(event));
     }
@@ -83,7 +83,7 @@ public class PermissionManagerTest {
     @Test
     public void testDoesNotRespondForEmptyServerConfig() {
         when(event.getChannelType()).thenReturn(ChannelType.TEXT);
-        when(guild.getName()).thenReturn(GUILD_NAME);
+        when(guild.getId()).thenReturn(GUILD_ID);
         when(event.getGuild()).thenReturn(guild);
         when(event.getAuthor()).thenReturn(user);
         assertFalse(permissionManager.isReplyAllowed(event));
@@ -96,12 +96,12 @@ public class PermissionManagerTest {
     public void testRespondsToServerAdmins() {
         // Create server config
         ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setName(GUILD_NAME);
+        serverConfig.setName(GUILD_ID);
         serverConfig.setAdminGroup(ADMIN_ROLE);
         config.setServers(List.of(serverConfig));
         when(event.getChannelType()).thenReturn(ChannelType.TEXT);
-        when(guild.getName()).thenReturn(GUILD_NAME);
-        when(role.getName()).thenReturn(ADMIN_ROLE);
+        when(guild.getId()).thenReturn(GUILD_ID);
+        when(role.getId()).thenReturn(ADMIN_ROLE);
         when(member.getRoles()).thenReturn(List.of(role));
         when(event.getMember()).thenReturn(member);
         when(event.getGuild()).thenReturn(guild);
@@ -115,12 +115,12 @@ public class PermissionManagerTest {
     public void testRespondsToServerTrustedUsers() {
         // Create server config
         ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setName(GUILD_NAME);
+        serverConfig.setName(GUILD_ID);
         serverConfig.setTrustedGroup(TRUSTED_ROLE);
         config.setServers(List.of(serverConfig));
         when(event.getChannelType()).thenReturn(ChannelType.TEXT);
-        when(guild.getName()).thenReturn(GUILD_NAME);
-        when(role.getName()).thenReturn(TRUSTED_ROLE);
+        when(guild.getId()).thenReturn(GUILD_ID);
+        when(role.getId()).thenReturn(TRUSTED_ROLE);
         when(member.getRoles()).thenReturn(List.of(role));
         when(event.getMember()).thenReturn(member);
         when(event.getGuild()).thenReturn(guild);
@@ -133,12 +133,12 @@ public class PermissionManagerTest {
     @Test
     public void testRespondsOnWhitelistedChannel() {
         ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setName(GUILD_NAME);
+        serverConfig.setName(GUILD_ID);
         serverConfig.setWhitelistedChannels(List.of(WHITELISTED_CHANNEL));
         config.setServers(List.of(serverConfig));
         when(event.getChannelType()).thenReturn(ChannelType.TEXT);
-        when(guild.getName()).thenReturn(GUILD_NAME);
-        when(channel.getName()).thenReturn(WHITELISTED_CHANNEL);
+        when(guild.getId()).thenReturn(GUILD_ID);
+        when(channel.getId()).thenReturn(WHITELISTED_CHANNEL);
         when(event.getChannel()).thenReturn(channel);
         when(event.getGuild()).thenReturn(guild);
         assertTrue(permissionManager.isReplyAllowed(event));
@@ -150,12 +150,12 @@ public class PermissionManagerTest {
     @Test
     public void testDoesNotRespondOnNonWhitelistedChannel() {
         ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setName(GUILD_NAME);
+        serverConfig.setName(GUILD_ID);
         serverConfig.setWhitelistedChannels(List.of(WHITELISTED_CHANNEL));
         config.setServers(List.of(serverConfig));
         when(event.getChannelType()).thenReturn(ChannelType.TEXT);
-        when(guild.getName()).thenReturn(GUILD_NAME);
-        when(channel.getName()).thenReturn("some_general_channel");
+        when(guild.getId()).thenReturn(GUILD_ID);
+        when(channel.getId()).thenReturn("404");
         when(event.getChannel()).thenReturn(channel);
         when(event.getGuild()).thenReturn(guild);
         assertFalse(permissionManager.isReplyAllowed(event));

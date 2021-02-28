@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class OmxNordicNewsConfig {
     private String enabled;
-    private String channel;
+    private Long channel;
 }

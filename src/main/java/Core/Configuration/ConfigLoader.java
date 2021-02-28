@@ -18,6 +18,7 @@ import java.util.Optional;
 @Component
 public class ConfigLoader {
     private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
+    private static final Config DEFAULT_CONFIG = new Config();
     private Config config;
     private final Path configFile;
     private Instant lastModified;
@@ -37,10 +38,10 @@ public class ConfigLoader {
             config = yaml.load(Files.readString(configFile));
             log.info("Configs loaded");
             // Compile all regex patterns
-            Optional.ofNullable(config.getServers()).ifPresent(x -> x.forEach(y -> {
+            config.getServers().forEach(y -> {
                 Optional.ofNullable(y.getReactions()).ifPresent(z -> z.forEach(Reaction::buildPattern));
                 Optional.ofNullable(y.getFilters()).ifPresent(FilterConfig::update);
-            }));
+            });
         } catch (IOException e) {
             log.error("Failed to load configuration");
         }
@@ -61,6 +62,6 @@ public class ConfigLoader {
         catch (IOException e) {
             log.error("Failed to get last modified time for config file. Assuming it has not changed", e);
         }
-        return config;
+        return Optional.ofNullable(config).orElse(DEFAULT_CONFIG);
     }
 }

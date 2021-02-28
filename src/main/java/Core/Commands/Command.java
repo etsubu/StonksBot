@@ -4,7 +4,9 @@ import Core.Configuration.CommandConfig;
 import Core.Configuration.Config;
 import Core.Configuration.ConfigLoader;
 import Core.Configuration.ServerConfig;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,17 +42,17 @@ public abstract class Command {
         this.names = Collections.unmodifiableList(names);
     }
 
-    public boolean isUserAllowed(String username, String serverName, List<Role> groups) {
+    public boolean isUserAllowed(User user, Guild server, List<Role> groups) {
         Config config = configLoader.getConfig();
         Optional<List<String>> globalAdmins = Optional.ofNullable(config.getGlobalAdmins());
-        if(globalAdmins.isPresent() && globalAdmins.get().stream().anyMatch(x -> x.equalsIgnoreCase(username))) {
+        if(globalAdmins.isPresent() && globalAdmins.get().stream().anyMatch(x -> x.equalsIgnoreCase(user.getId()))) {
             // Allow global admins to use any command
             return true;
         }
-        if(serverName == null || groups == null || groups.isEmpty()) {
+        if(server == null || groups == null || groups.isEmpty()) {
             return allowByDefault;
         }
-        Optional<ServerConfig> serverConfig = config.getServerConfig(serverName);
+        Optional<ServerConfig> serverConfig = config.getServerConfig(server.getId());
         if(serverConfig.isPresent()) {
             Optional<Map<String, CommandConfig>> commandConfigs = Optional.ofNullable(serverConfig.get().getCommands());
             if(commandConfigs.isPresent()) {
@@ -60,7 +62,7 @@ public abstract class Command {
                         Optional<List<String>> allowedGroups = Optional.ofNullable(commandConfig.getAllowedGroups());
                         if(allowedGroups.isPresent()) {
                             for(Role group : groups) {
-                                if(allowedGroups.get().stream().anyMatch(x -> x.equalsIgnoreCase(group.getName()))) {
+                                if(allowedGroups.get().stream().anyMatch(x -> x.equalsIgnoreCase(group.getId()))) {
                                     return true;
                                 }
                             }
@@ -85,8 +87,8 @@ public abstract class Command {
      * @param command Command the user typed
      * @return CommandResult containing the result
      */
-    public CommandResult execute(String command, String username, List<Role> groups, String serverName) {
-        if(isUserAllowed(username, serverName, groups)) {
+    public CommandResult execute(String command, User user, List<Role> groups, Guild server) {
+        if(isUserAllowed(user, server, groups)) {
             return exec(command);
         }
         return new CommandResult("You lack permissions to use this command", false);

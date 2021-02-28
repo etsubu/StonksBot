@@ -25,25 +25,24 @@ public class PermissionManager {
         User user = event.getAuthor();
         MessageChannel channel = event.getChannel();
         boolean isGlobalAdmin = Optional.ofNullable(configLoader.getConfig().getGlobalAdmins())
-                .map(x -> x.stream().anyMatch(y -> y.trim().equalsIgnoreCase(user.getName()))).orElse(false);
+                .map(x -> x.stream().anyMatch(y -> y.trim().equalsIgnoreCase(user.getId()))).orElse(false);
         if(isGlobalAdmin) {
             return true;
         }
         if(event.getChannelType() != ChannelType.TEXT) {
             return false;
         }
-        String serverName = event.getGuild().getName().trim().toLowerCase();
         Optional<List<Role>> userRoles = Optional.ofNullable(event.getMember()).map(Member::getRoles);
-        Optional<ServerConfig> serverConfig = configLoader.getConfig().getServerConfig(serverName);
+        Optional<ServerConfig> serverConfig = configLoader.getConfig().getServerConfig(event.getGuild().getId());
         if(serverConfig.isEmpty()) {
-            log.info("No configs for server {}, block by default", serverName);
+            log.info("No configs for server {}, block by default", event.getGuild().getId());
             return false;
         }
         boolean isInServerAdminGroup = userRoles.map(x -> x.stream()
-                .anyMatch(y -> y.getName().trim().equalsIgnoreCase(serverConfig.get().getAdminGroup())))
+                .anyMatch(y -> y.getId().trim().equalsIgnoreCase(serverConfig.get().getAdminGroup())))
                 .orElse(false);
         boolean isInServerTrustedGroup = userRoles.map(x -> x.stream()
-                .anyMatch(y -> y.getName().trim().equalsIgnoreCase(serverConfig.get().getTrustedGroup())))
+                .anyMatch(y -> y.getId().trim().equalsIgnoreCase(serverConfig.get().getTrustedGroup())))
                 .orElse(false);
         log.debug("Is admin: {}, is trusted: {}", isInServerAdminGroup, isInServerTrustedGroup);
         if(isInServerAdminGroup || isInServerTrustedGroup) {
@@ -52,6 +51,6 @@ public class PermissionManager {
         // If no special permissions then check if the channel is allowed
         // Allow if no channel is whitelisted
         return Optional.ofNullable(serverConfig.get().getWhitelistedChannels())
-                .map(x -> x.stream().anyMatch(y -> y.trim().equalsIgnoreCase(channel.getName()))).orElse(false);
+                .map(x -> x.stream().anyMatch(y -> y.trim().equalsIgnoreCase(channel.getId()))).orElse(false);
     }
 }

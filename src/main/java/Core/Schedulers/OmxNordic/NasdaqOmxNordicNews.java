@@ -19,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -86,12 +83,10 @@ public class NasdaqOmxNordicNews implements Schedulable {
     private void sendNewsPosts(List<OmxNewsItem> items) {
         log.info("Resolving news attachments");
         items.forEach(OmxNewsItem::resolveAttachments);
-        List<ServerChannel> serverConfigs = configLoader.getConfig().getServers().stream().filter(x -> x.getNewsChannel() != null)
-                .map(x -> new ServerChannel(x.getName(), x.getNewsChannel()))
-                .collect(Collectors.toList());
-        if(!serverConfigs.isEmpty()) {
+        List<Long> channelIds = configLoader.getConfig().getServers().stream().map(ServerConfig::getNewsChannel).filter(Objects::nonNull).collect(Collectors.toList());
+        if(!channelIds.isEmpty()) {
             items.forEach(x -> {
-                eventCore.sendMessage(serverConfigs, x.toString(), x.getFiles());
+                eventCore.sendMessage(channelIds, x.toString(), x.getFiles());
             });
         }
     }
@@ -115,9 +110,7 @@ public class NasdaqOmxNordicNews implements Schedulable {
 
     @Override
     public void invoke() {
-        if(configLoader.getConfig().getOmxhNews() == null ||
-                configLoader.getConfig().getOmxhNews().getEnabled() == null ||
-                !Boolean.parseBoolean(configLoader.getConfig().getOmxhNews().getEnabled())) {
+        if(Optional.ofNullable(configLoader.getConfig().getOmxhNews()).map(x -> Boolean.parseBoolean(x.getEnabled())).orElse(false)) {
             // Not enabled, skip
             return;
         }

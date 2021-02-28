@@ -70,13 +70,10 @@ public class CommandHandler {
             return new CommandResult("Unknown command!", false);
         }
         User user = event.getAuthor();
-        String serverName = null;
-        if(event.getChannelType() == ChannelType.TEXT) {
-            serverName = event.getGuild().getName().trim().toLowerCase();
-        }
         Optional<List<Role>> userRoles = Optional.ofNullable(event.getMember()).map(Member::getRoles);
+        Guild guild = event.getChannelType() == ChannelType.TEXT ? event.getGuild() : null;
         if(index < command.length() - 1)
-            return cmd.execute(command.substring(index + 1), user.getName(), userRoles.orElse(new LinkedList<>()), serverName);
-        return cmd.execute("", user.getName(), userRoles.orElse(new LinkedList<>()), serverName);
+            return cmd.execute(command.substring(index + 1), user, userRoles.orElse(new LinkedList<>()), guild);
+        return cmd.execute("", user, userRoles.orElse(new LinkedList<>()), guild);
     }
 }
