@@ -1,5 +1,6 @@
 package Core.HTTP;
 
+import Core.Utilities.Pair;
 import Core.Utilities.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Tiny Api for Core.HTTP Get requests
@@ -49,6 +55,34 @@ public class HttpApi {
             return Optional.empty();
         }
         return Optional.of(response.body());
+    }
+
+    public static Map<String, String> sendMultipleGet(Set<String> urls) throws IOException, InterruptedException {
+        Map<String, CompletableFuture<HttpResponse<String>>> responses = new HashMap<>((int)(urls.size()*1.25)+1);
+        Map<String, String> responseMap = new HashMap<>((int)(urls.size()*1.25)+1);
+        for(String url : urls) {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .setHeader("User-Agent", USER_AGENT_PRODUCT + "/" + VERSION)
+                    .timeout(Duration.ofSeconds(30))
+                    .GET()
+                    .build();
+            CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+            responses.put(url, response);
+        }
+        // Wait for responses and filter those that succeeded with status code 200
+        responses.entrySet().stream()
+                .map(x -> {
+                    try {
+                        return new Pair<>(x.getKey(), x.getValue().get());
+                    } catch (InterruptedException | ExecutionException e) {
+                        log.error("Failed to retrieve wall for profile {}", x.getKey());
+                    }
+                    return null;
+                })
+                .filter(x -> x != null && x.second.statusCode() == 200 && x.second.body() != null)
+                .forEach(x -> responseMap.put(x.first, x.second.body()));
+        return responseMap;
     }
 
     public static Optional<byte[]> downloadFile(String url) throws IOException, InterruptedException {

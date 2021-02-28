@@ -1,13 +1,11 @@
 package Core.Configuration;
 
-import lombok.Getter;
+import Core.Schedulers.Shareville.SharevilleTracker;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@Getter
 @Setter
 @NoArgsConstructor
 public class ServerConfig {
@@ -20,4 +18,25 @@ public class ServerConfig {
     private Map<String, CommandConfig> commands;
     private Long newsChannel;
     private Long recommendationChannel;
+    private SharevilleConfig shareville;
+
+    public String getName() { return name; }
+
+    public List<String> getWhitelistedChannels() { return Optional.ofNullable(whitelistedChannels).orElseGet(LinkedList::new); }
+
+    public List<Reaction> getReactions() { return Optional.ofNullable(reactions).orElseGet(LinkedList::new); }
+
+    public FilterConfig getFilters() { return Optional.ofNullable(filters).orElseGet(FilterConfig::new); }
+
+    public String getAdminGroup() { return adminGroup; }
+
+    public String getTrustedGroup() { return trustedGroup; }
+
+    public Map<String, CommandConfig> getCommands() { return Optional.ofNullable(commands).orElseGet(HashMap::new); }
+
+    public Long getNewsChannel() { return newsChannel; }
+
+    public Long getRecommendationChannel() { return recommendationChannel; }
+
+    public SharevilleConfig getShareville() { return Optional.ofNullable(shareville).orElseGet(SharevilleConfig::new); }
 }
