@@ -14,6 +14,7 @@ import org.ta4j.core.num.PrecisionNum;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class RecommendationCommand extends Command {
@@ -27,7 +28,7 @@ public class RecommendationCommand extends Command {
         this.yahooConnector = yahooConnector;
     }
 
-    private Optional<RecommendationEntry> filterEntry(List<RecommendationEntry> entries, String name) {
+    private Optional<RecommendationEntry> filterEntry(Set<RecommendationEntry> entries, String name) {
         Optional<RecommendationEntry> entry = entries.stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst();
         if(entry.isPresent()) {
             return entry;
@@ -49,8 +50,8 @@ public class RecommendationCommand extends Command {
         builder.append("```\n(Inderes)\n");
         builder.append("Nimi: ").append(entry.getName()).append('\n');
         builder.append("Suosituksen päivämäärä: ").append(entry.getDate()).append('\n');
-        builder.append("Tavoitehinta: ").append(entry.getTarget()).append("€\n");
-        price.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append('€')
+        builder.append("Tavoitehinta: ").append(entry.getTarget()).append(entry.getCurrency()).append('\n');
+        price.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(entry.getCurrency())
                 .append("\nNousuvara: ")
                         .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(PrecisionNum.valueOf(100)).toString(), 2))
                         .append("%\n"));
@@ -64,7 +65,7 @@ public class RecommendationCommand extends Command {
             return new CommandResult("You must provide OMXH/first north stock name that inderes follows", false);
         }
         try {
-            List<RecommendationEntry> entries = inderesConnector.queryRecommendations();
+            Set<RecommendationEntry> entries = inderesConnector.queryRecommendations();
             String[] parts = command.split(" ");
             if(parts[0].equals("filter")) {
                 return new CommandResult("Not implemented yet", false);

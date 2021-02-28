@@ -1,5 +1,6 @@
 package Core.HTTP;
 
+import Core.Utilities.VersionParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,9 +23,12 @@ public class HttpApi {
     private static final Logger log = LoggerFactory.getLogger(HttpApi.class);
     private static final long TIMEOUT = 30;
     private static final HttpClient client;
+    private static final String USER_AGENT_PRODUCT = "StonksBot";
+    private static final String VERSION;
 
     static  {
         client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(TIMEOUT)).build();
+        VERSION = VersionParser.applicationVersion();
     }
     /**
      * Sends Core.HTTP Get request and returns the response in String
@@ -35,6 +39,7 @@ public class HttpApi {
     public static Optional<String> sendGet(String url) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
+                .setHeader("User-Agent", USER_AGENT_PRODUCT + "/" + VERSION)
                 .timeout(Duration.ofSeconds(30))
                 .GET()
                 .build();

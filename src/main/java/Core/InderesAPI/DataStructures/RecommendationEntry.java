@@ -1,22 +1,31 @@
 package Core.InderesAPI.DataStructures;
 
 import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Objects;
 
 /**
  * Single stock recommendation returned from Inderes API
  * @author etsubu
  */
 @Getter
+@EqualsAndHashCode
+@AllArgsConstructor
 public class RecommendationEntry {
-    private String isin;
-    private String name;
+    private final String isin;
+    private final String name;
     @SerializedName("date_of_recommendation")
-    private String date;
+    private final String date;
     @SerializedName("target_price")
-    private String target;
-    private String currency;
-    private String recommendation;
+    private final String target;
+    private final String currency;
+    private final String recommendation;
+    @SerializedName("risk_level")
+    private final String risk;
 
     /**
      * Converts numeric recommendation to descriptive text format
@@ -33,5 +42,9 @@ public class RecommendationEntry {
             case '5': return "osta";
             default: return "tuntematon suositus";
         }
+    }
+
+    public boolean hasChanged(RecommendationEntry entry) {
+        return Objects.equals(isin, entry.isin) && !Objects.equals(date, entry.getDate());
     }
 }
