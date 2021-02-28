@@ -2,6 +2,10 @@
 oauth: test_oauth
 globalAdmins:
   - nagrodus
+omxhNews:
+  enabled: false
+shareville:
+  enabled: false
 servers:
   - name: test_server
     whitelistedChannels:

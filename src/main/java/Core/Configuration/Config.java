@@ -1,6 +1,5 @@
 package Core.Configuration;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
@@ -12,7 +11,8 @@ import java.util.Optional;
 @NoArgsConstructor
 public class Config {
     private String oauth;
-    private OmxNordicNewsConfig omxhNews;
+    private FeatureConfig omxhNews;
+    private FeatureConfig shareville;
     private List<String> globalAdmins;
     private List<ServerConfig> servers;
 
@@ -25,9 +25,11 @@ public class Config {
 
     public String getOauth() { return oauth; }
 
-    public OmxNordicNewsConfig getOmxhNews() { return omxhNews; }
+    public FeatureConfig getOmxhNews() { return omxhNews; }
 
     public List<String> getGlobalAdmins() { return Optional.ofNullable(globalAdmins).orElseGet(LinkedList::new); }
 
     public List<ServerConfig> getServers() { return Optional.ofNullable(servers).orElseGet(LinkedList::new); }
+
+    public FeatureConfig getShareville() { return Optional.ofNullable(shareville).orElseGet(()->new FeatureConfig("false")); }
 }

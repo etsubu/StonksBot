@@ -39,8 +39,8 @@ public class ConfigLoader {
             log.info("Configs loaded");
             // Compile all regex patterns
             config.getServers().forEach(y -> {
-                Optional.ofNullable(y.getReactions()).ifPresent(z -> z.forEach(Reaction::buildPattern));
-                Optional.ofNullable(y.getFilters()).ifPresent(FilterConfig::update);
+                y.getReactions().forEach(Reaction::buildPattern);
+                y.getFilters().update();
             });
         } catch (IOException e) {
             log.error("Failed to load configuration");
