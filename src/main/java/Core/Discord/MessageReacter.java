@@ -35,7 +35,7 @@ public class MessageReacter {
         if(event.getChannelType() != ChannelType.TEXT) {
             return Optional.empty();
         }
-        String serverName = event.getGuild().getName().trim().toLowerCase();
+        String serverName = event.getGuild().getId();
         Optional<ServerConfig> serverConfig = configLoader.getConfig().getServerConfig(serverName);
         if(serverConfig.isEmpty()) {
             log.info("No configs for server {}, block by default", serverName);

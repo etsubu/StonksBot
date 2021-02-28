@@ -4,6 +4,7 @@ import Core.Configuration.Config;
 import Core.Configuration.ConfigLoader;
 import Core.Configuration.ServerConfig;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
@@ -28,12 +29,12 @@ public class FilterHandler {
             return false;
         }
         Config config = configLoader.getConfig();
-        String serverName = event.getGuild().getName().trim().toLowerCase();
+        String serverName = event.getGuild().getId();
         Optional<ServerConfig> serverConfig = config.getServerConfig(serverName);
         if(serverConfig.isEmpty()) {
             return false;
         }
-        if(config.getGlobalAdmins().stream().anyMatch(x -> x.equalsIgnoreCase(event.getAuthor().getName()))) {
+        if(config.getGlobalAdmins().stream().anyMatch(x -> x.equalsIgnoreCase(event.getAuthor().getId()))) {
             // Ignore global admins
             return false;
         }
@@ -48,19 +49,18 @@ public class FilterHandler {
                     event.getAuthor().getName(),
                     event.getAuthor().getId());
             if(serverConfig.get().getFilters().getNotifyChannel() != null) {
-                List<TextChannel> channels = event.getGuild().getTextChannelsByName(serverConfig.get().getFilters().getNotifyChannel(), true);
-                if(channels.size() > 0) {
+                GuildChannel guildChannel = event.getJDA().getGuildChannelById(serverConfig.get().getFilters().getNotifyChannel());
+                if(guildChannel instanceof TextChannel) {
+                    TextChannel channel = (TextChannel) guildChannel;
                     // Remove the message
                     event.getMessage().delete().queue();
                     // Send notification to admin channel
-                    channels.get(0).sendMessage(String.format("Filtered message:%n```%s```%nnUser: %s, id=%s, channel=%s",
+                    channel.sendMessage(String.format("Filtered message:%n```%s```%nnUser: %s, id=%s, channel=%s",
                             event.getMessage().getContentDisplay().replaceAll("`", ""),
                             event.getAuthor().getName(),
                             event.getAuthor().getId(),
                             event.getChannel().getName())).queue();
                     log.info("Filtered message");
-                } else {
-                    log.info("Filtering message but no notification channel exists");
                 }
             } else {
                 log.info("Filtering message but no notification channel exists");
