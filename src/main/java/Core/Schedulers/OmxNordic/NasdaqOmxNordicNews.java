@@ -85,9 +85,7 @@ public class NasdaqOmxNordicNews implements Schedulable {
         items.forEach(OmxNewsItem::resolveAttachments);
         List<Long> channelIds = configLoader.getConfig().getServers().stream().map(ServerConfig::getNewsChannel).filter(Objects::nonNull).collect(Collectors.toList());
         if(!channelIds.isEmpty()) {
-            items.forEach(x -> {
-                eventCore.sendMessage(channelIds, x.toString(), x.getFiles());
-            });
+            items.forEach(x -> eventCore.sendMessage(channelIds, x.toString(), x.getFiles()));
         }
     }
 

@@ -25,7 +25,7 @@ public class Config {
 
     public String getOauth() { return oauth; }
 
-    public FeatureConfig getOmxhNews() { return omxhNews; }
+    public FeatureConfig getOmxhNews() { return Optional.ofNullable(omxhNews).orElseGet(()->new FeatureConfig("false")); }
 
     public List<String> getGlobalAdmins() { return Optional.ofNullable(globalAdmins).orElseGet(LinkedList::new); }
 
