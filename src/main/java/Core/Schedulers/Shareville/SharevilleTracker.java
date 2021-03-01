@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class SharevilleTracker implements Schedulable {
     private static final Logger log = LoggerFactory.getLogger(SharevilleTracker.class);
     private static final String PROFILE_URL_TEMPLATE = "https://www.shareville.fi/api/v1/profiles/%s/stream";
-    private static final int DELAY = 300; // 3min
+    private static final int DELAY = 300; // 5min
     private final ConfigLoader configLoader;
     private final Map<String, SharevilleUser> profileMap;
     private final EventCore eventCore;

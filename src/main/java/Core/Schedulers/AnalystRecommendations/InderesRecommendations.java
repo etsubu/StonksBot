@@ -76,8 +76,7 @@ public class InderesRecommendations implements Schedulable {
             return;
         }
         try {
-            Map<String, RecommendationEntry> recommendations = new HashMap<>(256);
-            inderesConnector.queryRecommendations().forEach(x -> recommendations.put(x.getIsin(), x));
+            Map<String, RecommendationEntry> recommendations = inderesConnector.queryRecommendationsMap();
             Map<String, RecommendationEntry> existingRecommendations;
             synchronized (entries) {
                 existingRecommendations = new HashMap<>(entries);
