@@ -92,8 +92,10 @@ public class InderesRecommendations implements Schedulable {
             // These are the recommendations that have at least 3 days between last change. This is used to avoid an issue
             // Where inderes changes recommendation without updating the date of recommendation at the same time and the date
             // is actually updated during the next day
+            // Alternatively if the actual recommendation values have changed then display those always
             Set<Pair<RecommendationEntry, RecommendationEntry>> freshRecommendations = changedRecommendations.stream()
-                    .filter(x -> Math.abs(x.first.getLastUpdated() - x.second.getLastUpdated()) > FRESHNESS_WINDOW)
+                    .filter(x -> Math.abs(x.first.getLastUpdated() - x.second.getLastUpdated()) > FRESHNESS_WINDOW
+                            || x.first.hasRecommendationChanged(x.second))
                     .collect(Collectors.toSet());
             // Refresh recommendations
             synchronized (entries) {

@@ -66,16 +66,10 @@ public class RecommendationEntry {
                 || !Objects.equals(risk, entry.getRisk()));
     }
 
-    public boolean hasDaysBetweenChange(RecommendationEntry entry, int days) {
-        ZonedDateTime time = TimeUtils.parseTime(entry.getDate());
-        ZonedDateTime ownTime = TimeUtils.parseTime(getDate());
-        if(time.equals(ownTime)) {
-            return false;
-        }
-        if(time.isAfter(ownTime)) {
-            return time.isAfter(ownTime.plusDays(days));
-        }
-        return ownTime.isAfter(time.plusDays(days));
+    public boolean hasRecommendationChanged(RecommendationEntry entry) {
+        return Objects.equals(isin, entry.isin) && (!Objects.equals(target, entry.getTarget())
+                || !Objects.equals(recommendation, entry.getRecommendation())
+                || !Objects.equals(risk, entry.getRisk()));
     }
 
     @Override
