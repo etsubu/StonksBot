@@ -71,6 +71,8 @@ public class InderesConnectorImpl implements InderesConnector {
                 log.error("Failed to parse recommendation json entry ", e);
             }
         });
+        // Update last updated timestamp
+        recommendations.values().forEach(x -> x.setLastUpdated(System.currentTimeMillis()));
         synchronized (entries) {
             entries.clear();
             entries.putAll(recommendations);

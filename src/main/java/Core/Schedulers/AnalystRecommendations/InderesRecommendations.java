@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @Component
 public class InderesRecommendations implements Schedulable {
     private static final Logger log = LoggerFactory.getLogger(InderesRecommendations.class);
+    // ~3 days freshness
+    private static final long FRESHNESS_WINDOW = 1000 * 60 * 60 * 24 * 3;
     private static final int DELAY = 300; // 5min
     // This is used for exponential backoff in case the server fails to respond
     private int failureCounter = 0;
@@ -87,12 +89,24 @@ public class InderesRecommendations implements Schedulable {
                             .map(y -> y.hasChanged(x.getValue())).orElse(false))
                     .map(x-> new Pair<>(existingRecommendations.get(x.getKey()), x.getValue()))
                     .collect(Collectors.toSet());
+            // These are the recommendations that have at least 3 days between last change. This is used to avoid an issue
+            // Where inderes changes recommendation without updating the date of recommendation at the same time and the date
+            // is actually updated during the next day
+            Set<Pair<RecommendationEntry, RecommendationEntry>> freshRecommendations = changedRecommendations.stream()
+                    .filter(x -> Math.abs(x.first.getLastUpdated() - x.second.getLastUpdated()) > FRESHNESS_WINDOW)
+                    .collect(Collectors.toSet());
             // Refresh recommendations
             synchronized (entries) {
-                entries.clear();
-                entries.putAll(recommendations);
+                // Delete those that are not followed by inderes anymore
+                entries.entrySet().removeIf(x -> !recommendations.containsKey(x.getKey()));
+                // Add new newly followed
+                recommendations.values().stream().filter(x -> !entries.containsKey(x.getIsin())).forEach(x -> entries.put(x.getIsin(), x));
+                // Updated those that had actually changed
+                changedRecommendations.stream().map(x -> x.second).forEach(x -> entries.put(x.getIsin(), x));
             }
-            notifyRecommendationChanges(changedRecommendations);
+            // Inderes can change recommendation values before changing the actual date of the recommendation
+            // Let's avoid this by updating the recommendation time to current
+            notifyRecommendationChanges(freshRecommendations);
             failureCounter = 0;
         } catch (IOException | InterruptedException e) {
             log.error("Failed to retrieve recommendations from inderes", e);

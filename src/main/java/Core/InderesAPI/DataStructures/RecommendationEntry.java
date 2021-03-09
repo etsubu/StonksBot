@@ -1,11 +1,13 @@
 package Core.InderesAPI.DataStructures;
 
+import Core.Utilities.TimeUtils;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.ZonedDateTime;
 import java.util.Objects;
 
 /**
@@ -13,19 +15,21 @@ import java.util.Objects;
  * @author etsubu
  */
 @Getter
-@EqualsAndHashCode
+@Setter
 @AllArgsConstructor
 public class RecommendationEntry {
-    private final String isin;
-    private final String name;
+    /* This is internal value and not from inderes */
+    private Long lastUpdated;
+    private String isin;
+    private String name;
     @SerializedName("date_of_recommendation")
-    private final String date;
+    private String date;
     @SerializedName("target_price")
-    private final String target;
-    private final String currency;
-    private final String recommendation;
+    private String target;
+    private String currency;
+    private String recommendation;
     @SerializedName("risk_level")
-    private final String risk;
+    private String risk;
 
     /**
      * Converts numeric recommendation to descriptive text format
@@ -44,7 +48,46 @@ public class RecommendationEntry {
         }
     }
 
+    public long getLastUpdated() {
+        if(lastUpdated == null) {
+            lastUpdated = System.currentTimeMillis();
+        }
+        return lastUpdated;
+    }
+
+    public void updateLastUpdated() {
+        lastUpdated = System.currentTimeMillis();
+    }
+
     public boolean hasChanged(RecommendationEntry entry) {
-        return Objects.equals(isin, entry.isin) && !Objects.equals(date, entry.getDate());
+        return Objects.equals(isin, entry.isin) && (!Objects.equals(date, entry.getDate())
+                || !Objects.equals(target, entry.getTarget())
+                || !Objects.equals(recommendation, entry.getRecommendation())
+                || !Objects.equals(risk, entry.getRisk()));
+    }
+
+    public boolean hasDaysBetweenChange(RecommendationEntry entry, int days) {
+        ZonedDateTime time = TimeUtils.parseTime(entry.getDate());
+        ZonedDateTime ownTime = TimeUtils.parseTime(getDate());
+        if(time.equals(ownTime)) {
+            return false;
+        }
+        if(time.isAfter(ownTime)) {
+            return time.isAfter(ownTime.plusDays(days));
+        }
+        return ownTime.isAfter(time.plusDays(days));
+    }
+
+    @Override
+    public int hashCode() {
+        return isin != null ? isin.hashCode() : 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null || o.getClass() != getClass()) {
+            return false;
+        }
+        return Objects.equals(((RecommendationEntry)o).getIsin(), getIsin());
     }
 }
