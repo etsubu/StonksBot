@@ -108,7 +108,7 @@ public class NasdaqOmxNordicNews implements Schedulable {
 
     @Override
     public void invoke() {
-        if(Optional.ofNullable(configLoader.getConfig().getOmxhNews()).map(x -> Boolean.parseBoolean(x.getEnabled())).orElse(false)) {
+        if(Optional.ofNullable(configLoader.getConfig().getOmxhNews()).map(x -> !Boolean.parseBoolean(x.getEnabled())).orElse(false)) {
             // Not enabled, skip
             return;
         }
