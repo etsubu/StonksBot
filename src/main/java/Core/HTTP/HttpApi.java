@@ -45,7 +45,6 @@ public class HttpApi {
     public static Optional<String> sendGet(String url) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .setHeader("User-Agent", USER_AGENT_PRODUCT + "/" + VERSION)
                 .timeout(Duration.ofSeconds(30))
                 .GET()
                 .build();
