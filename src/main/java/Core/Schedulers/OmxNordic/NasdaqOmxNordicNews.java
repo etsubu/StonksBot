@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Component
 public class NasdaqOmxNordicNews implements Schedulable {
     private static final Logger log = LoggerFactory.getLogger(NasdaqOmxNordicNews.class);
-    private final int DELAY_IN_TASK = 60; // 1min
+    private final int DELAY_IN_TASK = 120; // 2min'
     private int latestIdOmxh;
     private int latestIdFirstNorth;
     private final Gson gson;
@@ -40,7 +40,6 @@ public class NasdaqOmxNordicNews implements Schedulable {
         latestIdFirstNorth = -1;
         log.info("Registering scheduled task {}", getClass().getName());
         schedulerService.registerTask(this, DELAY_IN_TASK);
-
     }
 
     public Optional<List<OmxNewsItem>> parseResponse(String raw) {
@@ -113,8 +112,8 @@ public class NasdaqOmxNordicNews implements Schedulable {
             return;
         }
         try {
-            Optional<String> omxhResponse = HttpApi.sendGet("https://api.news.eu.nasdaq.com/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&market=Main%20Market%2C+Helsinki&cnscategory=&company=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=fi&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
-            Optional<String> firstNorthResponse = HttpApi.sendGet("https://api.news.eu.nasdaq.com/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=First%20North+Finland&cnscategory=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicFirstNorth&displayLanguage=en&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
+            Optional<String> omxhResponse = HttpApi.sendGet("https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&market=Main%20Market%2C+Helsinki&cnscategory=&company=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=fi&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
+            Optional<String> firstNorthResponse = HttpApi.sendGet("https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=First%20North+Finland&cnscategory=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicFirstNorth&displayLanguage=en&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&start=0&dir=DESC");
             List<OmxNewsItem> omxhItems = listNewsItems(omxhResponse, latestIdOmxh);
             List<OmxNewsItem> firstNorthItems = listNewsItems(firstNorthResponse, latestIdFirstNorth);
             List<OmxNewsItem> totalNewsItems = new ArrayList<>(omxhItems.size() + firstNorthItems.size());
