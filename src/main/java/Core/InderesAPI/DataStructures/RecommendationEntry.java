@@ -42,6 +42,7 @@ public class RecommendationEntry {
         switch (recommendation.charAt(0)) {
             case '1': return "myy";
             case '2': return "vähennä";
+            case '3': return "pidä";
             case '4': return "lisää";
             case '5': return "osta";
             default: return "tuntematon suositus";
