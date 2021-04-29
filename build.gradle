@@ -1,10 +1,10 @@
 plugins {
-    id "io.freefair.lombok" version "5.3.0"
-    id "org.owasp.dependencycheck" version "6.1.1"
-    id "com.github.spotbugs" version "4.6.2"
-    id "com.github.johnrengelman.shadow" version "6.1.0"
-    id "com.github.ben-manes.versions" version "0.36.0"
-    id 'se.patrikerdes.use-latest-versions' version '0.2.15'
+    id "io.freefair.lombok" version "6.0.0-m2"
+    id "org.owasp.dependencycheck" version "6.1.6"
+    id "com.github.spotbugs" version "4.7.1"
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.ben-manes.versions" version "0.38.0"
+    id 'se.patrikerdes.use-latest-versions' version '0.2.16'
     id "java"
 }
 
@@ -24,24 +24,24 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-core:5.3.4'
-    implementation 'org.springframework:spring-beans:5.3.4'
-    implementation 'org.springframework:spring-context:5.3.4'
+    implementation 'org.springframework:spring-core:5.3.6'
+    implementation 'org.springframework:spring-beans:5.3.6'
+    implementation 'org.springframework:spring-context:5.3.6'
     implementation 'org.yaml:snakeyaml:1.28'
     implementation 'org.ta4j:ta4j-core:0.13'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'org.json:json:20201115'
-    implementation ('net.dv8tion:JDA:4.2.0_229') {
+    implementation 'org.json:json:20210307'
+    implementation ('net.dv8tion:JDA:4.2.0_247') {
         exclude module: 'opus-java'
     }
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
-    implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.0'
-    implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
-    implementation 'org.apache.logging.log4j:log4j-api:2.14.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+    implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0-M1'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.0-M1'
-    testImplementation 'org.mockito:mockito-core:3.8.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.8.0'
+    testImplementation 'org.mockito:mockito-core:3.9.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:3.9.0'
 }
 
 group = 'org.stonksbot'
