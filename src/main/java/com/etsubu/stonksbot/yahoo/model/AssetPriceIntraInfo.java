@@ -4,7 +4,7 @@ import com.etsubu.stonksbot.yahoo.StockName;
 import lombok.Getter;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.PrecisionNum;
+import org.ta4j.core.num.DecimalNum;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -22,6 +22,7 @@ public class AssetPriceIntraInfo {
     private final Num volume;
 
     public AssetPriceIntraInfo(BarSeries series, StockName name) {
+
         this.name = name;
         previousClose = series.getFirstBar().getClosePrice();
         open = series.getLastBar().getOpenPrice();
@@ -46,7 +47,7 @@ public class AssetPriceIntraInfo {
     }
 
     public Num getChangePercent() {
-        return ((current.minus(previousClose)).dividedBy(previousClose)).multipliedBy(PrecisionNum.valueOf(100));
+        return ((current.minus(previousClose)).dividedBy(previousClose)).multipliedBy(DecimalNum.valueOf(100));
     }
 
     @Override

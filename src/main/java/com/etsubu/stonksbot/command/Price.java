@@ -1,8 +1,8 @@
 package com.etsubu.stonksbot.command;
 
 import com.etsubu.stonksbot.configuration.ConfigLoader;
+import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.AssetPriceIntraInfo;
-import com.etsubu.stonksbot.yahoo.YahooConnectorImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,13 +20,14 @@ import java.util.Optional;
 @Component
 public class Price extends Command {
     private static final Logger log = LoggerFactory.getLogger(Price.class);
-    private final YahooConnectorImpl api;
+    private final YahooConnector api;
     
     /**
-     * Initializes Price
-     * @param api AlphaVantageConnector for querying information
+     * Initializes Price command
+     * @param api yahoo finance api connector
+     * @param configLoader Configuration loader
      */
-    public Price(YahooConnectorImpl api, ConfigLoader configLoader) {
+    public Price(YahooConnector api, ConfigLoader configLoader) {
         super(List.of("price", "hinta", "p"), configLoader, true);
         this.api = api;
         log.info("Initialized price command");

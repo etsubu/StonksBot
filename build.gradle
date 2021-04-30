@@ -31,7 +31,7 @@ dependencies {
     implementation 'org.springframework:spring-beans:5.3.6'
     implementation 'org.springframework:spring-context:5.3.6'
     implementation 'org.yaml:snakeyaml:1.28'
-    implementation 'org.ta4j:ta4j-core:0.13'
+    implementation 'org.ta4j:ta4j-core:0.14'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.json:json:20210307'
     implementation ('net.dv8tion:JDA:4.2.1_262') {

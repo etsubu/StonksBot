@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.PrecisionNum;
+import org.ta4j.core.num.DecimalNum;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -66,14 +66,14 @@ public class FscoreCommand extends Command{
             log.info("Value does not have enough quarters available to calculate TTM");
             return Optional.empty();
         }
-        Num sum = PrecisionNum.valueOf(0);
+        Num sum = DecimalNum.valueOf(0);
         for(int i = 0; i < 4; i++) {
             Optional<DataValue> reportedValue = values.get(i).getReportedValue();
             if(reportedValue.isEmpty()) {
                 log.info("Quarter's reported value was empty");
                 return Optional.empty();
             }
-            sum = sum.plus(PrecisionNum.valueOf(reportedValue.get().getRaw()));
+            sum = sum.plus(DecimalNum.valueOf(reportedValue.get().getRaw()));
         }
         return Optional.of(sum);
     }
@@ -136,8 +136,8 @@ public class FscoreCommand extends Command{
             Optional<DataValue> currentValue = quarterlyLongTermDebt.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousValue = quarterlyLongTermDebt.get().getValue().get(4).getReportedValue();
             if(currentValue.isPresent() && previousValue.isPresent()) {
-                Num currentDebt = PrecisionNum.valueOf(currentValue.get().getRaw());
-                Num previousDebt = PrecisionNum.valueOf(previousValue.get().getRaw());
+                Num currentDebt = DecimalNum.valueOf(currentValue.get().getRaw());
+                Num previousDebt = DecimalNum.valueOf(previousValue.get().getRaw());
                 total++;
                 if(currentDebt.isLessThan(previousDebt)) {
                     score++;
@@ -150,8 +150,8 @@ public class FscoreCommand extends Command{
             Optional<DataValue> currentValue = annualLongTermDebt.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousValue = annualLongTermDebt.get().getValue().get(1).getReportedValue();
             if(currentValue.isPresent() && previousValue.isPresent()) {
-                Num currentDebt = PrecisionNum.valueOf(currentValue.get().getRaw());
-                Num previousDebt = PrecisionNum.valueOf(previousValue.get().getRaw());
+                Num currentDebt = DecimalNum.valueOf(currentValue.get().getRaw());
+                Num previousDebt = DecimalNum.valueOf(previousValue.get().getRaw());
                 total++;
                 if(currentDebt.isLessThan(previousDebt)) {
                     score++;
@@ -169,8 +169,8 @@ public class FscoreCommand extends Command{
             Optional<DataValue> currentLiabilities = quarterlyCurrentLiabilities.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousLiabilities = quarterlyCurrentLiabilities.get().getValue().get(4).getReportedValue();
             if(currentAssets.isPresent() && previousAssets.isPresent() && currentLiabilities.isPresent() && previousLiabilities.isPresent()) {
-                Num previousCurrentRatio = PrecisionNum.valueOf(previousAssets.get().getRaw()).dividedBy(PrecisionNum.valueOf(previousLiabilities.get().getRaw()));
-                Num currentCurrentRatio = PrecisionNum.valueOf(currentAssets.get().getRaw()).dividedBy(PrecisionNum.valueOf(currentLiabilities.get().getRaw()));
+                Num previousCurrentRatio = DecimalNum.valueOf(previousAssets.get().getRaw()).dividedBy(DecimalNum.valueOf(previousLiabilities.get().getRaw()));
+                Num currentCurrentRatio = DecimalNum.valueOf(currentAssets.get().getRaw()).dividedBy(DecimalNum.valueOf(currentLiabilities.get().getRaw()));
                 total++;
                 if(currentCurrentRatio.isGreaterThan(previousCurrentRatio)) {
                     score++;
@@ -186,7 +186,7 @@ public class FscoreCommand extends Command{
             Optional<DataValue> previousSharesIssued = quarterlyShareIssued.get().getValue().get(4).getReportedValue();
             if(currentSharesIssued.isPresent() && previousSharesIssued.isPresent()) {
                 total++;
-                if(PrecisionNum.valueOf(currentSharesIssued.get().getRaw()).isLessThanOrEqual(PrecisionNum.valueOf(previousSharesIssued.get().getRaw()))) {
+                if(DecimalNum.valueOf(currentSharesIssued.get().getRaw()).isLessThanOrEqual(DecimalNum.valueOf(previousSharesIssued.get().getRaw()))) {
                     score++;
                     builder.append("No new shares issued: 1\n");
                 } else {
@@ -202,8 +202,8 @@ public class FscoreCommand extends Command{
             Optional<DataValue> previousTotalRevenue = annualTotalRevenue.get().getValue().get(1).getReportedValue();
             if(currentGrossProfit.isPresent() && previousGrossProfit.isPresent() && currentTotalRevenue.isPresent() && previousTotalRevenue.isPresent()) {
                 total++;
-                Num currentGrossProfitMargin = PrecisionNum.valueOf(currentGrossProfit.get().getRaw()).dividedBy(PrecisionNum.valueOf(currentTotalRevenue.get().getRaw()));
-                Num previousGrossProfitMargin = PrecisionNum.valueOf(previousGrossProfit.get().getRaw()).dividedBy(PrecisionNum.valueOf(previousTotalRevenue.get().getRaw()));
+                Num currentGrossProfitMargin = DecimalNum.valueOf(currentGrossProfit.get().getRaw()).dividedBy(DecimalNum.valueOf(currentTotalRevenue.get().getRaw()));
+                Num previousGrossProfitMargin = DecimalNum.valueOf(previousGrossProfit.get().getRaw()).dividedBy(DecimalNum.valueOf(previousTotalRevenue.get().getRaw()));
                 if(currentGrossProfitMargin.isGreaterThan(previousGrossProfitMargin)) {
                     score++;
                     builder.append("Higher gross profit margin: 1\n");
@@ -219,8 +219,8 @@ public class FscoreCommand extends Command{
             Optional<DataValue> currentTotalAssets = quarterlyTotalAssets.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousTotalAssets = quarterlyTotalAssets.get().getValue().get(4).getReportedValue();
             if(currentTotalRevenue.isPresent() && previousTotalRevenue.isPresent() && currentTotalAssets.isPresent() && previousTotalAssets.isPresent()) {
-                Num currentAssetTurnover = PrecisionNum.valueOf(currentTotalRevenue.get().getRaw()).dividedBy(PrecisionNum.valueOf(currentTotalAssets.get().getRaw()));
-                Num previousAssetTurnover = PrecisionNum.valueOf(previousTotalRevenue.get().getRaw()).dividedBy(PrecisionNum.valueOf(previousTotalAssets.get().getRaw()));
+                Num currentAssetTurnover = DecimalNum.valueOf(currentTotalRevenue.get().getRaw()).dividedBy(DecimalNum.valueOf(currentTotalAssets.get().getRaw()));
+                Num previousAssetTurnover = DecimalNum.valueOf(previousTotalRevenue.get().getRaw()).dividedBy(DecimalNum.valueOf(previousTotalAssets.get().getRaw()));
                 total++;
                 if(currentAssetTurnover.isGreaterThan(previousAssetTurnover)) {
                     score++;

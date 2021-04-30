@@ -9,7 +9,7 @@ import com.etsubu.stonksbot.yahoo.YahooConnectorImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.ta4j.core.num.PrecisionNum;
+import org.ta4j.core.num.DecimalNum;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,7 +45,7 @@ public class RecommendationCommand extends Command {
         } catch (InterruptedException e) {
             log.error("Connection to yahoo finance timed out", e);
         }
-        PrecisionNum targetPrice = PrecisionNum.valueOf(entry.getTarget());
+        DecimalNum targetPrice = DecimalNum.valueOf(entry.getTarget());
         StringBuilder builder = new StringBuilder();
         builder.append("```\n(Inderes)\n");
         builder.append("Nimi: ").append(entry.getName()).append('\n');
@@ -53,7 +53,7 @@ public class RecommendationCommand extends Command {
         builder.append("Tavoitehinta: ").append(entry.getTarget()).append(entry.getCurrency()).append('\n');
         price.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(entry.getCurrency())
                 .append("\nNousuvara: ")
-                        .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(PrecisionNum.valueOf(100)).toString(), 2))
+                        .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
                         .append("%\n"));
         builder.append("Suositus: ").append(entry.getRecommendationText()).append("\n```");
         return builder.toString();

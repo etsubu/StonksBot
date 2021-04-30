@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.PrecisionNum;
+import org.ta4j.core.num.DecimalNum;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -90,14 +90,14 @@ public class YahooConnectorImpl implements YahooConnector{
             return Optional.empty();
         }
         values.sort(Comparator.comparing(FundaValue::getAsOfDate).reversed());
-        Num sum = PrecisionNum.valueOf(0);
+        Num sum = DecimalNum.valueOf(0);
         for(int i = 0; i < 4; i++) {
             Optional<DataValue> reportedValue = values.get(i).getReportedValue();
             if(reportedValue.isEmpty()){
                 log.error("Missing reported value");
                 return Optional.empty();
             }
-            sum = sum.plus(PrecisionNum.valueOf(reportedValue.get().getRaw()));
+            sum = sum.plus(DecimalNum.valueOf(reportedValue.get().getRaw()));
         }
         return Optional.of(sum);
     }
@@ -114,7 +114,7 @@ public class YahooConnectorImpl implements YahooConnector{
         }
         values.sort(Comparator.comparing(FundaValue::getAsOfDate).reversed());
         if(values.get(0).getReportedValue().isPresent() && values.get(0).getReportedValue().get().getRaw() != null) {
-            return Optional.of(PrecisionNum.valueOf(values.get(0).getReportedValue().get().getRaw()));
+            return Optional.of(DecimalNum.valueOf(values.get(0).getReportedValue().get().getRaw()));
         }
         return Optional.empty();
     }

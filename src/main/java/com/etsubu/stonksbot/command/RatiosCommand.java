@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.PrecisionNum;
+import org.ta4j.core.num.DecimalNum;
 
 import java.io.IOException;
 import java.util.List;
@@ -72,12 +72,12 @@ public class RatiosCommand extends Command {
         if(rawValue == null) {
             return Optional.empty();
         }
-        return Optional.of(PrecisionNum.valueOf(rawValue));
+        return Optional.of(DecimalNum.valueOf(rawValue));
     }
 
     private void calculateRatio(Num base, Num value, StringBuilder response, String ratioName) {
         response.append(ratioName).append(DoubleTools.roundToFormat((base.dividedBy(value)).doubleValue()))
-                .append(" - ").append(DoubleTools.roundToFormat((value.dividedBy(base)).multipliedBy(PrecisionNum.valueOf(100)).doubleValue()))
+                .append(" - ").append(DoubleTools.roundToFormat((value.dividedBy(base)).multipliedBy(DecimalNum.valueOf(100)).doubleValue()))
                 .append("%\n");
     }
 
@@ -109,7 +109,7 @@ public class RatiosCommand extends Command {
 
         if (grossProfitTTM.isPresent() && revenueTTM.isPresent()) {
             builder.append("Gross Profit Margin: ")
-                    .append(DoubleTools.round(grossProfitTTM.get().dividedBy(revenueTTM.get()).multipliedBy(PrecisionNum.valueOf(100)).doubleValue(), 2))
+                    .append(DoubleTools.round(grossProfitTTM.get().dividedBy(revenueTTM.get()).multipliedBy(DecimalNum.valueOf(100)).doubleValue(), 2))
                     .append("%\n");
         }
 
@@ -120,8 +120,8 @@ public class RatiosCommand extends Command {
             Optional<DataValue> currentLiabilities = quarterlyCurrentLiabilities.get().getValue().get(0).getReportedValue();
             if (currentAssets.isPresent() && currentLiabilities.isPresent()) {
                 builder.append("Current ratio: ")
-                        .append(DoubleTools.round(PrecisionNum.valueOf(currentAssets.get().getRaw())
-                                .dividedBy(PrecisionNum.valueOf(currentLiabilities.get().getRaw()))
+                        .append(DoubleTools.round(DecimalNum.valueOf(currentAssets.get().getRaw())
+                                .dividedBy(DecimalNum.valueOf(currentLiabilities.get().getRaw()))
                                 .doubleValue(), 2))
                         .append('\n');
             }
@@ -131,8 +131,8 @@ public class RatiosCommand extends Command {
                 .map(x -> x.size() > 0).orElse(false)) {
             Optional<DataValue> assets = quarterlyTotalAssets.get().getValue().get(0).getReportedValue();
             assets.ifPresent(value -> builder.append("ROA: ").append(DoubleTools.round(netIncomeTTM.get()
-                    .dividedBy(PrecisionNum.valueOf(value.getRaw()))
-                    .multipliedBy(PrecisionNum.valueOf(100)).doubleValue(), 2))
+                    .dividedBy(DecimalNum.valueOf(value.getRaw()))
+                    .multipliedBy(DecimalNum.valueOf(100)).doubleValue(), 2))
                     .append("%\n"));
         }
 

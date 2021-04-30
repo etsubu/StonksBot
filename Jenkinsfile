@@ -44,7 +44,7 @@ pipeline {
     }
     post {
         always {
-            archiveArtifacts artifacts: 'build/libs/**/*.jar,build/reports/**/*.html', fingerprint: true
+            archiveArtifacts artifacts: 'build/libs/**/*.jar,build/reports/**/*.html,build/reports/**/*.xml', fingerprint: true
             junit 'build/reports/**/*.xml'
         }
         cleanup {

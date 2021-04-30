@@ -6,7 +6,8 @@ import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BaseBar;
 import org.ta4j.core.BaseBarSeries;
-import org.ta4j.core.num.PrecisionNum;
+import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.Num;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -69,12 +70,12 @@ public class ChartResult {
     private void buildCandle(BarSeries series, ZoneId zoneId, List<String> open, List<String> high, List<String> low, List<String> close, List<String> volume, int i) throws IOException {
         Instant ins = Instant.ofEpochSecond(Long.parseLong(timestamp.get(i)));
         ZonedDateTime z = ZonedDateTime.ofInstant(ins, zoneId);
-        PrecisionNum v = PrecisionNum.valueOf(Optional.ofNullable(volume.get(i)).orElse("0"));
-        PrecisionNum o = PrecisionNum.valueOf(open.get(i));
-        PrecisionNum h = PrecisionNum.valueOf(high.get(i));
-        PrecisionNum l = PrecisionNum.valueOf(low.get(i));
-        PrecisionNum c = PrecisionNum.valueOf(close.get(i));
-        Bar bar = new BaseBar(meta.dataGranularityToDuration(), z, o, h, l, c, v, PrecisionNum.valueOf(1));
+        Num v = DecimalNum.valueOf(Optional.ofNullable(volume.get(i)).orElse("0"));
+        Num o = DecimalNum.valueOf(open.get(i));
+        Num h = DecimalNum.valueOf(high.get(i));
+        Num l = DecimalNum.valueOf(low.get(i));
+        Num c = DecimalNum.valueOf(close.get(i));
+        Bar bar = new BaseBar(meta.dataGranularityToDuration(), z, o, h, l, c, v, DecimalNum.valueOf(1));
         series.addBar(bar);
     }
 }

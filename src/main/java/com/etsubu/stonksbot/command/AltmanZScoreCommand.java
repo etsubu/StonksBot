@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.num.Num;
-import org.ta4j.core.num.PrecisionNum;
+import org.ta4j.core.num.DecimalNum;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -71,11 +71,11 @@ public class AltmanZScoreCommand extends Command {
         Num D = marketcap.get().dividedBy(totalLiabilities.get());
         Num E = revenueTTM.get().dividedBy(totalAssets.get());
         // Z-Score = 1.2A + 1.4B + 3.3C + 0.6D + 1.0E
-        Num score = (PrecisionNum.valueOf(1.2).multipliedBy(A))
-                .plus(PrecisionNum.valueOf(1.4).multipliedBy(B))
-                .plus(PrecisionNum.valueOf(3.3).multipliedBy(C))
-                .plus(PrecisionNum.valueOf(0.6).multipliedBy(D))
-                .plus(PrecisionNum.valueOf(1.0).multipliedBy(E));
+        Num score = (DecimalNum.valueOf(1.2).multipliedBy(A))
+                .plus(DecimalNum.valueOf(1.4).multipliedBy(B))
+                .plus(DecimalNum.valueOf(3.3).multipliedBy(C))
+                .plus(DecimalNum.valueOf(0.6).multipliedBy(D))
+                .plus(DecimalNum.valueOf(1.0).multipliedBy(E));
         StringBuilder builder = new StringBuilder("```\n").append(response.first.getFullname()).append(" - ").append(response.first.getTicker()).append('\n');
         builder.append("Z-Score: ").append(DoubleTools.round(score.doubleValue())).append("\n```");
         return new CommandResult(builder.toString(), true);
