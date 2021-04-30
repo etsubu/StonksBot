@@ -1,13 +1,13 @@
-package com.etsubu.stonksbot.scheduler.Shareville;
+package com.etsubu.stonksbot.scheduler.shareville;
 
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.utility.HttpApi;
-import com.etsubu.stonksbot.scheduler.Shareville.Model.SharevilleUser;
+import com.etsubu.stonksbot.scheduler.shareville.Model.SharevilleUser;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import com.etsubu.stonksbot.discord.EventCore;
 import com.etsubu.stonksbot.scheduler.Schedulable;
 import com.etsubu.stonksbot.scheduler.SchedulerService;
-import com.etsubu.stonksbot.scheduler.Shareville.Model.WallEntry;
+import com.etsubu.stonksbot.scheduler.shareville.Model.WallEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

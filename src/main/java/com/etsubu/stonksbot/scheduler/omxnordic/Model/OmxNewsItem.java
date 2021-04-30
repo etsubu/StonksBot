@@ -1,4 +1,4 @@
-package com.etsubu.stonksbot.scheduler.OmxNordic.Model;
+package com.etsubu.stonksbot.scheduler.omxnordic.Model;
 
 import com.etsubu.stonksbot.utility.HttpApi;
 import lombok.AllArgsConstructor;

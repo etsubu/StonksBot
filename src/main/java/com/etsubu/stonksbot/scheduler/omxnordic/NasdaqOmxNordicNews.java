@@ -1,10 +1,10 @@
-package com.etsubu.stonksbot.scheduler.OmxNordic;
+package com.etsubu.stonksbot.scheduler.omxnordic;
 
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import com.etsubu.stonksbot.discord.EventCore;
 import com.etsubu.stonksbot.utility.HttpApi;
-import com.etsubu.stonksbot.scheduler.OmxNordic.Model.OmxNewsItem;
+import com.etsubu.stonksbot.scheduler.omxnordic.Model.OmxNewsItem;
 import com.etsubu.stonksbot.scheduler.Schedulable;
 import com.etsubu.stonksbot.scheduler.SchedulerService;
 import com.google.gson.Gson;

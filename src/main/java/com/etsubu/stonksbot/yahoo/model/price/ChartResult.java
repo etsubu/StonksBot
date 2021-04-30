@@ -1,6 +1,7 @@
 package com.etsubu.stonksbot.yahoo.model.price;
 
 import com.google.gson.Gson;
+import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 import org.ta4j.core.Bar;
 import org.ta4j.core.BarSeries;
@@ -16,11 +17,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 public class ChartResult {
     private static final Gson gson = new Gson();
-    private PriceMeta meta;
-    private List<String> timestamp;
-    private PriceIndicators indicators;
+    private final PriceMeta meta;
+    private final List<String> timestamp;
+    private final PriceIndicators indicators;
 
     public static ChartResult buildChartResultFromJson(String json) {
         JSONObject root = new JSONObject(json);

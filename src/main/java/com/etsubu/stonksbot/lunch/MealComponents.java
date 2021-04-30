@@ -1,14 +1,22 @@
 package com.etsubu.stonksbot.lunch;
 
+import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
+@AllArgsConstructor
 public class MealComponents {
-    private String Name;
-    private String RecipeId;
-    private List<String> Diets;
-    private Object Nutrients;
-    private String IconUrl;
+    @SerializedName("Name")
+    private final String name;
+    @SerializedName("RecipeId")
+    private final String recipeId;
+    @SerializedName("Diets")
+    private final List<String> diets;
+    @SerializedName("Nutrients")
+    private final Object nutrients;
+    @SerializedName("IconUrl")
+    private final String iconUrl;
 }

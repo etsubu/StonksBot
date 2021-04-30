@@ -2,7 +2,7 @@ package com.etsubu.stonksbot.discord;
 
 import com.etsubu.stonksbot.command.CommandResult;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
-import com.etsubu.stonksbot.scheduler.OmxNordic.Model.AttachmentFile;
+import com.etsubu.stonksbot.scheduler.omxnordic.Model.AttachmentFile;
 import com.etsubu.stonksbot.command.CommandHandler;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.permission.PermissionManager;

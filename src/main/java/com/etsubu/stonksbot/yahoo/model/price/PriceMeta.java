@@ -1,25 +1,27 @@
 package com.etsubu.stonksbot.yahoo.model.price;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.Duration;
 
 @Getter
+@AllArgsConstructor
 public class PriceMeta {
-    private String currency;
-    private String symbol;
-    private String exhangeName;
-    private String instrumentType;
-    private String firstTradeDate;
-    private String regularMarketTime;
-    private String gmtooffset;
-    private String timezone;
-    private String exchangeTimezoneName;
-    private String regularMarketPrice;
-    private String chartPreviousClose;
-    private String priceHint;
-    private CurrentTradingPeriod currentTradingPeriod;
-    private String dataGranularity;
+    private final String currency;
+    private final String symbol;
+    private final String exhangeName;
+    private final String instrumentType;
+    private final String firstTradeDate;
+    private final String regularMarketTime;
+    private final String gmtooffset;
+    private final String timezone;
+    private final String exchangeTimezoneName;
+    private final String regularMarketPrice;
+    private final String chartPreviousClose;
+    private final String priceHint;
+    private final CurrentTradingPeriod currentTradingPeriod;
+    private final String dataGranularity;
 
     public Duration dataGranularityToDuration() {
         if(dataGranularity.endsWith("m")) {

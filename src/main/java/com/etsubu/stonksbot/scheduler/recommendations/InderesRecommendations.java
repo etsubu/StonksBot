@@ -1,4 +1,4 @@
-package com.etsubu.stonksbot.scheduler.AnalystRecommendations;
+package com.etsubu.stonksbot.scheduler.recommendations;
 
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.inderes.model.RecommendationEntry;

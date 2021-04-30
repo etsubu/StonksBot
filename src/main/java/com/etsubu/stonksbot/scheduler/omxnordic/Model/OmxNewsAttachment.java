@@ -1,11 +1,9 @@
-package com.etsubu.stonksbot.scheduler.OmxNordic.Model;
+package com.etsubu.stonksbot.scheduler.omxnordic.Model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
 public class OmxNewsAttachment {
     private final String mimetype;

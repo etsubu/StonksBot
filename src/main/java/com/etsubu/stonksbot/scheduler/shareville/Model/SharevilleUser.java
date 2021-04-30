@@ -1,4 +1,4 @@
-package com.etsubu.stonksbot.scheduler.Shareville.Model;
+package com.etsubu.stonksbot.scheduler.shareville.Model;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;

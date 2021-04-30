@@ -1,10 +1,12 @@
 package com.etsubu.stonksbot.yahoo.model.price;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class CurrentTradingPeriod {
-    private TradingPeriod pre;
-    private TradingPeriod regular;
-    private TradingPeriod post;
+    private final TradingPeriod pre;
+    private final TradingPeriod regular;
+    private final TradingPeriod post;
 }

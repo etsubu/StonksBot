@@ -1,11 +1,13 @@
 package com.etsubu.stonksbot.yahoo.model.price;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class TradingPeriod {
-    private String timezone;
-    private String start;
-    private String end;
-    private String gmtoffset;
+    private final String timezone;
+    private final String start;
+    private final String end;
+    private final String gmtoffset;
 }
