@@ -9,8 +9,11 @@ plugins {
 }
 
 repositories {
-    jcenter()
     mavenCentral()
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
 }
 
 test {
@@ -31,7 +34,7 @@ dependencies {
     implementation 'org.ta4j:ta4j-core:0.13'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'org.json:json:20210307'
-    implementation ('net.dv8tion:JDA:4.2.0_247') {
+    implementation ('net.dv8tion:JDA:4.2.1_262') {
         exclude module: 'opus-java'
     }
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
@@ -44,7 +47,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:3.9.0'
 }
 
-group = 'org.stonksbot'
+group = 'com.etsubu.stonksbot'
 version = '1.1-SNAPSHOT'
 
 sourceCompatibility = 11
@@ -53,6 +56,6 @@ targetCompatibility = 11
 jar {
     manifest {
         attributes "Version" : project.version
-        attributes "Main-Class": "Core.Main"
+        attributes "Main-Class": "com.stonksbot.Main"
     }
 }
