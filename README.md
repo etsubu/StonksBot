@@ -71,7 +71,7 @@ servers:
 ## Contributing
 
 Some of the bots features are kind a niche such as lunch list which is due to usage and thus requirements of a 
-private server. However, new commands can be easily added by creating new files in Core/Commands/ folder and 
+private server. However, new commands can be easily added by creating new files in com.stonksbot.core/Commands/ folder and 
 implementing Command interface. The bot finds available commands during runtime meaning there is no need to register 
 the commands in a separate place. 
 
