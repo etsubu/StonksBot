@@ -42,9 +42,9 @@ public class InderesRecommendations implements Schedulable {
 
     private String buildRecommendationChange(Set<Pair<RecommendationEntry, RecommendationEntry>> changes) {
         StringBuilder builder = new StringBuilder(64 * changes.size());
-        builder.append("```\n(Inderes)\nSuositusmuutokset:\n");
         for(var v : changes) {
-            builder.append("Nimi: ").append(v.getFirst().getName()).append('\n');
+            builder.append("```\n(Inderes)\nSuositusmuutokset:");
+            builder.append("\nNimi: ").append(v.getFirst().getName()).append('\n');
             builder.append("Tavoitehinta: ").append(v.getFirst().getTarget()).append(" -> ").append(v.getSecond().getTarget()).append('\n');
             builder.append("Suositus: ").append(v.getFirst().getRecommendationText()).append(" -> ").append(v.getSecond().getRecommendationText()).append('\n');
             builder.append("Riski: ").append(v.getFirst().getRisk()).append(" -> ").append(v.getSecond().getRisk()).append("\n--------------```");

@@ -43,8 +43,6 @@ public class YahooConnectorImpl implements YahooConnector{
     public static final String DEFAULT_STATISTICS = "defaultKeyStatistics";
     public static final String CALENDAR_EVENTS = "calendarEvents";
     public static final String ASSET_PROFILE = "assetProfile";
-    public static final String TRAILING_FREE_CASH_FLOW = "trailingFreeCashFlow";
-    public static final String TRAILING_MARKET_CAP = "trailingMarketCap";
     private final HttpClient client;
     private int loadBalanceIndex;
     private final TickerStorage tickerStorage;
