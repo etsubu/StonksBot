@@ -37,18 +37,15 @@ public class FilterHandler {
             // Ignore global admins
             return false;
         }
-        if(serverConfig.get().getFilters() == null) {
-            // Skip if no filters
-            return false;
-        }
-        if(serverConfig.get().getFilters().getRegexPatterns().stream().anyMatch(x -> x.matcher(event.getMessage().getContentDisplay().toLowerCase()).matches())) {
+        if(serverConfig.get().getFilters().getRegexPatterns()
+                .stream().anyMatch(x -> x.matcher(event.getMessage().getContentDisplay().toLowerCase()).matches())) {
             // Filter pattern matches
             log.info("Filtering message '{}' by '{}' id='{}'",
                     event.getMessage().getContentDisplay().replaceAll("\n",""),
                     event.getAuthor().getName(),
                     event.getAuthor().getId());
-            if(serverConfig.get().getFilters().getNotifyChannel() != null) {
-                GuildChannel guildChannel = event.getJDA().getGuildChannelById(serverConfig.get().getFilters().getNotifyChannel());
+            if(serverConfig.get().getFilters().getNotifyChannel().isPresent()) {
+                GuildChannel guildChannel = event.getJDA().getGuildChannelById(serverConfig.get().getFilters().getNotifyChannel().get());
                 if(guildChannel instanceof TextChannel) {
                     TextChannel channel = (TextChannel) guildChannel;
                     // Remove the message

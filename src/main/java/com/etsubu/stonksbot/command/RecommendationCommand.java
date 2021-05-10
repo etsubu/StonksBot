@@ -55,7 +55,8 @@ public class RecommendationCommand extends Command {
                 .append("\nNousuvara: ")
                         .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
                         .append("%\n"));
-        builder.append("Suositus: ").append(entry.getRecommendationText()).append("\n```");
+        builder.append("Suositus: ").append(entry.getRecommendationText()).append('\n');
+        builder.append("Riski: ").append(entry.getRisk()).append("```");
         return builder.toString();
     }
 

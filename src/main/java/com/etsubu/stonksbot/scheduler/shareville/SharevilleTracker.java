@@ -37,7 +37,7 @@ public class SharevilleTracker implements Schedulable {
     }
 
     private String buildNotification(List<SharevilleUser> users) {
-        StringBuilder builder = new StringBuilder("```Shareville tapahtumat:\n");
+        StringBuilder builder = new StringBuilder();
         boolean content = false;
         for(SharevilleUser user : users) {
             SharevilleUser old = profileMap.get(user.getUrl());
@@ -47,18 +47,19 @@ public class SharevilleTracker implements Schedulable {
                     for(WallEntry we : transactions) {
                         if(we.isValid()) {
                             content = true;
+                            builder.append("```\nShareville tapahtumat:");
                             String name = we.getFirst().getProfile().getName();
-                            builder.append("Käyttäjä: ").append(name).append('\n');
+                            builder.append("\nKäyttäjä: ").append(name).append('\n');
                             builder.append("Kohde: ").append(we.getTransaction().getInstrument().getName()).append('\n');
                             builder.append("Tyyppi: ").append(we.getTransaction().getSideAsDescriptive()).append('\n');
                             builder.append("Hinta: ").append(we.getTransaction().getPrice()).append(we.getTransaction().getInstrument().getCurrency()).append('\n');
-                            builder.append("---------------");
+                            builder.append("---------------```\n");
                         }
                     }
                 }
             }
         }
-        return content ? builder.append("\n```").toString() : null;
+        return content ? builder.toString() : null;
     }
 
     public void notify(List<ServerConfig> serverConfigs, List<SharevilleUser> sharevilleUsers) {
