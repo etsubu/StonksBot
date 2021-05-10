@@ -56,6 +56,6 @@ targetCompatibility = 11
 jar {
     manifest {
         attributes "Version" : project.version
-        attributes "Main-Class": "com.stonksbot.Main"
+        attributes "Main-Class": "com.etsubu.stonksbot.Main"
     }
 }

@@ -53,5 +53,5 @@ public class FilterConfig {
         return Collections.unmodifiableList(patterns);
     }
 
-    public Optional<String> getNotifyChannel() { return Optional.ofNullable(notifyChannel); }
+    public String getNotifyChannel() { return notifyChannel; }
 }

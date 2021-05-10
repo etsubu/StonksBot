@@ -44,8 +44,8 @@ public class FilterHandler {
                     event.getMessage().getContentDisplay().replaceAll("\n",""),
                     event.getAuthor().getName(),
                     event.getAuthor().getId());
-            if(serverConfig.get().getFilters().getNotifyChannel().isPresent()) {
-                GuildChannel guildChannel = event.getJDA().getGuildChannelById(serverConfig.get().getFilters().getNotifyChannel().get());
+            if(serverConfig.get().getFilters().getNotifyChannel() != null) {
+                GuildChannel guildChannel = event.getJDA().getGuildChannelById(serverConfig.get().getFilters().getNotifyChannel());
                 if(guildChannel instanceof TextChannel) {
                     TextChannel channel = (TextChannel) guildChannel;
                     // Remove the message
