@@ -118,14 +118,14 @@ public class EventCore extends ListenerAdapter
             }
             try {
                 CommandResult result = commandHandler.execute(event);
-                event.getChannel().sendMessage(result.getResponse()).queue();
                 if(result.getResponse().isEmpty() || result.getResponse().isBlank()) {
                     log.error("Command returned blank response");
-                    event.getChannel().sendMessage("Oops, this command returned blank response. Developer should probably take a look at logs.").queue();
-                }
-                if (result.getSucceeded()) {
+                    event.getMessage().reply("Oops, this command returned blank response. Developer should probably take a look at logs.").queue();
+                } else if (result.getSucceeded()) {
+                    event.getMessage().reply(result.getResponse()).queue();
                     log.info("Successfully executed user command: {}", event.getMessage().getContentDisplay().replaceAll("\n", ""));
                 } else {
+                    event.getMessage().reply("Failed to execute command.").queue();
                     log.error("Failed to execute user command: " + result.getResponse() + " - "
                             + Optional.ofNullable(result.getException())
                             .map(Exception::getMessage)
