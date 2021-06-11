@@ -1,5 +1,6 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.utility.DoubleTools;
 import com.etsubu.stonksbot.yahoo.model.DataValue;
@@ -8,6 +9,7 @@ import com.etsubu.stonksbot.yahoo.model.fundament.FundamentEntry;
 import com.etsubu.stonksbot.yahoo.YahooConnectorImpl;
 import com.etsubu.stonksbot.utility.Pair;
 import com.etsubu.stonksbot.yahoo.StockName;
+import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -144,7 +146,8 @@ public class RatiosCommand extends Command {
     }
 
     @Override
-    public CommandResult exec(String command) {
+    public CommandResult exec(CommandContext context) {
+        String command = context.getMessage();
         log.info("Requesting ratios for {}", command);
         try {
             Pair<StockName, Map<String, FundamentEntry>> response = yahooConnector.queryFundamentTimeSeries(command, SCORE_COMPONENTS);

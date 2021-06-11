@@ -1,8 +1,10 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.AssetPriceIntraInfo;
+import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,7 +36,8 @@ public class Price extends Command {
     }
 
     @Override
-    public CommandResult exec(String command) {
+    public CommandResult exec(CommandContext context) {
+        String command = context.getMessage();
         if(command.isBlank()) {
             return new CommandResult("You need to specify stock name to query, see !help price", false);
         }
@@ -46,7 +49,7 @@ public class Price extends Command {
             }
             return new CommandResult(info.get().toString(), true);
         } catch (IOException | InterruptedException e) {
-            return new CommandResult("Did not find a stock with they keyword '" + command + "'", false, e);
+            return new CommandResult(false, false, "Did not find a stock with they keyword '" + command + "'", e);
         }
     }
 

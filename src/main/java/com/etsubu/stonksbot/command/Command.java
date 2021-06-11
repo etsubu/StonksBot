@@ -1,5 +1,6 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.CommandConfig;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
@@ -82,17 +83,18 @@ public abstract class Command {
     
     /**
      * Defines command execution
-     * @param command Command the user typed
+     * @param context Command context that was sent by the user
      * @return CommandResult containing the result
      */
-    public CommandResult execute(String command, User user, List<Role> groups, Guild server) {
-        if(isUserAllowed(user, server, groups)) {
-            return exec(command);
+    public CommandResult execute(CommandContext context) {
+        if(isUserAllowed(context.getSender(), context.getGuild().orElse(null), context.getUserRoles())) {
+
+            return exec(context);
         }
         return new CommandResult("You lack permissions to use this command", false);
     }
 
-    public abstract CommandResult exec(String command);
+    public abstract CommandResult exec(CommandContext context);
 
     /**
      * @return Help texts telling the user how to use the command
