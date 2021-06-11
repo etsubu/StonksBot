@@ -1,5 +1,6 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.CommandConfig;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.Config;
@@ -46,7 +47,7 @@ public class CommandTest {
         }
 
         @Override
-        public CommandResult exec(String command) { return null; }
+        public CommandResult exec(CommandContext context) { return null; }
         @Override
         public String help() { return null; }
     }

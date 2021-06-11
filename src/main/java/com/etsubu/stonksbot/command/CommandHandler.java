@@ -1,5 +1,8 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
+import com.etsubu.stonksbot.configuration.ConfigLoader;
+import com.etsubu.stonksbot.configuration.ServerConfig;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
@@ -18,6 +21,7 @@ import java.util.*;
 public class CommandHandler {
     private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
     private final Map<String, Command> commandMap;
+    private final ConfigLoader configLoader;
 
     /**
      * Defines the prefix which a command must begin with
@@ -27,7 +31,8 @@ public class CommandHandler {
     /**
      * Initializes CommandHandler
      */
-    public CommandHandler(List<Command> commandList, HelpCommand helpCommand) {
+    public CommandHandler(List<Command> commandList, HelpCommand helpCommand, ConfigLoader configLoader) {
+        this.configLoader = configLoader;
         this.commandMap = new HashMap<>();
         commandList.forEach(x -> x.getNames().forEach(y -> commandMap.put(y, x)));
         helpCommand.getNames().forEach(x -> commandMap.put(x, helpCommand));
@@ -42,6 +47,21 @@ public class CommandHandler {
     public Optional<Command> getCommand(String name) {
         return Optional.ofNullable(commandMap.get(name));
     }
+
+    private CommandContext buildContext(MessageReceivedEvent event, String cmd) {
+        ServerConfig serverConfig = null;
+        if(event.isFromGuild()) {
+            serverConfig = configLoader.getConfig().getServerConfig(event.getGuild().getId()).orElse(null);
+        }
+        return CommandContext.builder()
+                .guild(event.isFromGuild() ? event.getGuild() : null)
+                .message(cmd)
+                .sender(event.getAuthor())
+                .userRoles(Optional.ofNullable(event.getMember()).map(Member::getRoles).orElseGet(LinkedList::new))
+                .serverConfig(serverConfig)
+                .build();
+    }
+
     /**
      * 
      * @param cmd Message typed
@@ -69,11 +89,8 @@ public class CommandHandler {
             log.info("Failed to find command for user input: " + command.replaceAll("\n", ""));
             return new CommandResult("Unknown command!", false);
         }
-        User user = event.getAuthor();
-        Optional<List<Role>> userRoles = Optional.ofNullable(event.getMember()).map(Member::getRoles);
-        Guild guild = event.getChannelType() == ChannelType.TEXT ? event.getGuild() : null;
         if(index < command.length() - 1)
-            return cmd.execute(command.substring(index + 1), user, userRoles.orElse(new LinkedList<>()), guild);
-        return cmd.execute("", user, userRoles.orElse(new LinkedList<>()), guild);
+            return cmd.execute(buildContext(event, command.substring(index + 1)));
+        return cmd.execute(buildContext(event, ""));
     }
 }

@@ -1,10 +1,12 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.lunch.LunchMenu;
 import com.etsubu.stonksbot.lunch.LunchQuery;
 import com.etsubu.stonksbot.lunch.MealComponents;
 import com.etsubu.stonksbot.lunch.MealOption;
+import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -58,8 +60,7 @@ public class Lunch extends Command{
         return builder.toString();
     }
     @Override
-    public CommandResult exec(String command) {
-        log.info("Executing " + command);
+    public CommandResult exec(CommandContext context) {
         try {
             List<LunchMenu> lunches = query.queryLunchList();
             return new CommandResult(formatLunches(lunches), true);

@@ -1,6 +1,8 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
+import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +27,12 @@ public class HelpCommand extends Command implements ApplicationContextAware {
     }
 
     @Override
-    public CommandResult exec(String command) {
+    public CommandResult exec(CommandContext context) {
+        String command = context.getMessage();
         if(applicationContext == null) {
             return new CommandResult("Still initializing commands, try again in a bit", true);
         }
         try {
-            System.out.println(command);
             if(command == null || command.isEmpty() || command.isBlank()) {
                 return new CommandResult(help(), false);
             }

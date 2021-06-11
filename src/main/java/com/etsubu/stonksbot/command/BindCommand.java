@@ -1,9 +1,11 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.yahoo.TickerStorage;
 import com.etsubu.stonksbot.yahoo.YahooConnectorImpl;
 import com.etsubu.stonksbot.yahoo.StockName;
+import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -29,7 +31,8 @@ public class BindCommand extends Command {
     }
 
     @Override
-    public CommandResult exec(String command) {
+    public CommandResult exec(CommandContext context) {
+        String command = context.getMessage();
         String[] parts = command.split(" ");
         if(parts.length < 2) {
             return new CommandResult("You need to provide ticker and keyword for the command. See !help bind for more info", false);

@@ -97,6 +97,13 @@ public class EventCore extends ListenerAdapter
         }
         return sent;
     }
+
+    public void sendPrivateMessage(User user, String content) {
+        user.openPrivateChannel().queue((channel) ->
+        {
+            channel.sendMessage(content).queue();
+        });
+    }
     
     @Override
     public void onMessageReceived(MessageReceivedEvent event)
@@ -121,11 +128,16 @@ public class EventCore extends ListenerAdapter
                 if(result.getResponse().isEmpty() || result.getResponse().isBlank()) {
                     log.error("Command returned blank response");
                     event.getMessage().reply("Oops, this command returned blank response. Developer should probably take a look at logs.").queue();
-                } else if (result.getSucceeded()) {
-                    event.getMessage().reply(result.getResponse()).queue();
+                } else if (result.isSucceeded()) {
+                    if(result.isRespondWithDM()) {
+                        sendPrivateMessage(event.getAuthor(), result.getResponse());
+                        event.getMessage().reply("Responded with DM.").queue();
+                    } else {
+                        event.getMessage().reply(result.getResponse()).queue();
+                    }
                     log.info("Successfully executed user command: {}", event.getMessage().getContentDisplay().replaceAll("\n", ""));
                 } else {
-                    event.getMessage().reply("Failed to execute command.").queue();
+                    event.getMessage().reply(result.getResponse()).queue();
                     log.error("Failed to execute user command: " + result.getResponse() + " - "
                             + Optional.ofNullable(result.getException())
                             .map(Exception::getMessage)
@@ -133,7 +145,7 @@ public class EventCore extends ListenerAdapter
                 }
             } catch (Exception e) {
                 log.error("Uncaught exception", e);
-                event.getChannel().sendMessage("Oops, this command caused unexpected exception. Developer should probably take a look at logs.").queue();
+                event.getChannel().sendMessage("Oops, this command caused an unexpected exception. Developer should probably take a look at logs.").queue();
             }
         }
     }

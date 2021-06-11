@@ -1,7 +1,9 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.utility.ArchiveTools;
+import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -29,7 +31,7 @@ public class AboutCommand extends Command {
     }
 
     @Override
-    public CommandResult exec(String command) {
+    public CommandResult exec(CommandContext context) {
         return result;
     }
 

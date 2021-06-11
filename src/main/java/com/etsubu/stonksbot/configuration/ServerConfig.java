@@ -18,6 +18,7 @@ public class ServerConfig {
     private Long newsChannel;
     private Long recommendationChannel;
     private SharevilleConfig shareville;
+    private String votelinkTemplate;
 
     public String getName() { return name; }
 
@@ -38,4 +39,7 @@ public class ServerConfig {
     public Long getRecommendationChannel() { return recommendationChannel; }
 
     public SharevilleConfig getShareville() { return Optional.ofNullable(shareville).orElseGet(SharevilleConfig::new); }
+
+    public String getVotelinkTemplate() { return votelinkTemplate; }
+
 }

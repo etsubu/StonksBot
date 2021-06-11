@@ -1,6 +1,8 @@
 package com.etsubu.stonksbot.command;
 
+import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
+import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -22,7 +24,7 @@ public class ListCommand extends Command implements ApplicationContextAware {
     }
 
     @Override
-    public CommandResult exec(String command) {
+    public CommandResult exec(CommandContext context) {
         if(applicationContext == null) {
             return new CommandResult("Not yet initialized, wait a moment and try again", true);
         }
