@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -42,7 +44,7 @@ public class VoteLinkCommand extends Command {
         String pattern = Pattern.quote(substring);
         String builder = template;
         for(String s : replacements) {
-            builder = builder.replaceFirst(pattern, s);
+            builder = builder.replaceFirst(pattern, URLEncoder.encode(s, StandardCharsets.UTF_8));
         }
         return builder;
     }
@@ -59,6 +61,7 @@ public class VoteLinkCommand extends Command {
             return new CommandResult("There are no active vote polls configured for the server.", false);
         }
         String[] tag = context.getSender().getAsTag().split("#");
+        tag[0] = "pitkä nimi";
         if(tag.length != 2) {
             log.error("User tag format has changed '{}'", context.getSender().getAsTag());
             return new CommandResult("There are no active vote polls configured for the server.", false);
