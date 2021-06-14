@@ -61,7 +61,6 @@ public class VoteLinkCommand extends Command {
             return new CommandResult("There are no active vote polls configured for the server.", false);
         }
         String[] tag = context.getSender().getAsTag().split("#");
-        tag[0] = "pitkä nimi";
         if(tag.length != 2) {
             log.error("User tag format has changed '{}'", context.getSender().getAsTag());
             return new CommandResult("There are no active vote polls configured for the server.", false);
