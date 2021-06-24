@@ -8,10 +8,15 @@ import com.etsubu.stonksbot.scheduler.SchedulerService;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import com.etsubu.stonksbot.discord.EventCore;
+import com.etsubu.stonksbot.utility.DoubleTools;
 import com.etsubu.stonksbot.utility.Pair;
+import com.etsubu.stonksbot.yahoo.YahooConnector;
+import com.etsubu.stonksbot.yahoo.model.AssetPriceIntraInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.ta4j.core.num.DecimalNum;
+import org.ta4j.core.num.Num;
 
 import java.io.IOException;
 import java.util.*;
@@ -40,14 +45,30 @@ public class InderesRecommendations implements Schedulable {
         schedulerService.registerTask(this, DELAY);
     }
 
+    private String formatChangePercentage(String from, String to) {
+        try {
+            Num f = DecimalNum.valueOf(from);
+            Num t = DecimalNum.valueOf(to);
+            Num change = (t.minus(f)).dividedBy(f);
+            return DoubleTools.roundToFormat(change.multipliedBy(DecimalNum.valueOf(100)).doubleValue());
+        } catch (NumberFormatException e) {
+            log.error("Invalid number", e);
+            return "-";
+        }
+    }
+
     private String buildRecommendationChange(Set<Pair<RecommendationEntry, RecommendationEntry>> changes) {
         StringBuilder builder = new StringBuilder(64 * changes.size());
         for(var v : changes) {
+            var from = v.getFirst();
+            var to = v.getSecond();
             builder.append("```\n(Inderes)\nSuositusmuutokset:");
-            builder.append("\nNimi: ").append(v.getFirst().getName()).append('\n');
-            builder.append("Tavoitehinta: ").append(v.getFirst().getTarget()).append(" -> ").append(v.getSecond().getTarget()).append('\n');
-            builder.append("Suositus: ").append(v.getFirst().getRecommendationText()).append(" -> ").append(v.getSecond().getRecommendationText()).append('\n');
-            builder.append("Riski: ").append(v.getFirst().getRisk()).append(" -> ").append(v.getSecond().getRisk()).append("\n--------------```");
+            builder.append("\nNimi: ").append(from.getName()).append('\n');
+            builder.append("Tavoitehinta: ").append(from.getTarget()).append(" -> ").append(to.getTarget()).append(" (")
+                    .append(formatChangePercentage(from.getTarget(), to.getTarget())).append("%)")
+                    .append('\n');
+            builder.append("Suositus: ").append(from.getRecommendationText()).append(" -> ").append(to.getRecommendationText()).append('\n');
+            builder.append("Riski: ").append(from.getRisk()).append(" -> ").append(to.getRisk()).append("\n--------------```");
         }
         return builder.toString();
     }
