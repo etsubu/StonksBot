@@ -49,6 +49,9 @@ public class InderesRecommendations implements Schedulable {
         try {
             Num f = DecimalNum.valueOf(from);
             Num t = DecimalNum.valueOf(to);
+            if(f.isZero()) {
+                return "-";
+            }
             Num change = (t.minus(f)).dividedBy(f);
             return DoubleTools.roundToFormat(change.multipliedBy(DecimalNum.valueOf(100)).doubleValue());
         } catch (NumberFormatException e) {
