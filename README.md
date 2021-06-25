@@ -23,6 +23,7 @@ You need to have Java 11 JDK installed on your system to run and compile the app
 ```
 git clone git@github.com:etsubu/StonksBot.git
 cd StonksBot
+./gradlew clean build
 ./gradlew shadowJar
 ```
 

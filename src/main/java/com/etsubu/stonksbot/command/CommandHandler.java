@@ -66,7 +66,7 @@ public class CommandHandler {
      * @return True if the message starts with the command prefix, false if not
      */
     public boolean isCommand(String cmd) {
-        return cmd.startsWith(COMMAND_PREFIX);
+        return cmd.startsWith(COMMAND_PREFIX) && cmd.length() > COMMAND_PREFIX.length();
     }
 
     /**
@@ -88,8 +88,9 @@ public class CommandHandler {
             log.info("Failed to find command for user input: " + command.replaceAll("\n", ""));
             return new CommandResult("Unknown command!", false);
         }
-        if (index < command.length() - 1)
+        if (index < command.length() - 1) {
             return cmd.execute(buildContext(event, command.substring(index + 1)));
+        }
         return cmd.execute(buildContext(event, ""));
     }
 }

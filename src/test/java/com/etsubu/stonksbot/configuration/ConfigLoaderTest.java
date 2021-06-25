@@ -56,5 +56,14 @@ public class ConfigLoaderTest {
         assertEquals(2, fscoreConfig.getAllowedGroups().size());
         assertTrue(fscoreConfig.getAllowedGroups().contains("test_group"));
         assertTrue(fscoreConfig.getAllowedGroups().contains("test_group2"));
+        // shareville
+        assertNotNull(serverConfigList.get(0).getShareville());
+        assertEquals(123456L, serverConfigList.get(0).getShareville().getSharevilleChannel());
+        assertEquals(1, serverConfigList.get(0).getShareville().getSharevilleProfiles().size());
+        assertEquals("12345", serverConfigList.get(0).getShareville().getSharevilleProfiles().get(0));
+        //misc
+        assertEquals(123L, serverConfigList.get(0).getRecommendationChannel());
+        assertEquals(1234L, serverConfigList.get(0).getNewsChannel());
+        assertEquals("asd{}asd{}", serverConfigList.get(0).getVotelinkTemplate());
     }
 }

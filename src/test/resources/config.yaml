@@ -20,3 +20,11 @@ servers:
           - test_group2
     adminGroup: some_admin_group
     trustedGroup: some_trusted_group
+    recommendationChannel: 123
+    newsChannel: 1234
+    votelinkTemplate: asd{}asd{}
+    shareville:
+      sharevilleProfiles:
+        - 12345
+      sharevilleChannel:
+        123456
