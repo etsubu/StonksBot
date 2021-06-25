@@ -15,18 +15,19 @@ import java.util.Optional;
 
 /**
  * Used for querying latest price info for a single stock
+ *
  * @author etsubu
  * @version 29 Aug 2018
- *
  */
 @Component
 public class Price extends Command {
     private static final Logger log = LoggerFactory.getLogger(Price.class);
     private final YahooConnector api;
-    
+
     /**
      * Initializes Price command
-     * @param api yahoo finance api connector
+     *
+     * @param api          yahoo finance api connector
      * @param configLoader Configuration loader
      */
     public Price(YahooConnector api, ConfigLoader configLoader) {
@@ -38,13 +39,13 @@ public class Price extends Command {
     @Override
     public CommandResult exec(CommandContext context) {
         String command = context.getMessage();
-        if(command.isBlank()) {
+        if (command.isBlank()) {
             return new CommandResult("You need to specify stock name to query, see !help price", false);
         }
         log.info("Querying asset with: " + command);
         try {
             Optional<AssetPriceIntraInfo> info = api.queryCurrentIntraPriceInfo(command);
-            if(info.isEmpty()) {
+            if (info.isEmpty()) {
                 return new CommandResult("Failed to request intraday info", false);
             }
             return new CommandResult(info.get().toString(), true);

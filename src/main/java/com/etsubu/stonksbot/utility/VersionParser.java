@@ -25,7 +25,7 @@ public class VersionParser {
         }
         if (resources.hasMoreElements()) {
             try {
-                try(InputStream is = resources.nextElement().openStream()) {
+                try (InputStream is = resources.nextElement().openStream()) {
                     Manifest manifest = new Manifest(is);
                     Attributes attr = manifest.getAttributes("Version");
                     if (attr == null || !attr.containsKey("Version")) {

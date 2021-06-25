@@ -4,16 +4,19 @@ import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Objects;
 
 /**
  * Single stock recommendation returned from Inderes API
+ *
  * @author etsubu
  */
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString
 public class RecommendationEntry {
     /* This is internal value and not from inderes */
     private Long lastUpdated;
@@ -30,6 +33,7 @@ public class RecommendationEntry {
 
     /**
      * Converts numeric recommendation to descriptive text format
+     *
      * @return Stock recommendation in finnish
      */
     public String getRecommendationText() {
@@ -37,17 +41,23 @@ public class RecommendationEntry {
             return "tuntematon suositus";
         }
         switch (recommendation.charAt(0)) {
-            case '1': return "myy";
-            case '2': return "vähennä";
-            case '3': return "pidä";
-            case '4': return "lisää";
-            case '5': return "osta";
-            default: return "tuntematon suositus";
+            case '1':
+                return "myy";
+            case '2':
+                return "vähennä";
+            case '3':
+                return "pidä";
+            case '4':
+                return "lisää";
+            case '5':
+                return "osta";
+            default:
+                return "tuntematon suositus";
         }
     }
 
     public long getLastUpdated() {
-        if(lastUpdated == null) {
+        if (lastUpdated == null) {
             lastUpdated = System.currentTimeMillis();
         }
         return lastUpdated;
@@ -77,9 +87,9 @@ public class RecommendationEntry {
 
     @Override
     public boolean equals(Object o) {
-        if(o == null || o.getClass() != getClass()) {
+        if (o == null || o.getClass() != getClass()) {
             return false;
         }
-        return Objects.equals(((RecommendationEntry)o).getIsin(), getIsin());
+        return Objects.equals(((RecommendationEntry) o).getIsin(), getIsin());
     }
 }

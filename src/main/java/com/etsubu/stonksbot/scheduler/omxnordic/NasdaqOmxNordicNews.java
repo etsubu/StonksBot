@@ -43,16 +43,16 @@ public class NasdaqOmxNordicNews implements Schedulable {
     public Optional<List<OmxNewsItem>> parseResponse(String raw) {
         int begin = raw.indexOf('{');
         int end = raw.lastIndexOf('}');
-        if(begin == -1 || end == -1) {
+        if (begin == -1 || end == -1) {
             log.info("Received invalid data from omx nasdaq nordic {}", raw);
             return Optional.empty();
         }
         try {
             raw = raw.substring(begin, end + 1);
             JSONObject root = new JSONObject(raw);
-            if(root.has("results")) {
+            if (root.has("results")) {
                 JSONObject results = root.getJSONObject("results");
-                if(results.has("item")) {
+                if (results.has("item")) {
                     JSONArray items = results.getJSONArray("item");
                     List<OmxNewsItem> news = new ArrayList<>(items.length());
                     for (int i = 0; i < items.length(); i++) {
@@ -62,8 +62,7 @@ public class NasdaqOmxNordicNews implements Schedulable {
                         return Optional.empty();
                     }
                     return Optional.of(news);
-                }
-                else {
+                } else {
                     log.error("Omx nordic response json did not contain results section");
                 }
             } else {
@@ -81,17 +80,17 @@ public class NasdaqOmxNordicNews implements Schedulable {
         log.info("Resolving news attachments");
         items.forEach(OmxNewsItem::resolveAttachments);
         List<Long> channelIds = configLoader.getConfig().getServers().stream().map(ServerConfig::getNewsChannel).filter(Objects::nonNull).collect(Collectors.toList());
-        if(!channelIds.isEmpty()) {
+        if (!channelIds.isEmpty()) {
             items.forEach(x -> eventCore.sendMessage(channelIds, x.toString(), x.getFiles()));
         }
     }
 
     private List<OmxNewsItem> listNewsItems(Optional<String> omxhResponse, int latestId) {
-        if(omxhResponse.isEmpty()) {
+        if (omxhResponse.isEmpty()) {
             return new LinkedList<>();
         }
         Optional<List<OmxNewsItem>> items = parseResponse(omxhResponse.get());
-        if(items.isPresent()) {
+        if (items.isPresent()) {
             // Filter only latest news
             return items.get().stream().filter(x ->
                     Optional.ofNullable(x.getDisclosureId()).map(y -> y > latestId).orElse(false) &&
@@ -105,7 +104,7 @@ public class NasdaqOmxNordicNews implements Schedulable {
 
     @Override
     public void invoke() {
-        if(Optional.ofNullable(configLoader.getConfig().getOmxhNews()).map(x -> !Boolean.parseBoolean(x.getEnabled())).orElse(false)) {
+        if (Optional.ofNullable(configLoader.getConfig().getOmxhNews()).map(x -> !Boolean.parseBoolean(x.getEnabled())).orElse(false)) {
             // Not enabled, skip
             return;
         }
@@ -115,19 +114,19 @@ public class NasdaqOmxNordicNews implements Schedulable {
             List<OmxNewsItem> omxhItems = listNewsItems(omxhResponse, latestIdOmxh);
             List<OmxNewsItem> firstNorthItems = listNewsItems(firstNorthResponse, latestIdFirstNorth);
             List<OmxNewsItem> totalNewsItems = new ArrayList<>(omxhItems.size() + firstNorthItems.size());
-            if(latestIdOmxh != -1) {
+            if (latestIdOmxh != -1) {
                 totalNewsItems.addAll(omxhItems);
             }
-            if(latestIdFirstNorth != -1) {
+            if (latestIdFirstNorth != -1) {
                 totalNewsItems.addAll(firstNorthItems);
             }
-            if(omxhItems.size() > 0) {
+            if (omxhItems.size() > 0) {
                 latestIdOmxh = omxhItems.get(0).getDisclosureId();
             }
-            if(firstNorthItems.size() > 0) {
+            if (firstNorthItems.size() > 0) {
                 latestIdFirstNorth = firstNorthItems.get(0).getDisclosureId();
             }
-            if(totalNewsItems.size() > 0) {
+            if (totalNewsItems.size() > 0) {
                 omxhItems.addAll(totalNewsItems);
                 sendNewsPosts(totalNewsItems);
             }

@@ -16,7 +16,7 @@ import java.util.Optional;
 @AllArgsConstructor
 @Getter
 @ToString
-public class WallEntry implements Comparable<WallEntry>{
+public class WallEntry implements Comparable<WallEntry> {
     private static final Logger log = LoggerFactory.getLogger(WallEntry.class);
     @SerializedName("object")
     private final Transaction transaction;
@@ -25,7 +25,7 @@ public class WallEntry implements Comparable<WallEntry>{
     private final EntryFirst first;
 
     public Optional<Instant> getTimeInstant() {
-        if(time == null) {
+        if (time == null) {
             return Optional.empty();
         }
         try {
@@ -53,7 +53,7 @@ public class WallEntry implements Comparable<WallEntry>{
 
     @Override
     public boolean equals(Object o) {
-        if(o == null || getClass() != o.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
         WallEntry we = (WallEntry) o;

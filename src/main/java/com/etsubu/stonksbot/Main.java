@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  * @author etsubu
  * @version 26 Jul 2018
- *
  */
 @ComponentScan
 public class Main {

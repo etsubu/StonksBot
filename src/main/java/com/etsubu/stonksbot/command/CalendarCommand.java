@@ -22,6 +22,7 @@ import java.util.Optional;
 public class CalendarCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(CalendarCommand.class);
     private final YahooConnectorImpl yahooConnector;
+
     /**
      * Initializes Command
      */
@@ -35,9 +36,9 @@ public class CalendarCommand extends Command {
         StringBuilder builder = new StringBuilder();
         builder.append("```");
         builder.append(name.getFullname()).append(" - ").append(name.getTicker()).append('\n');
-        if(earnings.getEarnings().isPresent()) {
+        if (earnings.getEarnings().isPresent()) {
             CalendarEvent event = earnings.getEarnings().get();
-            if(event.earningsDate().isPresent() && event.earningsDate().get().size() > 0) {
+            if (event.earningsDate().isPresent() && event.earningsDate().get().size() > 0) {
                 builder.append("Earnings date: ")
                         .append(TimeUtils.formatEpocSeconds(Long.parseLong(event.earningsDate().get().get(0).getRaw())))
                         .append('\n');
@@ -58,12 +59,12 @@ public class CalendarCommand extends Command {
     @Override
     public CommandResult exec(CommandContext context) {
         String command = context.getMessage();
-        if(command.isBlank()) {
+        if (command.isBlank()) {
             return new CommandResult("You need to specify stock name to query, see !help price", false);
         }
         try {
             Optional<DataResponse> response = yahooConnector.queryData(command, YahooConnectorImpl.CALENDAR_EVENTS);
-            if(response.isPresent() && response.get().getCalendarEvents().isPresent()) {
+            if (response.isPresent() && response.get().getCalendarEvents().isPresent()) {
                 CalendarEarnings event = response.get().getCalendarEvents().get();
                 return new CommandResult(buildResponse(event, response.get().getName()), true);
             }

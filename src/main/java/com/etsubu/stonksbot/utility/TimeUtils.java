@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 /**
  * Provides commonly used time utility functions
+ *
  * @author etsubu
  */
 public class TimeUtils {

@@ -23,11 +23,9 @@ import java.util.Optional;
 /**
  * @author etsubu
  * @version 26 Jul 2018
- *
  */
 @Component
-public class EventCore extends ListenerAdapter
-{
+public class EventCore extends ListenerAdapter {
     private static final Logger log = LoggerFactory.getLogger(EventCore.class);
     private final CommandHandler commandHandler;
     private JDA jda;
@@ -53,12 +51,12 @@ public class EventCore extends ListenerAdapter
     }
 
     public boolean start() {
-        if(jda != null) {
+        if (jda != null) {
             jda.shutdown();
         }
         Config config = configLoader.getConfig();
         Optional<String> oauth = Optional.ofNullable(config.getOauth());
-        if(oauth.isEmpty()) {
+        if (oauth.isEmpty()) {
             log.error("No oath token present");
             return false;
         }
@@ -74,18 +72,19 @@ public class EventCore extends ListenerAdapter
 
     /**
      * Sends text message to the requested channel on server
+     *
      * @param channelIds
      * @param message
      * @return
      */
     public boolean sendMessage(List<Long> channelIds, String message, List<AttachmentFile> attachmentFiles) {
         boolean sent = false;
-        for(long channelId : channelIds) {
+        for (long channelId : channelIds) {
             GuildChannel guildChannel = jda.getGuildChannelById(channelId);
-            if(guildChannel instanceof TextChannel) {
-                MessageAction msg = ((TextChannel)guildChannel).sendMessage(message);
-                if(attachmentFiles != null && !attachmentFiles.isEmpty()) {
-                    for(AttachmentFile file : attachmentFiles) {
+            if (guildChannel instanceof TextChannel) {
+                MessageAction msg = ((TextChannel) guildChannel).sendMessage(message);
+                if (attachmentFiles != null && !attachmentFiles.isEmpty()) {
+                    for (AttachmentFile file : attachmentFiles) {
                         msg = msg.addFile(file.getFile(), file.getFilename());
                     }
                 }
@@ -104,32 +103,31 @@ public class EventCore extends ListenerAdapter
             channel.sendMessage(content).queue();
         });
     }
-    
+
     @Override
-    public void onMessageReceived(MessageReceivedEvent event)
-    {
-        if(event.getAuthor().isBot() || event.getAuthor().getName().equalsIgnoreCase(jda.getSelfUser().getName())) {
+    public void onMessageReceived(MessageReceivedEvent event) {
+        if (event.getAuthor().isBot() || event.getAuthor().getName().equalsIgnoreCase(jda.getSelfUser().getName())) {
             // Skip messages sent by bots or ourselves
             return;
         }
         reacter.react(event).ifPresent(x -> event.getMessage().addReaction(x).queue());
-        if(filterHandler.shouldBeFiltered(event)) {
+        if (filterHandler.shouldBeFiltered(event)) {
             return;
         }
 
         if (this.commandHandler.isCommand(event.getMessage().getContentDisplay()) && event.getMessage().getContentDisplay().length() > 1) {
-            if(!permissionManager.isReplyAllowed(event)) {
+            if (!permissionManager.isReplyAllowed(event)) {
                 log.info("Prevented reply for {}  on channel {}", event.getAuthor().getName(), event.getChannel().getName());
                 event.getChannel().sendMessage("Please use whitelisted channel for performing commands").queue();
                 return;
             }
             try {
                 CommandResult result = commandHandler.execute(event);
-                if(result.getResponse().isEmpty() || result.getResponse().isBlank()) {
+                if (result.getResponse().isEmpty() || result.getResponse().isBlank()) {
                     log.error("Command returned blank response");
                     event.getMessage().reply("Oops, this command returned blank response. Developer should probably take a look at logs.").queue();
                 } else if (result.isSucceeded()) {
-                    if(result.isRespondWithDM()) {
+                    if (result.isRespondWithDM()) {
                         sendPrivateMessage(event.getAuthor(), result.getResponse());
                         event.getMessage().reply("Responded with DM.").queue();
                     } else {

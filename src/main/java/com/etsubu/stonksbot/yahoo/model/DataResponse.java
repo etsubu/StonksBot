@@ -12,13 +12,23 @@ public class DataResponse {
     private final DefaultKeyStatistics defaultKeyStatistics;
     private final AssetProfile assetProfile;
 
-    public Optional<CalendarEarnings> getCalendarEvents() { return Optional.ofNullable(calendarEvents); }
+    public Optional<CalendarEarnings> getCalendarEvents() {
+        return Optional.ofNullable(calendarEvents);
+    }
 
-    public Optional<DefaultKeyStatistics> getDefaultKeyStatistics() { return Optional.ofNullable(defaultKeyStatistics); }
+    public Optional<DefaultKeyStatistics> getDefaultKeyStatistics() {
+        return Optional.ofNullable(defaultKeyStatistics);
+    }
 
-    public Optional<AssetProfile> getAssetProfile() { return Optional.ofNullable(assetProfile); }
+    public Optional<AssetProfile> getAssetProfile() {
+        return Optional.ofNullable(assetProfile);
+    }
 
-    public StockName getName() { return name; }
+    public StockName getName() {
+        return name;
+    }
 
-    public void setName(StockName name) { this.name = name; }
+    public void setName(StockName name) {
+        this.name = name;
+    }
 }

@@ -16,7 +16,7 @@ public class SharevilleUser {
     private final String url;
 
     public SharevilleUser(String body, String url) {
-        if(body == null) {
+        if (body == null) {
             throw new IllegalArgumentException("Body cannot be null");
         }
         this.url = url;
@@ -25,14 +25,14 @@ public class SharevilleUser {
         } catch (JsonParseException e) {
             throw new IllegalArgumentException("Failed to parse json body of wall");
         }
-        if(wall == null || wall.getResults() == null) {
+        if (wall == null || wall.getResults() == null) {
             throw new IllegalArgumentException("Profile wall did not contain any entries");
         }
         // Remove invalid times
         wall.getResults().removeIf(x -> x.getTimeInstant().isEmpty());
         // Sort
         wall.getResults().sort(WallEntry::compareTo);
-        if(wall.getResults().isEmpty()) {
+        if (wall.getResults().isEmpty()) {
             throw new IllegalArgumentException("No entries with valid timestamp in profile wall");
         }
     }
@@ -51,5 +51,7 @@ public class SharevilleUser {
                 .collect(Collectors.toList());
     }
 
-    public String getUrl() { return url; }
+    public String getUrl() {
+        return url;
+    }
 }

@@ -3,6 +3,7 @@ package com.etsubu.stonksbot.command;
 import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.utility.DoubleTools;
+import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.DataValue;
 import com.etsubu.stonksbot.yahoo.model.fundament.FundaValue;
 import com.etsubu.stonksbot.yahoo.model.fundament.FundamentEntry;
@@ -55,23 +56,23 @@ public class RatiosCommand extends Command {
             TRAILING_PB,
             QUARTERLY_EBIT,
             QUARTERLY_EBITDA);
-    private final YahooConnectorImpl yahooConnector;
+    private final YahooConnector yahooConnector;
 
-    public RatiosCommand(YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+    public RatiosCommand(YahooConnector yahooConnector, ConfigLoader configLoader) {
         super(List.of("ratios", "r", "suhdeluvut"), configLoader, true);
         this.yahooConnector = yahooConnector;
     }
 
     private Optional<Num> getLatestValue(Optional<FundamentEntry> entry) {
-        if(entry.isEmpty()) {
+        if (entry.isEmpty()) {
             return Optional.empty();
         }
         Optional<List<FundaValue>> values = Optional.ofNullable(entry.get().getValue());
-        if(values.map(List::isEmpty).orElse(true) || values.get().get(0).getReportedValue().isEmpty()) {
+        if (values.map(List::isEmpty).orElse(true) || values.get().get(0).getReportedValue().isEmpty()) {
             return Optional.empty();
         }
         String rawValue = values.get().get(0).getReportedValue().get().getRaw();
-        if(rawValue == null) {
+        if (rawValue == null) {
             return Optional.empty();
         }
         return Optional.of(DecimalNum.valueOf(rawValue));
@@ -104,8 +105,8 @@ public class RatiosCommand extends Command {
 
         enterpriseValue.ifPresent(num -> {
             revenueTTM.ifPresent(x -> calculateRatio(num, x, builder, "EV/Revenue:          "));
-            ebitda.ifPresent(x -> calculateRatio(num, x, builder,     "EV/EBITDA:           "));
-            ebit.ifPresent(x -> calculateRatio(num, x, builder,       "EV/EBIT:             "));
+            ebitda.ifPresent(x -> calculateRatio(num, x, builder, "EV/EBITDA:           "));
+            ebit.ifPresent(x -> calculateRatio(num, x, builder, "EV/EBIT:             "));
         });
         marketcap.ifPresent(num -> freeCashFlow.ifPresent(x -> calculateRatio(num, x, builder, "MCAP/FCF:            ")));
 

@@ -18,9 +18,9 @@ import java.util.concurrent.ExecutionException;
 
 /**
  * Tiny Api for com.stonksbot.Core.HTTP Get requests
+ *
  * @author etsubu
  * @version 28 Aug 2018
- *
  */
 public class HttpApi {
     private static final Logger log = LoggerFactory.getLogger(HttpApi.class);
@@ -29,12 +29,14 @@ public class HttpApi {
     private static final String USER_AGENT_PRODUCT = "StonksBot";
     private static final String VERSION;
 
-    static  {
+    static {
         client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(TIMEOUT)).build();
         VERSION = VersionParser.applicationVersion();
     }
+
     /**
      * Sends com.stonksbot.Core.HTTP Get request and returns the response in String
+     *
      * @param url URL to request
      * @return Response in String
      * @throws IOException If there was an connection error
@@ -46,7 +48,7 @@ public class HttpApi {
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if(response.statusCode() != 200) {
+        if (response.statusCode() != 200) {
             log.error("Request returned invalid status code {}", response.statusCode());
             return Optional.empty();
         }
@@ -54,9 +56,9 @@ public class HttpApi {
     }
 
     public static Map<String, String> sendMultipleGet(Set<String> urls) throws IOException, InterruptedException {
-        Map<String, CompletableFuture<HttpResponse<String>>> responses = new HashMap<>((int)(urls.size()*1.25)+1);
-        Map<String, String> responseMap = new HashMap<>((int)(urls.size()*1.25)+1);
-        for(String url : urls) {
+        Map<String, CompletableFuture<HttpResponse<String>>> responses = new HashMap<>((int) (urls.size() * 1.25) + 1);
+        Map<String, String> responseMap = new HashMap<>((int) (urls.size() * 1.25) + 1);
+        for (String url : urls) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .setHeader("User-Agent", USER_AGENT_PRODUCT + "/" + VERSION)
@@ -88,7 +90,7 @@ public class HttpApi {
                 .GET()
                 .build();
         HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-        if(response.statusCode() != 200) {
+        if (response.statusCode() != 200) {
             log.error("Request returned invalid status code {}", response.statusCode());
             return Optional.empty();
         }

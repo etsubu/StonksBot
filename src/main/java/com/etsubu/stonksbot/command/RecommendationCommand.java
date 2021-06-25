@@ -5,6 +5,7 @@ import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.inderes.model.RecommendationEntry;
 import com.etsubu.stonksbot.inderes.InderesConnector;
 import com.etsubu.stonksbot.utility.DoubleTools;
+import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.AssetPriceIntraInfo;
 import com.etsubu.stonksbot.yahoo.YahooConnectorImpl;
 import net.dv8tion.jda.api.entities.User;
@@ -22,9 +23,9 @@ import java.util.Set;
 public class RecommendationCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(RecommendationCommand.class);
     private final InderesConnector inderesConnector;
-    private final YahooConnectorImpl yahooConnector;
+    private final YahooConnector yahooConnector;
 
-    public RecommendationCommand(InderesConnector inderesConnector, YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+    public RecommendationCommand(InderesConnector inderesConnector, YahooConnector yahooConnector, ConfigLoader configLoader) {
         super(List.of("suositus", "recommendation"), configLoader, true);
         this.inderesConnector = inderesConnector;
         this.yahooConnector = yahooConnector;
@@ -32,7 +33,7 @@ public class RecommendationCommand extends Command {
 
     private Optional<RecommendationEntry> filterEntry(Set<RecommendationEntry> entries, String name) {
         Optional<RecommendationEntry> entry = entries.stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst();
-        if(entry.isPresent()) {
+        if (entry.isPresent()) {
             return entry;
         }
         return entries.stream().filter(x -> x.getName().toLowerCase().startsWith(name.toLowerCase())).findFirst();
@@ -55,8 +56,8 @@ public class RecommendationCommand extends Command {
         builder.append("Tavoitehinta: ").append(entry.getTarget()).append(entry.getCurrency()).append('\n');
         price.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(entry.getCurrency())
                 .append("\nNousuvara: ")
-                        .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
-                        .append("%\n"));
+                .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
+                .append("%\n"));
         builder.append("Suositus: ").append(entry.getRecommendationText()).append('\n');
         builder.append("Riski: ").append(entry.getRisk()).append("```");
         return builder.toString();
@@ -65,13 +66,13 @@ public class RecommendationCommand extends Command {
     @Override
     public CommandResult exec(CommandContext context) {
         String command = context.getMessage();
-        if(command.isEmpty()) {
+        if (command.isEmpty()) {
             return new CommandResult("You must provide OMXH/first north stock name that inderes follows", false);
         }
         try {
             Set<RecommendationEntry> entries = inderesConnector.queryRecommendations();
             String[] parts = command.split(" ");
-            if(parts[0].equals("filter")) {
+            if (parts[0].equals("filter")) {
                 return new CommandResult("Not implemented yet", false);
             } else {
                 Optional<RecommendationEntry> entry = filterEntry(entries, command);

@@ -11,13 +11,23 @@ public class FundaValue {
     private String currency;
     private DataValue reportedValue;
 
-    public Optional<String> getDataId() { return Optional.ofNullable(dataId); }
+    public Optional<String> getDataId() {
+        return Optional.ofNullable(dataId);
+    }
 
-    public String getAsOfDate() { return asOfDate; }
+    public String getAsOfDate() {
+        return asOfDate;
+    }
 
-    public Optional<String> getPeriodType() { return Optional.ofNullable(periodType); }
+    public Optional<String> getPeriodType() {
+        return Optional.ofNullable(periodType);
+    }
 
-    public Optional<String> getCurrency() { return Optional.ofNullable(currency); }
+    public Optional<String> getCurrency() {
+        return Optional.ofNullable(currency);
+    }
 
-    public Optional<DataValue> getReportedValue() { return Optional.ofNullable(reportedValue); }
+    public Optional<DataValue> getReportedValue() {
+        return Optional.ofNullable(reportedValue);
+    }
 }

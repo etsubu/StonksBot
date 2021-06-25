@@ -51,15 +51,14 @@ public class ConfigLoader {
     public Config getConfig() {
         try {
             FileTime time = Files.getLastModifiedTime(configFile);
-            if(time.toInstant().isAfter(lastModified)) {
+            if (time.toInstant().isAfter(lastModified)) {
                 log.info("Changes in config files, reloading.");
                 loadConfigs();
             }
         } catch (NoSuchFileException e) {
             log.error("No config file present");
             return new Config();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             log.error("Failed to get last modified time for config file. Assuming it has not changed", e);
         }
         return Optional.ofNullable(config).orElse(DEFAULT_CONFIG);

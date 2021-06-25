@@ -25,12 +25,12 @@ public class ListCommand extends Command implements ApplicationContextAware {
 
     @Override
     public CommandResult exec(CommandContext context) {
-        if(applicationContext == null) {
+        if (applicationContext == null) {
             return new CommandResult("Not yet initialized, wait a moment and try again", true);
         }
         Map<String, Command> cmds = applicationContext.getBeansOfType(Command.class);
         StringBuilder builder = new StringBuilder();
-        for(Command cmd : cmds.values()) {
+        for (Command cmd : cmds.values()) {
             builder.append('!')
                     .append(String.join("/", cmd.getNames()))
                     .append('\n');

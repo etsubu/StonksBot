@@ -13,9 +13,15 @@ public class DataValue {
         this.longFmt = longFmt;
     }
 
-    public String getRaw() { return raw; }
+    public String getRaw() {
+        return raw;
+    }
 
-    public String getFmt() { return fmt; }
+    public String getFmt() {
+        return fmt;
+    }
 
-    public Optional<String> getLongFmt() { return Optional.ofNullable(longFmt); }
+    public Optional<String> getLongFmt() {
+        return Optional.ofNullable(longFmt);
+    }
 }

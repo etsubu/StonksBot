@@ -24,29 +24,29 @@ public class FilterHandler {
 
     public boolean shouldBeFiltered(MessageReceivedEvent event) {
         // No reactions to DMs
-        if(event.getChannelType() != ChannelType.TEXT) {
+        if (event.getChannelType() != ChannelType.TEXT) {
             return false;
         }
         Config config = configLoader.getConfig();
         String serverName = event.getGuild().getId();
         Optional<ServerConfig> serverConfig = config.getServerConfig(serverName);
-        if(serverConfig.isEmpty()) {
+        if (serverConfig.isEmpty()) {
             return false;
         }
-        if(config.getGlobalAdmins().stream().anyMatch(x -> x.equalsIgnoreCase(event.getAuthor().getId()))) {
+        if (config.getGlobalAdmins().stream().anyMatch(x -> x.equalsIgnoreCase(event.getAuthor().getId()))) {
             // Ignore global admins
             return false;
         }
-        if(serverConfig.get().getFilters().getRegexPatterns()
+        if (serverConfig.get().getFilters().getRegexPatterns()
                 .stream().anyMatch(x -> x.matcher(event.getMessage().getContentDisplay().toLowerCase()).matches())) {
             // Filter pattern matches
             log.info("Filtering message '{}' by '{}' id='{}'",
-                    event.getMessage().getContentDisplay().replaceAll("\n",""),
+                    event.getMessage().getContentDisplay().replaceAll("\n", ""),
                     event.getAuthor().getName(),
                     event.getAuthor().getId());
-            if(serverConfig.get().getFilters().getNotifyChannel() != null) {
+            if (serverConfig.get().getFilters().getNotifyChannel() != null) {
                 GuildChannel guildChannel = event.getJDA().getGuildChannelById(serverConfig.get().getFilters().getNotifyChannel());
-                if(guildChannel instanceof TextChannel) {
+                if (guildChannel instanceof TextChannel) {
                     TextChannel channel = (TextChannel) guildChannel;
                     // Remove the message
                     event.getMessage().delete().queue();

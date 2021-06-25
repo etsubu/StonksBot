@@ -6,9 +6,9 @@ import lombok.Getter;
 
 /**
  * CommandResult contains the possible response of an executed command and whether it succeeded or not
+ *
  * @author etsubu
  * @version 26 Jul 2018
- *
  */
 @Getter
 @AllArgsConstructor
@@ -18,10 +18,11 @@ public class CommandResult {
     private final boolean respondWithDM;
     private final String response;
     private final Exception exception;
-    
+
     /**
      * Initializes CommandResult
-     * @param response Text response of the executed command. Can be null
+     *
+     * @param response  Text response of the executed command. Can be null
      * @param succeeded Whether the command succeeded or not
      */
     public CommandResult(String response, boolean succeeded) {

@@ -39,7 +39,7 @@ public class ChartResult {
         List<String> low = quote.getLow();
         List<String> close = quote.getClose();
         List<String> volume = quote.getVolume();
-        for(int i = 0; i < timestamp.size(); i++) {
+        for (int i = 0; i < timestamp.size(); i++) {
             buildCandle(series, zoneId, open, high, low, close, volume, i);
         }
         return series;
@@ -56,12 +56,12 @@ public class ChartResult {
         List<String> volume = quote.getVolume();
         long intraStartTime = Long.parseLong(meta.getCurrentTradingPeriod().getRegular().getStart());
         long intraEndTime = Long.parseLong(meta.getCurrentTradingPeriod().getRegular().getEnd());
-        for(int i = 0; i < timestamp.size(); i++) {
+        for (int i = 0; i < timestamp.size(); i++) {
             long currentTime = Long.parseLong(timestamp.get(i));
-            if(currentTime < intraStartTime) {
+            if (currentTime < intraStartTime) {
                 continue;
             }
-            if(currentTime > intraEndTime) {
+            if (currentTime > intraEndTime) {
                 break;
             }
             buildCandle(series, zoneId, open, high, low, close, volume, i);

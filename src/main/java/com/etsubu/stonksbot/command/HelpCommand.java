@@ -29,11 +29,11 @@ public class HelpCommand extends Command implements ApplicationContextAware {
     @Override
     public CommandResult exec(CommandContext context) {
         String command = context.getMessage();
-        if(applicationContext == null) {
+        if (applicationContext == null) {
             return new CommandResult("Still initializing commands, try again in a bit", true);
         }
         try {
-            if(command == null || command.isEmpty() || command.isBlank()) {
+            if (command == null || command.isEmpty() || command.isBlank()) {
                 return new CommandResult(help(), false);
             }
             CommandHandler commandHandler = applicationContext.getBean(CommandHandler.class);

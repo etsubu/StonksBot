@@ -5,61 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * {
- *   "quoteSummary": {
- *     "result": [
- *       {
- *         "calendarEvents": {
- *           "maxAge": 1,
- *           "earnings": {
- *             "earningsDate": [
- *               {
- *                 "raw": 1602547200,
- *                 "fmt": "2020-10-13"
- *               }
- *             ],
- *             "earningsAverage": {
- *               "raw": 1.82,
- *               "fmt": "1.82"
- *             },
- *             "earningsLow": {
- *               "raw": 1.23,
- *               "fmt": "1.23"
- *             },
- *             "earningsHigh": {
- *               "raw": 2.33,
- *               "fmt": "2.33"
- *             },
- *             "revenueAverage": {
- *               "raw": 27373900000,
- *               "fmt": "27.37B",
- *               "longFmt": "27,373,900,000"
- *             },
- *             "revenueLow": {
- *               "raw": 26038500000,
- *               "fmt": "26.04B",
- *               "longFmt": "26,038,500,000"
- *             },
- *             "revenueHigh": {
- *               "raw": 28416000000,
- *               "fmt": "28.42B",
- *               "longFmt": "28,416,000,000"
- *             }
- *           },
- *           "exDividendDate": {
- *             "raw": 1593648000,
- *             "fmt": "2020-07-02"
- *           },
- *           "dividendDate": {
- *             "raw": 1596153600,
- *             "fmt": "2020-07-31"
- *           }
- *         }
- *       }
- *     ],
- *     "error": null
- *   }
- * }
+ * Container for a single calendar event and its estimates.
+ *
+ * @author etsubu
  */
 public class CalendarEvent {
     public final List<DataValue> earningsDate;
@@ -91,42 +39,42 @@ public class CalendarEvent {
     }
 
     public Optional<DataValue> getEarningsAverage() {
-        if(earningsAverage != null && earningsAverage.getRaw() != null) {
+        if (earningsAverage != null && earningsAverage.getRaw() != null) {
             return Optional.of(earningsAverage);
         }
         return Optional.empty();
     }
 
     public Optional<DataValue> getEarningsLow() {
-        if(earningsLow != null && earningsLow.getRaw() != null) {
+        if (earningsLow != null && earningsLow.getRaw() != null) {
             return Optional.of(earningsLow);
         }
         return Optional.empty();
     }
 
     public Optional<DataValue> getEarningsHigh() {
-        if(earningsHigh != null && earningsHigh.getRaw() != null) {
+        if (earningsHigh != null && earningsHigh.getRaw() != null) {
             return Optional.of(earningsHigh);
         }
         return Optional.empty();
     }
 
     public Optional<DataValue> getRevenueAverage() {
-        if(revenueAverage != null && revenueAverage.getRaw() != null) {
+        if (revenueAverage != null && revenueAverage.getRaw() != null) {
             return Optional.of(revenueAverage);
         }
         return Optional.empty();
     }
 
     public Optional<DataValue> getRevenueLow() {
-        if(revenueLow != null && revenueLow.getRaw() != null) {
+        if (revenueLow != null && revenueLow.getRaw() != null) {
             return Optional.of(revenueLow);
         }
         return Optional.empty();
     }
 
     public Optional<DataValue> getRevenueHigh() {
-        if(revenueHigh != null && revenueHigh.getRaw() != null) {
+        if (revenueHigh != null && revenueHigh.getRaw() != null) {
             return Optional.of(revenueHigh);
         }
         return Optional.empty();

@@ -39,13 +39,13 @@ public class SharevilleTracker implements Schedulable {
     private String buildNotification(List<SharevilleUser> users) {
         StringBuilder builder = new StringBuilder();
         boolean content = false;
-        for(SharevilleUser user : users) {
+        for (SharevilleUser user : users) {
             SharevilleUser old = profileMap.get(user.getUrl());
-            if(old.getLatestTranscationDate().isPresent()) {
+            if (old.getLatestTranscationDate().isPresent()) {
                 List<WallEntry> transactions = user.getTransactionAfter(old.getLatestTranscationDate().get());
-                if(transactions != null && transactions.size() > 0) {
-                    for(WallEntry we : transactions) {
-                        if(we.isValid()) {
+                if (transactions != null && transactions.size() > 0) {
+                    for (WallEntry we : transactions) {
+                        if (we.isValid()) {
                             content = true;
                             builder.append("```\nShareville tapahtumat:");
                             String name = we.getFirst().getProfile().getName();
@@ -63,18 +63,18 @@ public class SharevilleTracker implements Schedulable {
     }
 
     public void notify(List<ServerConfig> serverConfigs, List<SharevilleUser> sharevilleUsers) {
-        for(ServerConfig server : serverConfigs) {
+        for (ServerConfig server : serverConfigs) {
             List<SharevilleUser> changedUsers = new ArrayList<>(sharevilleUsers);
             Long channel = server.getShareville().getSharevilleChannel();
             // Filter only those that the server is tracking
-            changedUsers.removeIf(x -> server.getShareville().getSharevilleProfiles().stream().noneMatch(y->x.getUrl().contains("/"+y+"/")));
+            changedUsers.removeIf(x -> server.getShareville().getSharevilleProfiles().stream().noneMatch(y -> x.getUrl().contains("/" + y + "/")));
             changedUsers.removeIf(x -> !profileMap.containsKey(x.getUrl()));
             // Filter profiles that have new transactions
             //changedUsers.removeIf(x -> profileMap.containsKey(x.getUrl())
             //        && x.getLatestTransactionTimestamp().compareTo(profileMap.get(x.getUrl()).getLatestTransactionTimestamp()) >= 0);
             // We now have a list of profiles that the server tracks and that have new transactions
             String notification = buildNotification(changedUsers);
-            if(notification != null) {
+            if (notification != null) {
                 log.info("Sent shareville transaction notification");
                 eventCore.sendMessage(List.of(channel), notification, null);
             }
@@ -83,7 +83,7 @@ public class SharevilleTracker implements Schedulable {
 
     @Override
     public void invoke() {
-        if(!Boolean.parseBoolean(configLoader.getConfig().getShareville().getEnabled())) {
+        if (!Boolean.parseBoolean(configLoader.getConfig().getShareville().getEnabled())) {
             // feature is not enabled;
             return;
         }
@@ -97,7 +97,7 @@ public class SharevilleTracker implements Schedulable {
                 .map(ServerConfig::getShareville)
                 .map(x -> x.getSharevilleProfiles().stream().map(y -> String.format(PROFILE_URL_TEMPLATE, y)).collect(Collectors.toSet()))
                 .collect(HashSet::new, Set::addAll, Set::addAll);
-        if(profileIds.isEmpty()) {
+        if (profileIds.isEmpty()) {
             // No profiles to track, skip
             return;
         }

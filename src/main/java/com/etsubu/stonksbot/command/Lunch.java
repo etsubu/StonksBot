@@ -18,10 +18,11 @@ import java.util.Optional;
 
 /**
  * Retrieves lunch list from "semma" for university of jyväskylä. Piato and Maija restaurants are displayed
+ *
  * @author etsubu
  */
 @Component
-public class Lunch extends Command{
+public class Lunch extends Command {
     private static final Logger log = LoggerFactory.getLogger(Lunch.class);
     private static final ZoneId TIMEZONE = ZoneId.of("Europe/Helsinki");
     private final LunchQuery query;
@@ -33,12 +34,12 @@ public class Lunch extends Command{
     }
 
     private String formatLunches(List<LunchMenu> menus) {
-        if(Optional.ofNullable(menus).map(List::isEmpty).orElse(true)) {
+        if (Optional.ofNullable(menus).map(List::isEmpty).orElse(true)) {
             // Empty lunch list
             return "No lunch list available. Better cook your own food. I recommend chili";
         }
         StringBuilder builder = new StringBuilder();
-        for(LunchMenu menu : menus) {
+        for (LunchMenu menu : menus) {
             builder.append("**")
                     .append(menu.getRestaurantName())
                     .append("**")
@@ -47,9 +48,9 @@ public class Lunch extends Command{
                     .append(' ')
                     .append(menu.getDate())
                     .append('\n');
-            for(MealOption meal : menu.getSetMenus()) {
+            for (MealOption meal : menu.getSetMenus()) {
                 builder.append(meal.getName()).append('\n');
-                for(MealComponents component : meal.getMeals()) {
+                for (MealComponents component : meal.getMeals()) {
                     builder.append('\t').append(component.getName()).append(' ')
                             .append(String.join(", ", component.getDiets()))
                             .append('\n');
@@ -59,6 +60,7 @@ public class Lunch extends Command{
         }
         return builder.toString();
     }
+
     @Override
     public CommandResult exec(CommandContext context) {
         try {

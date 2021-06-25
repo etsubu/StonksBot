@@ -8,5 +8,6 @@ import java.util.Set;
 
 public interface InderesConnector {
     Set<RecommendationEntry> queryRecommendations() throws IOException, InterruptedException;
-    Map<String,RecommendationEntry> queryRecommendationsMap() throws IOException, InterruptedException;
+
+    Map<String, RecommendationEntry> queryRecommendationsMap() throws IOException, InterruptedException;
 }

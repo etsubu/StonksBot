@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 /**
  * Component for caching stock names and tickers to avoid having to perform same queries
+ *
  * @author etsubu
  */
 @Component
@@ -35,7 +36,7 @@ public class TickerStorage {
     }
 
     private void init() throws IOException {
-        if(Files.exists(Path.of("tickers.txt"))) {
+        if (Files.exists(Path.of("tickers.txt"))) {
             List<String> lines = Files.readAllLines(tickerFile).stream().filter(x -> x.split(":").length == 3).collect(Collectors.toList());
             lines.forEach(x -> {
                 String[] shortcut = x.split(":");
@@ -50,7 +51,7 @@ public class TickerStorage {
 
     public void setShortcut(String shortcut, StockName name) {
         synchronized (tickerMap) {
-            if(!tickerMap.containsKey(shortcut)) {
+            if (!tickerMap.containsKey(shortcut)) {
                 tickerMap.put(shortcut.toLowerCase(), name);
                 try {
                     Files.writeString(tickerFile, shortcut.toLowerCase() + ":" + name.toString() + "\n", StandardOpenOption.APPEND);

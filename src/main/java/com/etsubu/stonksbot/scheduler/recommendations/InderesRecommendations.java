@@ -49,7 +49,7 @@ public class InderesRecommendations implements Schedulable {
         try {
             Num f = DecimalNum.valueOf(from);
             Num t = DecimalNum.valueOf(to);
-            if(f.isZero()) {
+            if (f.isZero()) {
                 return "-";
             }
             Num change = (t.minus(f)).dividedBy(f);
@@ -62,7 +62,7 @@ public class InderesRecommendations implements Schedulable {
 
     private String buildRecommendationChange(Set<Pair<RecommendationEntry, RecommendationEntry>> changes) {
         StringBuilder builder = new StringBuilder(64 * changes.size());
-        for(var v : changes) {
+        for (var v : changes) {
             var from = v.getFirst();
             var to = v.getSecond();
             builder.append("```\n(Inderes)\nSuositusmuutokset:");
@@ -77,14 +77,14 @@ public class InderesRecommendations implements Schedulable {
     }
 
     private void notifyRecommendationChanges(Set<Pair<RecommendationEntry, RecommendationEntry>> changes) {
-        if(!changes.isEmpty()) {
+        if (!changes.isEmpty()) {
             log.info("Found recommendation changes in {} stocks", changes.size());
             Config config = configLoader.getConfig();
             List<Long> channels = config.getServers().stream()
                     .map(ServerConfig::getRecommendationChannel)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
-            if(!channels.isEmpty()) {
+            if (!channels.isEmpty()) {
                 log.info("Sending message");
                 eventCore.sendMessage(channels, buildRecommendationChange(changes), null);
                 log.info("Notified channels about recommendation changes");
@@ -96,7 +96,7 @@ public class InderesRecommendations implements Schedulable {
 
     @Override
     public void invoke() {
-        if(failureTempCounter > 0) {
+        if (failureTempCounter > 0) {
             log.info("Skipping inderes recommendation query due to exponential backoff. Counter={}", failureTempCounter);
             failureTempCounter--;
             return;
@@ -109,10 +109,10 @@ public class InderesRecommendations implements Schedulable {
             }
             Set<Pair<RecommendationEntry, RecommendationEntry>> changedRecommendations =
                     recommendations.entrySet().stream()
-                    .filter(x -> Optional.ofNullable(existingRecommendations.get(x.getKey()))
-                            .map(y -> y.hasChanged(x.getValue())).orElse(false))
-                    .map(x-> new Pair<>(existingRecommendations.get(x.getKey()), x.getValue()))
-                    .collect(Collectors.toSet());
+                            .filter(x -> Optional.ofNullable(existingRecommendations.get(x.getKey()))
+                                    .map(y -> y.hasChanged(x.getValue())).orElse(false))
+                            .map(x -> new Pair<>(existingRecommendations.get(x.getKey()), x.getValue()))
+                            .collect(Collectors.toSet());
             // These are the recommendations that have at least 3 days between last change. This is used to avoid an issue
             // Where inderes changes recommendation without updating the date of recommendation at the same time and the date
             // is actually updated during the next day

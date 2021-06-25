@@ -13,7 +13,7 @@ public class TaskEntry {
 
     public boolean tick() {
         ticks++;
-        if(ticks == delay) {
+        if (ticks == delay) {
             ticks = 0;
             return true;
         }
@@ -24,5 +24,7 @@ public class TaskEntry {
         task.invoke();
     }
 
-    public Schedulable getTask() { return task; }
+    public Schedulable getTask() {
+        return task;
+    }
 }

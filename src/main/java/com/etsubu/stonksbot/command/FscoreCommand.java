@@ -2,6 +2,7 @@ package com.etsubu.stonksbot.command;
 
 import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
+import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.DataValue;
 import com.etsubu.stonksbot.yahoo.model.fundament.FundaValue;
 import com.etsubu.stonksbot.yahoo.model.fundament.FundamentEntry;
@@ -22,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class FscoreCommand extends Command{
+public class FscoreCommand extends Command {
     private static final String QUARTERLY_NET_INCOME = "quarterlyNetIncome";
     private static final String QUARTERLY_OPERATING_CASH_FLOW = "quarterlyOperatingCashFlow";
     private static final String QUARTERLY_LONG_TERM_DEBT = "quarterlyLongTermDebt";
@@ -50,28 +51,28 @@ public class FscoreCommand extends Command{
             ANNUAL_TOTAL_REVENUE)
     );
 
-    private final YahooConnectorImpl yahooConnector;
+    private final YahooConnector yahooConnector;
 
-    public FscoreCommand(YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+    public FscoreCommand(YahooConnector yahooConnector, ConfigLoader configLoader) {
         super(List.of("fscore", "fluku", "f"), configLoader, false);
         this.yahooConnector = yahooConnector;
         log.info("Initialized f-score command");
     }
 
     private Optional<Num> sumLastFourQuarters(Optional<FundamentEntry> entry) {
-        if(entry.isEmpty()) {
+        if (entry.isEmpty()) {
             log.info("Argument was empty, returning empty");
             return Optional.empty();
         }
         List<FundaValue> values = entry.get().getValue();
-        if(values == null || values.size() < 4) {
+        if (values == null || values.size() < 4) {
             log.info("Value does not have enough quarters available to calculate TTM");
             return Optional.empty();
         }
         Num sum = DecimalNum.valueOf(0);
-        for(int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             Optional<DataValue> reportedValue = values.get(i).getReportedValue();
-            if(reportedValue.isEmpty()) {
+            if (reportedValue.isEmpty()) {
                 log.info("Quarter's reported value was empty");
                 return Optional.empty();
             }
@@ -97,65 +98,65 @@ public class FscoreCommand extends Command{
         Optional<FundamentEntry> quarterlyTotalRevenue = Optional.ofNullable(entries.get(QUARTERLY_TOTAL_REVENUE));
         Optional<FundamentEntry> annualTotalRevenue = Optional.ofNullable(entries.get(ANNUAL_TOTAL_REVENUE));
         StringBuilder builder = new StringBuilder("```\n").append(response.first.getFullname()).append(" - ").append(response.first.getTicker()).append('\n');
-        if(netIncomeTTM.isPresent()) {
+        if (netIncomeTTM.isPresent()) {
             total++;
-            if(netIncomeTTM.get().isPositive()) {
+            if (netIncomeTTM.get().isPositive()) {
                 score++;
                 builder.append("Positive net income: 1\n");
             } else {
                 builder.append("Positive net income: 0\n");
             }
         }
-        if(opexTTM.isPresent()) {
+        if (opexTTM.isPresent()) {
             total++;
-            if(opexTTM.get().isPositive()) {
+            if (opexTTM.get().isPositive()) {
                 score++;
                 builder.append("Positive operating cash flow: 1\n");
             } else {
                 builder.append("Positive operating cash flow: 0\n");
             }
         }
-        if(netIncomeTTM.isPresent() && opexTTM.isPresent()) {
+        if (netIncomeTTM.isPresent() && opexTTM.isPresent()) {
             total++;
-            if(opexTTM.get().isGreaterThan(netIncomeTTM.get())) {
+            if (opexTTM.get().isGreaterThan(netIncomeTTM.get())) {
                 score++;
                 builder.append("Operating cash flow > net income: 1\n");
             } else {
                 builder.append("Operating cash flow > net income: 0\n");
             }
         }
-        if(totalAssets.isPresent() && netIncomeTTM.isPresent()) {
+        if (totalAssets.isPresent() && netIncomeTTM.isPresent()) {
             Num roa = netIncomeTTM.get().dividedBy(totalAssets.get());
             total++;
-            if(roa.isPositive()) {
+            if (roa.isPositive()) {
                 score++;
                 builder.append("Positive ROA: 1\n");
             } else {
                 builder.append("Positive ROA: 0\n");
             }
         }
-        if(quarterlyLongTermDebt.isPresent() && quarterlyLongTermDebt.get().getValue() != null && quarterlyLongTermDebt.get().getValue().size() >= 5) {
+        if (quarterlyLongTermDebt.isPresent() && quarterlyLongTermDebt.get().getValue() != null && quarterlyLongTermDebt.get().getValue().size() >= 5) {
             Optional<DataValue> currentValue = quarterlyLongTermDebt.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousValue = quarterlyLongTermDebt.get().getValue().get(4).getReportedValue();
-            if(currentValue.isPresent() && previousValue.isPresent()) {
+            if (currentValue.isPresent() && previousValue.isPresent()) {
                 Num currentDebt = DecimalNum.valueOf(currentValue.get().getRaw());
                 Num previousDebt = DecimalNum.valueOf(previousValue.get().getRaw());
                 total++;
-                if(currentDebt.isLessThan(previousDebt)) {
+                if (currentDebt.isLessThan(previousDebt)) {
                     score++;
                     builder.append("Decrease of long term debt: 1\n");
                 } else {
                     builder.append("Decrease of long term debt: 0\n");
                 }
             }
-        } else if(annualLongTermDebt.isPresent() && annualLongTermDebt.get().getValue() != null && annualLongTermDebt.get().getValue().size() >= 2) {
+        } else if (annualLongTermDebt.isPresent() && annualLongTermDebt.get().getValue() != null && annualLongTermDebt.get().getValue().size() >= 2) {
             Optional<DataValue> currentValue = annualLongTermDebt.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousValue = annualLongTermDebt.get().getValue().get(1).getReportedValue();
-            if(currentValue.isPresent() && previousValue.isPresent()) {
+            if (currentValue.isPresent() && previousValue.isPresent()) {
                 Num currentDebt = DecimalNum.valueOf(currentValue.get().getRaw());
                 Num previousDebt = DecimalNum.valueOf(previousValue.get().getRaw());
                 total++;
-                if(currentDebt.isLessThan(previousDebt)) {
+                if (currentDebt.isLessThan(previousDebt)) {
                     score++;
                     builder.append("Decrease of long term debt: 1\n");
                 } else {
@@ -163,18 +164,18 @@ public class FscoreCommand extends Command{
                 }
             }
         }
-        if(quarterlyCurrentAssets.isPresent() && quarterlyCurrentLiabilities.isPresent()
+        if (quarterlyCurrentAssets.isPresent() && quarterlyCurrentLiabilities.isPresent()
                 && Optional.ofNullable(quarterlyCurrentAssets.get().getValue()).map(x -> x.size() >= 5).orElse(false)
                 && Optional.ofNullable(quarterlyCurrentLiabilities.get().getValue()).map(x -> x.size() >= 5).orElse(false)) {
             Optional<DataValue> currentAssets = quarterlyCurrentAssets.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousAssets = quarterlyCurrentAssets.get().getValue().get(4).getReportedValue();
             Optional<DataValue> currentLiabilities = quarterlyCurrentLiabilities.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousLiabilities = quarterlyCurrentLiabilities.get().getValue().get(4).getReportedValue();
-            if(currentAssets.isPresent() && previousAssets.isPresent() && currentLiabilities.isPresent() && previousLiabilities.isPresent()) {
+            if (currentAssets.isPresent() && previousAssets.isPresent() && currentLiabilities.isPresent() && previousLiabilities.isPresent()) {
                 Num previousCurrentRatio = DecimalNum.valueOf(previousAssets.get().getRaw()).dividedBy(DecimalNum.valueOf(previousLiabilities.get().getRaw()));
                 Num currentCurrentRatio = DecimalNum.valueOf(currentAssets.get().getRaw()).dividedBy(DecimalNum.valueOf(currentLiabilities.get().getRaw()));
                 total++;
-                if(currentCurrentRatio.isGreaterThan(previousCurrentRatio)) {
+                if (currentCurrentRatio.isGreaterThan(previousCurrentRatio)) {
                     score++;
                     builder.append("Higher current ratio: 1\n");
                 } else {
@@ -183,12 +184,12 @@ public class FscoreCommand extends Command{
             }
 
         }
-        if(quarterlyShareIssued.isPresent() && quarterlyShareIssued.get().getValue() != null && quarterlyShareIssued.get().getValue().size() >= 5) {
+        if (quarterlyShareIssued.isPresent() && quarterlyShareIssued.get().getValue() != null && quarterlyShareIssued.get().getValue().size() >= 5) {
             Optional<DataValue> currentSharesIssued = quarterlyShareIssued.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousSharesIssued = quarterlyShareIssued.get().getValue().get(4).getReportedValue();
-            if(currentSharesIssued.isPresent() && previousSharesIssued.isPresent()) {
+            if (currentSharesIssued.isPresent() && previousSharesIssued.isPresent()) {
                 total++;
-                if(DecimalNum.valueOf(currentSharesIssued.get().getRaw()).isLessThanOrEqual(DecimalNum.valueOf(previousSharesIssued.get().getRaw()))) {
+                if (DecimalNum.valueOf(currentSharesIssued.get().getRaw()).isLessThanOrEqual(DecimalNum.valueOf(previousSharesIssued.get().getRaw()))) {
                     score++;
                     builder.append("No new shares issued: 1\n");
                 } else {
@@ -196,17 +197,17 @@ public class FscoreCommand extends Command{
                 }
             }
         }
-        if(annualGrossProfit.isPresent() && annualGrossProfit.get().getValue() != null && annualGrossProfit.get().getValue().size() >= 2
+        if (annualGrossProfit.isPresent() && annualGrossProfit.get().getValue() != null && annualGrossProfit.get().getValue().size() >= 2
                 && annualTotalRevenue.isPresent() && annualTotalRevenue.get().getValue() != null && annualTotalRevenue.get().getValue().size() >= 2) {
             Optional<DataValue> currentGrossProfit = annualGrossProfit.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousGrossProfit = annualGrossProfit.get().getValue().get(1).getReportedValue();
             Optional<DataValue> currentTotalRevenue = annualTotalRevenue.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousTotalRevenue = annualTotalRevenue.get().getValue().get(1).getReportedValue();
-            if(currentGrossProfit.isPresent() && previousGrossProfit.isPresent() && currentTotalRevenue.isPresent() && previousTotalRevenue.isPresent()) {
+            if (currentGrossProfit.isPresent() && previousGrossProfit.isPresent() && currentTotalRevenue.isPresent() && previousTotalRevenue.isPresent()) {
                 total++;
                 Num currentGrossProfitMargin = DecimalNum.valueOf(currentGrossProfit.get().getRaw()).dividedBy(DecimalNum.valueOf(currentTotalRevenue.get().getRaw()));
                 Num previousGrossProfitMargin = DecimalNum.valueOf(previousGrossProfit.get().getRaw()).dividedBy(DecimalNum.valueOf(previousTotalRevenue.get().getRaw()));
-                if(currentGrossProfitMargin.isGreaterThan(previousGrossProfitMargin)) {
+                if (currentGrossProfitMargin.isGreaterThan(previousGrossProfitMargin)) {
                     score++;
                     builder.append("Higher gross profit margin: 1\n");
                 } else {
@@ -214,17 +215,17 @@ public class FscoreCommand extends Command{
                 }
             }
         }
-        if(quarterlyTotalRevenue.isPresent() && quarterlyTotalRevenue.get().getValue() != null && quarterlyTotalRevenue.get().getValue().size() >= 5
+        if (quarterlyTotalRevenue.isPresent() && quarterlyTotalRevenue.get().getValue() != null && quarterlyTotalRevenue.get().getValue().size() >= 5
                 && quarterlyTotalAssets.isPresent() && quarterlyTotalAssets.get().getValue() != null && quarterlyTotalAssets.get().getValue().size() >= 5) {
             Optional<DataValue> currentTotalRevenue = quarterlyTotalRevenue.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousTotalRevenue = quarterlyTotalRevenue.get().getValue().get(4).getReportedValue();
             Optional<DataValue> currentTotalAssets = quarterlyTotalAssets.get().getValue().get(0).getReportedValue();
             Optional<DataValue> previousTotalAssets = quarterlyTotalAssets.get().getValue().get(4).getReportedValue();
-            if(currentTotalRevenue.isPresent() && previousTotalRevenue.isPresent() && currentTotalAssets.isPresent() && previousTotalAssets.isPresent()) {
+            if (currentTotalRevenue.isPresent() && previousTotalRevenue.isPresent() && currentTotalAssets.isPresent() && previousTotalAssets.isPresent()) {
                 Num currentAssetTurnover = DecimalNum.valueOf(currentTotalRevenue.get().getRaw()).dividedBy(DecimalNum.valueOf(currentTotalAssets.get().getRaw()));
                 Num previousAssetTurnover = DecimalNum.valueOf(previousTotalRevenue.get().getRaw()).dividedBy(DecimalNum.valueOf(previousTotalAssets.get().getRaw()));
                 total++;
-                if(currentAssetTurnover.isGreaterThan(previousAssetTurnover)) {
+                if (currentAssetTurnover.isGreaterThan(previousAssetTurnover)) {
                     score++;
                     builder.append("Higher asset turnover ratio: 1\n");
                 } else {

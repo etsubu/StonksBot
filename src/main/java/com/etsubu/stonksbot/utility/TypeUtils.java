@@ -4,6 +4,7 @@ public class TypeUtils {
 
     /**
      * Creates a new array of same size and copies the elements to that array
+     *
      * @param array Array to clone
      * @return Deep cloned array
      */
