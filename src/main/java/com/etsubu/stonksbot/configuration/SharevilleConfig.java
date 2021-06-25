@@ -15,7 +15,11 @@ public class SharevilleConfig {
     private List<String> sharevilleProfiles;
     private Long sharevilleChannel;
 
-    public List<String> getSharevilleProfiles() { return Optional.ofNullable(sharevilleProfiles).orElseGet(LinkedList::new); }
+    public List<String> getSharevilleProfiles() {
+        return Optional.ofNullable(sharevilleProfiles).orElseGet(LinkedList::new);
+    }
 
-    public Long getSharevilleChannel() { return sharevilleChannel; }
+    public Long getSharevilleChannel() {
+        return sharevilleChannel;
+    }
 }

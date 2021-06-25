@@ -20,13 +20,16 @@ public class Transaction {
     }
 
     public String getSideAsDescriptive() {
-        if(side == null) {
+        if (side == null) {
             return null;
         }
         switch (side) {
-            case 1: return "Osto";
-            case 2: return "Myynti";
-            default: return "Tuntematon toimeksianto";
+            case 1:
+                return "Osto";
+            case 2:
+                return "Myynti";
+            default:
+                return "Tuntematon toimeksianto";
         }
     }
 }

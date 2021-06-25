@@ -13,6 +13,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Displays help text for the requested command.
+ *
+ * @author etsubu
+ */
 @Component
 public class HelpCommand extends Command implements ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(HelpCommand.class);
@@ -29,11 +34,11 @@ public class HelpCommand extends Command implements ApplicationContextAware {
     @Override
     public CommandResult exec(CommandContext context) {
         String command = context.getMessage();
-        if(applicationContext == null) {
+        if (applicationContext == null) {
             return new CommandResult("Still initializing commands, try again in a bit", true);
         }
         try {
-            if(command == null || command.isEmpty() || command.isBlank()) {
+            if (command == null || command.isEmpty() || command.isBlank()) {
                 return new CommandResult(help(), false);
             }
             CommandHandler commandHandler = applicationContext.getBean(CommandHandler.class);

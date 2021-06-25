@@ -11,7 +11,7 @@ public class PriceIndicators {
     }
 
     public Optional<PriceQuote> getQuote() {
-        if(quote != null && !quote.isEmpty()) {
+        if (quote != null && !quote.isEmpty()) {
             return Optional.of(quote.get(0));
         }
         return Optional.empty();

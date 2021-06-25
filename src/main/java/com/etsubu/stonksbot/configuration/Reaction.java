@@ -12,10 +12,11 @@ public class Reaction {
     private String message;
     private String react;
 
-    public Reaction() {}
+    public Reaction() {
+    }
 
     public void buildPattern() {
-        if(message != null) {
+        if (message != null) {
             pattern = Pattern.compile(message);
         }
     }

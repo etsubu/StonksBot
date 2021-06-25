@@ -15,21 +15,23 @@ public class CalendarEarnings {
         this.dividendDate = dividendDate;
     }
 
-    public int getMaxAge() { return maxAge; }
+    public int getMaxAge() {
+        return maxAge;
+    }
 
     public Optional<CalendarEvent> getEarnings() {
         return Optional.ofNullable(earnings);
     }
 
     public Optional<DataValue> getExDividendDate() {
-        if(exDividendDate != null && exDividendDate.getRaw() != null) {
+        if (exDividendDate != null && exDividendDate.getRaw() != null) {
             return Optional.of(exDividendDate);
         }
         return Optional.empty();
     }
 
     public Optional<DataValue> getDividendDate() {
-        if(dividendDate != null && dividendDate.getRaw() != null) {
+        if (dividendDate != null && dividendDate.getRaw() != null) {
             return Optional.of(dividendDate);
         }
         return Optional.empty();

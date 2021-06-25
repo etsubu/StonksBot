@@ -14,11 +14,13 @@ import java.util.regex.Pattern;
 
 /**
  * Creates personalized links for users to access voting poll
+ *
  * @author etsubu
  */
 @Component
 public class VoteLinkCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(AboutCommand.class);
+
     /**
      * Initializes the author command
      */
@@ -28,12 +30,12 @@ public class VoteLinkCommand extends Command {
     }
 
     private static int countOccurences(String message, String substring) {
-        if(message == null) {
+        if (message == null) {
             return 0;
         }
         int count = 0;
         int index = message.indexOf(substring);
-        while(index != -1 && index < message.length()) {
+        while (index != -1 && index < message.length()) {
             count++;
             index = message.indexOf(substring, index + substring.length());
         }
@@ -43,7 +45,7 @@ public class VoteLinkCommand extends Command {
     private static String replaceInstances(String template, String substring, String[] replacements) {
         String pattern = Pattern.quote(substring);
         String builder = template;
-        for(String s : replacements) {
+        for (String s : replacements) {
             builder = builder.replaceFirst(pattern, URLEncoder.encode(s, StandardCharsets.UTF_8));
         }
         return builder;
@@ -52,16 +54,16 @@ public class VoteLinkCommand extends Command {
     @Override
     public CommandResult exec(CommandContext context) {
         Optional<String> votelinkTemplate = context.getServerConfig().flatMap(x -> Optional.ofNullable(x.getVotelinkTemplate()));
-        if(votelinkTemplate.isEmpty()) {
+        if (votelinkTemplate.isEmpty()) {
             return new CommandResult("There are no active vote polls configured for the server.", false);
         }
 
-        if(countOccurences(votelinkTemplate.get(), "{}") != 2) {
+        if (countOccurences(votelinkTemplate.get(), "{}") != 2) {
             log.error("Invalid votelink template '{}'", votelinkTemplate.get());
             return new CommandResult("There are no active vote polls configured for the server.", false);
         }
         String[] tag = context.getSender().getAsTag().split("#");
-        if(tag.length != 2) {
+        if (tag.length != 2) {
             log.error("User tag format has changed '{}'", context.getSender().getAsTag());
             return new CommandResult("There are no active vote polls configured for the server.", false);
         }

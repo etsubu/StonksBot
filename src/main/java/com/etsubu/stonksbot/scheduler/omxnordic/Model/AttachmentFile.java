@@ -11,7 +11,9 @@ public class AttachmentFile {
         this.filename = filename;
     }
 
-    public String getFilename() { return filename; }
+    public String getFilename() {
+        return filename;
+    }
 
     public byte[] getFile() {
         return TypeUtils.cloneByteArray(file);

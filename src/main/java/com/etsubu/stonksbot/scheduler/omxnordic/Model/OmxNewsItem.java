@@ -34,13 +34,13 @@ public class OmxNewsItem {
     }
 
     public void resolveAttachments() {
-        if(attachment != null) {
+        if (attachment != null) {
             files = new ArrayList<>(attachment.size());
-            for(OmxNewsAttachment att : attachment) {
+            for (OmxNewsAttachment att : attachment) {
                 log.info("Downloading attachment {}", att.getFileName());
                 try {
                     Optional<byte[]> rawFile = HttpApi.downloadFile(att.getAttachmentUrl());
-                    if(rawFile.isPresent()) {
+                    if (rawFile.isPresent()) {
                         files.add(new AttachmentFile(rawFile.get(), att.getFileName()));
                     } else {
                         log.error("Failed to download attachment {}", att.getFileName());
@@ -54,7 +54,7 @@ public class OmxNewsItem {
 
     @Override
     public String toString() {
-        if(isValid()) {
+        if (isValid()) {
             StringBuilder builder = new StringBuilder();
             builder.append("**Otsikko**: `")
                     .append(headline)

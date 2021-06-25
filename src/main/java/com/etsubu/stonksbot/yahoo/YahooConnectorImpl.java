@@ -34,7 +34,7 @@ import java.time.Instant;
 import java.util.*;
 
 @Component
-public class YahooConnectorImpl implements YahooConnector{
+public class YahooConnectorImpl implements YahooConnector {
     private static final Logger log = LoggerFactory.getLogger(YahooConnectorImpl.class);
     private static final String FUNDAMENT_BASE_URL = "https://query%d.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=%s";
     private static final String PRICE_BASE_URL = "https://query%d.finance.yahoo.com/v8/finance/chart/%s?interval=1d&range=2d";
@@ -70,7 +70,7 @@ public class YahooConnectorImpl implements YahooConnector{
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if(response.statusCode() != 200) {
+        if (response.statusCode() != 200) {
             log.error("Request returned invalid status code {}", response.statusCode());
             return Optional.empty();
         }
@@ -78,20 +78,20 @@ public class YahooConnectorImpl implements YahooConnector{
     }
 
     public static Optional<Num> sumLastFourQuarters(Optional<FundamentEntry> entry) {
-        if(entry.isEmpty()) {
+        if (entry.isEmpty()) {
             log.info("Argument was empty, returning empty");
             return Optional.empty();
         }
         List<FundaValue> values = entry.get().getValue();
-        if(values == null || values.size() < 4) {
+        if (values == null || values.size() < 4) {
             log.info("Value does not have enough quarters available to calculate TTM");
             return Optional.empty();
         }
         values.sort(Comparator.comparing(FundaValue::getAsOfDate).reversed());
         Num sum = DecimalNum.valueOf(0);
-        for(int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++) {
             Optional<DataValue> reportedValue = values.get(i).getReportedValue();
-            if(reportedValue.isEmpty()){
+            if (reportedValue.isEmpty()) {
                 log.error("Missing reported value");
                 return Optional.empty();
             }
@@ -101,17 +101,17 @@ public class YahooConnectorImpl implements YahooConnector{
     }
 
     public static Optional<Num> getLatestValue(Optional<FundamentEntry> entry) {
-        if(entry.isEmpty()) {
+        if (entry.isEmpty()) {
             log.info("Argument was empty, returning empty");
             return Optional.empty();
         }
         List<FundaValue> values = entry.get().getValue();
-        if(values == null || values.isEmpty()) {
+        if (values == null || values.isEmpty()) {
             log.info("Value does not have enough quarters");
             return Optional.empty();
         }
         values.sort(Comparator.comparing(FundaValue::getAsOfDate).reversed());
-        if(values.get(0).getReportedValue().isPresent() && values.get(0).getReportedValue().get().getRaw() != null) {
+        if (values.get(0).getReportedValue().isPresent() && values.get(0).getReportedValue().get().getRaw() != null) {
             return Optional.of(DecimalNum.valueOf(values.get(0).getReportedValue().get().getRaw()));
         }
         return Optional.empty();
@@ -119,16 +119,16 @@ public class YahooConnectorImpl implements YahooConnector{
 
     public Optional<StockName> findTicker(String keyword) throws IOException, InterruptedException {
         Optional<StockName> ticker = tickerStorage.findTicker(keyword);
-        if(ticker.isPresent()) {
+        if (ticker.isPresent()) {
             log.info("Found ticker from cache {}=>{}", keyword, ticker.get());
             return ticker;
         }
         // Query from yahoo finance
         String requestUrl = String.format(SEARCH_BASE_URL, getLoadBalanceIndex(), URLEncoder.encode(keyword, StandardCharsets.UTF_8));
         Optional<String> response = requestHttp(requestUrl);
-        if(response.isPresent()) {
+        if (response.isPresent()) {
             SearchResponse searchResults = gson.fromJson(response.get(), SearchResponse.class);
-            if(searchResults.getQuotes().isEmpty()) {
+            if (searchResults.getQuotes().isEmpty()) {
                 return Optional.empty();
             }
             String queriedTicker = searchResults.getQuotes().get(0).getSymbol();
@@ -143,7 +143,7 @@ public class YahooConnectorImpl implements YahooConnector{
     public Optional<BarSeries> queryIntraPriceChart(String ticker) throws IOException, InterruptedException {
         String requestUrl = String.format(PRICE_BASE_URL, getLoadBalanceIndex(), URLEncoder.encode(ticker, StandardCharsets.UTF_8));
         Optional<String> body = requestHttp(requestUrl);
-        if(body.isPresent()) {
+        if (body.isPresent()) {
             return Optional.ofNullable(ChartResult.buildChartResultFromJson(body.get()).getBarSeries());
         }
         return Optional.empty();
@@ -163,27 +163,28 @@ public class YahooConnectorImpl implements YahooConnector{
         return requestHttp(requestUrl).map(x -> GeneralResponse.parseResponse(x, ticker));
     }
 
-    private Map<String, FundamentEntry> parseFundamentalTimeSeries(String json) throws IllegalArgumentException{
+    private Map<String, FundamentEntry> parseFundamentalTimeSeries(String json) throws IllegalArgumentException {
         JSONObject root = new JSONObject(json);
         root = root.getJSONObject("timeseries");
-        if(root.get("error") != null && !root.get("error").toString().equalsIgnoreCase("null")) {
+        if (root.get("error") != null && !root.get("error").toString().equalsIgnoreCase("null")) {
             log.error("Received error from yahoo finance rest api '{}', {}", root.get("error").toString(), json);
             throw new IllegalArgumentException("Yahoo finance returned error " + root.get("error").toString());
         }
         JSONArray result = root.getJSONArray("result");
         Map<String, FundamentEntry> fundamentEntryMap = new HashMap<>();
-        for(int i = 0; i < result.length(); i++) {
+        for (int i = 0; i < result.length(); i++) {
             JSONObject jsonEntry = result.getJSONObject(i);
             FundamentEntry entry = gson.fromJson(jsonEntry.toString(), FundamentEntry.class);
             Optional<String> type = entry.getMeta().getType();
-            if(type.isEmpty()) {
+            if (type.isEmpty()) {
                 log.info("Type was not available");
                 continue;
             }
             log.info("Parsed type {}", type.get());
             try {
                 JSONArray timeseries = jsonEntry.getJSONArray(type.get());
-                Type valueEntryList = new TypeToken<ArrayList<FundaValue>>() {}.getType();
+                Type valueEntryList = new TypeToken<ArrayList<FundaValue>>() {
+                }.getType();
                 // Set the value entry list manually
                 entry.setValue(gson.fromJson(timeseries.toString(), valueEntryList));
                 entry.getValue().sort(Comparator.comparing(FundaValue::getAsOfDate).reversed());
@@ -201,7 +202,7 @@ public class YahooConnectorImpl implements YahooConnector{
         String types = String.join("%2C", fundaments);
         String url = String.format(FUNDAMENTAL_TIMESERIES_URL, getLoadBalanceIndex(), name.getTicker(), types, Instant.now().getEpochSecond());
         Optional<String> response = requestHttp(url);
-        if(response.isEmpty()) {
+        if (response.isEmpty()) {
             log.error("No fundamental data for {}", name.getTicker());
             return new HashMap<>();
         }
@@ -214,7 +215,7 @@ public class YahooConnectorImpl implements YahooConnector{
         String types = String.join("%2C", fundaments);
         String url = String.format(FUNDAMENTAL_TIMESERIES_URL, getLoadBalanceIndex(), name.getTicker(), types, Instant.now().getEpochSecond());
         Optional<String> response = requestHttp(url);
-        if(response.isEmpty()) {
+        if (response.isEmpty()) {
             log.error("No fundamental data for {}", name.getTicker());
             return new Pair<>(name, new HashMap<>());
         }

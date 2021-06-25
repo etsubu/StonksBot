@@ -31,23 +31,23 @@ public class LunchQuery {
 
     public synchronized List<LunchMenu> queryLunchList() throws IOException, InterruptedException {
         ZonedDateTime time = ZonedDateTime.now(zoneId);
-        if(time.getHour() >= 18) {
+        if (time.getHour() >= 18) {
             // Look for tomorrow's lunch
             time = time.plusDays(1);
         }
-        if(time.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+        if (time.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
             time = time.plusDays(2);
-        } else if(time.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+        } else if (time.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             time = time.plusDays(3);
         }
         String asciiDate = formatter.format(time);
         log.info("Query lunch list");
         List<LunchMenu> menus = new ArrayList<>();
-        for(Pair<String, String> restaurant : restaurants) {
+        for (Pair<String, String> restaurant : restaurants) {
             String url = String.format(restaurant.first, asciiDate);
             HttpApi.sendGet(url).ifPresent(x -> {
                 LunchMenu menu = gson.fromJson(x, LunchResponse.class).getMenu();
-                if(menu != null) {
+                if (menu != null) {
                     menu.setRestaurantName(restaurant.second);
                     menus.add(menu);
                 }

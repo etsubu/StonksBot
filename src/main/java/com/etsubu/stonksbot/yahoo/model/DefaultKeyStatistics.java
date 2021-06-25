@@ -33,12 +33,12 @@ public class DefaultKeyStatistics {
     private DataValue priceChange;
 
     public Optional<Double> getShortRateChange() {
-        if(sharesShort == null || sharesShortPriorMonth == null) {
+        if (sharesShort == null || sharesShortPriorMonth == null) {
             return Optional.empty();
         }
         String sharesShortRaw = sharesShort.getRaw();
         String sharesShortPriorMonthRaw = sharesShortPriorMonth.getRaw();
-        if(sharesShortPriorMonthRaw == null || sharesShortRaw == null){
+        if (sharesShortPriorMonthRaw == null || sharesShortRaw == null) {
             return Optional.empty();
         }
         try {
@@ -52,63 +52,105 @@ public class DefaultKeyStatistics {
     }
 
     private Optional<String> getValue(DataValue value) {
-        if(value != null && value.getRaw() != null) {
+        if (value != null && value.getRaw() != null) {
             return Optional.of(value.getRaw());
         }
         return Optional.empty();
     }
 
-    public int getMaxAge() { return maxAge; }
+    public int getMaxAge() {
+        return maxAge;
+    }
 
-    public Optional<String> getPriceHint() { return getValue(priceHint); }
+    public Optional<String> getPriceHint() {
+        return getValue(priceHint);
+    }
 
-    public Optional<String> getForwardPE() { return getValue(forwardPE); }
+    public Optional<String> getForwardPE() {
+        return getValue(forwardPE);
+    }
 
-    public Optional<String> getProfitMargins() { return getValue(profitMargins); }
+    public Optional<String> getProfitMargins() {
+        return getValue(profitMargins);
+    }
 
-    public Optional<String> getFloatShares() { return getValue(floatShares); }
+    public Optional<String> getFloatShares() {
+        return getValue(floatShares);
+    }
 
-    public Optional<String> getSharesOutstanding() { return getValue(sharesOutstanding); }
+    public Optional<String> getSharesOutstanding() {
+        return getValue(sharesOutstanding);
+    }
 
-    public Optional<String> getSharesShort() { return getValue(sharesShort); }
+    public Optional<String> getSharesShort() {
+        return getValue(sharesShort);
+    }
 
-    public Optional<String> getSharesShortPriorMonth() { return getValue(sharesShortPriorMonth); }
+    public Optional<String> getSharesShortPriorMonth() {
+        return getValue(sharesShortPriorMonth);
+    }
 
-    public Optional<String> getDateShortInterest() { return getValue(dateShortInterest); }
+    public Optional<String> getDateShortInterest() {
+        return getValue(dateShortInterest);
+    }
 
-    public Optional<String> getSharesPercentSharesOut() { return getValue(sharesPercentSharesOut); }
+    public Optional<String> getSharesPercentSharesOut() {
+        return getValue(sharesPercentSharesOut);
+    }
 
-    public Optional<String> getHeldPercentInsiders() { return getValue(heldPercentInsiders); }
+    public Optional<String> getHeldPercentInsiders() {
+        return getValue(heldPercentInsiders);
+    }
 
-    public Optional<String> getHeldPercentInstitutions() { return getValue(heldPercentInstitutions); }
+    public Optional<String> getHeldPercentInstitutions() {
+        return getValue(heldPercentInstitutions);
+    }
 
-    public Optional<String> getShortRatio() { return getValue(shortRatio); }
+    public Optional<String> getShortRatio() {
+        return getValue(shortRatio);
+    }
 
-    public Optional<String> getShortPercentOfFloat() { return getValue(shortPercentOfFloat); }
+    public Optional<String> getShortPercentOfFloat() {
+        return getValue(shortPercentOfFloat);
+    }
 
-    public Optional<String> getBeta() { return getValue(beta); }
+    public Optional<String> getBeta() {
+        return getValue(beta);
+    }
 
-    public Optional<String> getBookValue() { return getValue(bookValue); }
+    public Optional<String> getBookValue() {
+        return getValue(bookValue);
+    }
 
-    public Optional<String> getPriceToBook() { return getValue(priceToBook); }
+    public Optional<String> getPriceToBook() {
+        return getValue(priceToBook);
+    }
 
-    public Optional<String> getTrailingEps() { return getValue(trailingEps); }
+    public Optional<String> getTrailingEps() {
+        return getValue(trailingEps);
+    }
 
-    public Optional<String> getForwardEps() { return getValue(forwardEps); }
+    public Optional<String> getForwardEps() {
+        return getValue(forwardEps);
+    }
 
-    public Optional<String> getPegRatio() { return getValue(pegRatio); }
+    public Optional<String> getPegRatio() {
+        return getValue(pegRatio);
+    }
 
-    public Optional<String> getEvRevenue() { return getValue(enterpriseToRevenue); }
+    public Optional<String> getEvRevenue() {
+        return getValue(enterpriseToRevenue);
+    }
 
     public Optional<Double> getForecastedEpsChange() {
-        if(forwardEps.getRaw() == null || trailingEps.getRaw() == null || getValue(trailingEps).isEmpty() && getValue(forwardEps).isEmpty()) {
+        if (forwardEps.getRaw() == null || trailingEps.getRaw() == null || getValue(trailingEps).isEmpty() && getValue(forwardEps).isEmpty()) {
             return Optional.empty();
         }
         try {
             BigDecimal fEps = new BigDecimal(forwardEps.getRaw());
             BigDecimal tEps = new BigDecimal(trailingEps.getRaw());
             // Let's not divide by zero or negative numbers (misleading)
-            if(tEps.compareTo(BigDecimal.ZERO) <= 0) {
+            if (tEps.compareTo(BigDecimal.ZERO) <= 0) {
                 return Optional.empty();
             }
             BigDecimal forecastedEpsGrowth = (fEps.subtract(tEps)).divide(tEps, 4, RoundingMode.HALF_UP);
@@ -118,7 +160,11 @@ public class DefaultKeyStatistics {
         }
     }
 
-    public Optional<String> getEvEbitda() { return getValue(enterpriseToEbitda); }
+    public Optional<String> getEvEbitda() {
+        return getValue(enterpriseToEbitda);
+    }
 
-    public Optional<String> getPriceChange() { return getValue(priceChange); }
+    public Optional<String> getPriceChange() {
+        return getValue(priceChange);
+    }
 }

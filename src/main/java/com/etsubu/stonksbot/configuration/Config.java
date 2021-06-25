@@ -17,19 +17,29 @@ public class Config {
     private List<ServerConfig> servers;
 
     public Optional<ServerConfig> getServerConfig(String id) {
-        if(servers == null) {
+        if (servers == null) {
             return Optional.empty();
         }
         return servers.stream().filter(x -> x.getName().trim().equalsIgnoreCase(id)).findFirst();
     }
 
-    public String getOauth() { return oauth; }
+    public String getOauth() {
+        return oauth;
+    }
 
-    public FeatureConfig getOmxhNews() { return Optional.ofNullable(omxhNews).orElseGet(()->new FeatureConfig("false")); }
+    public FeatureConfig getOmxhNews() {
+        return Optional.ofNullable(omxhNews).orElseGet(() -> new FeatureConfig("false"));
+    }
 
-    public List<String> getGlobalAdmins() { return Optional.ofNullable(globalAdmins).orElseGet(LinkedList::new); }
+    public List<String> getGlobalAdmins() {
+        return Optional.ofNullable(globalAdmins).orElseGet(LinkedList::new);
+    }
 
-    public List<ServerConfig> getServers() { return Optional.ofNullable(servers).orElseGet(LinkedList::new); }
+    public List<ServerConfig> getServers() {
+        return Optional.ofNullable(servers).orElseGet(LinkedList::new);
+    }
 
-    public FeatureConfig getShareville() { return Optional.ofNullable(shareville).orElseGet(()->new FeatureConfig("false")); }
+    public FeatureConfig getShareville() {
+        return Optional.ofNullable(shareville).orElseGet(() -> new FeatureConfig("false"));
+    }
 }

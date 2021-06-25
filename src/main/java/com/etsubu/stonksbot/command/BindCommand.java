@@ -3,6 +3,7 @@ package com.etsubu.stonksbot.command;
 import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.yahoo.TickerStorage;
+import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.YahooConnectorImpl;
 import com.etsubu.stonksbot.yahoo.StockName;
 import net.dv8tion.jda.api.entities.User;
@@ -16,14 +17,16 @@ import java.util.Optional;
 
 /**
  * Command for binding keywords to tickers
+ *
+ * @author etsubu
  */
 @Component
 public class BindCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(BindCommand.class);
-    private final YahooConnectorImpl yahooConnector;
+    private final YahooConnector yahooConnector;
     private final TickerStorage storage;
 
-    public BindCommand(YahooConnectorImpl yahooConnector, TickerStorage storage, ConfigLoader configLoader) {
+    public BindCommand(YahooConnector yahooConnector, TickerStorage storage, ConfigLoader configLoader) {
         super(List.of("bind", "sido"), configLoader, false);
         this.yahooConnector = yahooConnector;
         this.storage = storage;
@@ -34,19 +37,19 @@ public class BindCommand extends Command {
     public CommandResult exec(CommandContext context) {
         String command = context.getMessage();
         String[] parts = command.split(" ");
-        if(parts.length < 2) {
+        if (parts.length < 2) {
             return new CommandResult("You need to provide ticker and keyword for the command. See !help bind for more info", false);
         }
         String ticker = parts[0];
         String keyword = command.substring(command.indexOf(' ') + 1);
         try {
             Optional<StockName> name = yahooConnector.findTicker(ticker);
-            if(name.isEmpty()) {
+            if (name.isEmpty()) {
                 log.error("Failed to find stock with ticker {}", ticker);
                 return new CommandResult("Could not find any stock with ticker " + ticker + " please double check the name", false);
             }
             storage.setShortcut(keyword.replaceAll(":", ""), name.get());
-            return new CommandResult("Bound keyword '" +  keyword + "' to ticker '" + ticker + "'", true);
+            return new CommandResult("Bound keyword '" + keyword + "' to ticker '" + ticker + "'", true);
         } catch (IOException | InterruptedException e) {
             log.error("Failed to find stock with ticker {}", ticker, e);
             return new CommandResult("Failed to communicate with data provider", false);

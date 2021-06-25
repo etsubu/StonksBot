@@ -25,7 +25,7 @@ public class SchedulerService implements Runnable {
     public static void sleep(int seconds) {
         long until = System.currentTimeMillis() + (seconds * 1000L);
         long current;
-        while((current = System.currentTimeMillis()) < until) {
+        while ((current = System.currentTimeMillis()) < until) {
             try {
                 Thread.sleep(until - current);
             } catch (InterruptedException e) {
@@ -50,7 +50,7 @@ public class SchedulerService implements Runnable {
 
     @Override
     public void run() {
-        while(true) {
+        while (true) {
             sleep(1);
             synchronized (tasks) {
                 tasks.stream().filter(TaskEntry::tick).forEach(x -> executorService.submit(x::call));

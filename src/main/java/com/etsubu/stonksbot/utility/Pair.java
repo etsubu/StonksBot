@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @EqualsAndHashCode
-public class Pair<X,Y> {
+public class Pair<X, Y> {
     public final X first;
     public final Y second;
 

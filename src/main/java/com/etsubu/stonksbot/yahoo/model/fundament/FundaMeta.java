@@ -13,14 +13,14 @@ public class FundaMeta {
     }
 
     public Optional<String> getSymbol() {
-        if(symbol != null && !symbol.isEmpty()) {
+        if (symbol != null && !symbol.isEmpty()) {
             return Optional.of(symbol.get(0));
         }
         return Optional.empty();
     }
 
     public Optional<String> getType() {
-        if(type != null && !type.isEmpty()) {
+        if (type != null && !type.isEmpty()) {
             return Optional.of(type.get(0));
         }
         return Optional.empty();

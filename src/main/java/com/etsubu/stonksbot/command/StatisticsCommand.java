@@ -2,6 +2,7 @@ package com.etsubu.stonksbot.command;
 
 import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
+import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.DataResponse;
 import com.etsubu.stonksbot.yahoo.model.DefaultKeyStatistics;
 import com.etsubu.stonksbot.utility.DoubleTools;
@@ -16,14 +17,20 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Displays some common statistics related to the requested stock.
+ *
+ * @author etsubu
+ */
 @Component
-public class StatisticsCommand extends Command{
+public class StatisticsCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(StatisticsCommand.class);
-    private final YahooConnectorImpl yahooConnector;
+    private final YahooConnector yahooConnector;
+
     /**
      * Initializes Command
      */
-    public StatisticsCommand(YahooConnectorImpl yahooConnector, ConfigLoader configLoader) {
+    public StatisticsCommand(YahooConnector yahooConnector, ConfigLoader configLoader) {
         super(List.of("stats", "tilastot", "s"), configLoader, true);
         this.yahooConnector = yahooConnector;
     }
@@ -50,13 +57,13 @@ public class StatisticsCommand extends Command{
     @Override
     public CommandResult exec(CommandContext context) {
         String command = context.getMessage();
-        if(command.isBlank()) {
+        if (command.isBlank()) {
             return new CommandResult("You need to specify stock name to query, see !help price", false);
         }
         log.info("Requesting statistics for {}", command);
         try {
             Optional<DataResponse> response = yahooConnector.queryData(command, YahooConnectorImpl.DEFAULT_STATISTICS);
-            if(response.isPresent() && response.get().getDefaultKeyStatistics().isPresent()) {
+            if (response.isPresent() && response.get().getDefaultKeyStatistics().isPresent()) {
                 log.info("Received statistics for {}", response.get().getName().toString());
                 DefaultKeyStatistics statistics = response.get().getDefaultKeyStatistics().get();
                 return buildResponse(statistics, response.get().getName());
@@ -70,6 +77,6 @@ public class StatisticsCommand extends Command{
 
     @Override
     public String help() {
-        return "Displays key statistics about the given stock\nUsage: !" + String.join("/", super.names) +" [stockname/ticker]\nExample: !stats msft";
+        return "Displays key statistics about the given stock\nUsage: !" + String.join("/", super.names) + " [stockname/ticker]\nExample: !stats msft";
     }
 }

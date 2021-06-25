@@ -26,15 +26,15 @@ public class PermissionManager {
         MessageChannel channel = event.getChannel();
         boolean isGlobalAdmin = Optional.ofNullable(configLoader.getConfig().getGlobalAdmins())
                 .map(x -> x.stream().anyMatch(y -> y.trim().equalsIgnoreCase(user.getId()))).orElse(false);
-        if(isGlobalAdmin) {
+        if (isGlobalAdmin) {
             return true;
         }
-        if(event.getChannelType() != ChannelType.TEXT) {
+        if (event.getChannelType() != ChannelType.TEXT) {
             return false;
         }
         Optional<List<Role>> userRoles = Optional.ofNullable(event.getMember()).map(Member::getRoles);
         Optional<ServerConfig> serverConfig = configLoader.getConfig().getServerConfig(event.getGuild().getId());
-        if(serverConfig.isEmpty()) {
+        if (serverConfig.isEmpty()) {
             log.info("No configs for server {}, block by default", event.getGuild().getId());
             return false;
         }
@@ -45,7 +45,7 @@ public class PermissionManager {
                 .anyMatch(y -> y.getId().trim().equalsIgnoreCase(serverConfig.get().getTrustedGroup())))
                 .orElse(false);
         log.debug("Is admin: {}, is trusted: {}", isInServerAdminGroup, isInServerTrustedGroup);
-        if(isInServerAdminGroup || isInServerTrustedGroup) {
+        if (isInServerAdminGroup || isInServerTrustedGroup) {
             return true;
         }
         // If no special permissions then check if the channel is allowed

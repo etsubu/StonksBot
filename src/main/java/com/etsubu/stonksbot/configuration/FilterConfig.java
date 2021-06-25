@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 /**
  * Configurations for filtering unwanted messages
+ *
  * @author etsubu
  */
 @Setter
@@ -40,18 +41,20 @@ public class FilterConfig {
     }
 
     public List<Pattern> getRegexPatterns() {
-        if(regexPatterns == null) {
+        if (regexPatterns == null) {
             regexPatterns = new LinkedList<>();
         }
         return Collections.unmodifiableList(regexPatterns);
     }
 
     public List<String> getPatterns() {
-        if(patterns == null) {
+        if (patterns == null) {
             patterns = new LinkedList<>();
         }
         return Collections.unmodifiableList(patterns);
     }
 
-    public String getNotifyChannel() { return notifyChannel; }
+    public String getNotifyChannel() {
+        return notifyChannel;
+    }
 }

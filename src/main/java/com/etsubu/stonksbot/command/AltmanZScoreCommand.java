@@ -2,12 +2,12 @@ package com.etsubu.stonksbot.command;
 
 import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
+import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.fundament.FundamentEntry;
 import com.etsubu.stonksbot.utility.DoubleTools;
 import com.etsubu.stonksbot.utility.Pair;
 import com.etsubu.stonksbot.yahoo.StockName;
 import com.etsubu.stonksbot.yahoo.YahooConnectorImpl;
-import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -20,6 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Calculates altman z-score for a requested stock.
+ *
+ * @author etsubu
+ */
 @Component
 public class AltmanZScoreCommand extends Command {
     private static final String QUARTERLY_TOTAL_ASSETS = "quarterlyTotalAssets";
@@ -43,9 +48,9 @@ public class AltmanZScoreCommand extends Command {
             QUARTERLY_EBIT)
     );
 
-    private final YahooConnectorImpl yahooConnector;
+    private final YahooConnector yahooConnector;
 
-    public AltmanZScoreCommand(ConfigLoader configLoader, YahooConnectorImpl yahooConnector) {
+    public AltmanZScoreCommand(ConfigLoader configLoader, YahooConnector yahooConnector) {
         super(List.of("z", "zscore", "zluku"), configLoader, false);
         this.yahooConnector = yahooConnector;
     }
@@ -59,12 +64,12 @@ public class AltmanZScoreCommand extends Command {
         Optional<Num> totalAssets = YahooConnectorImpl.getLatestValue(Optional.ofNullable(entries.get(QUARTERLY_TOTAL_ASSETS)));
         Optional<Num> totalLiabilities = YahooConnectorImpl.getLatestValue(Optional.ofNullable(entries.get(QUARTERLY_TOTAL_LIABILITIES)));
         Optional<Num> totalLiabilitiesNet = YahooConnectorImpl.getLatestValue(Optional.ofNullable(entries.get(QUARTERLY_QUARTERLY_TOTAL_LIABILITIES_NET_MINORITY_INTEREST)));
-        if(totalLiabilities.isEmpty()) {
+        if (totalLiabilities.isEmpty()) {
             totalLiabilities = totalLiabilitiesNet;
         }
         Optional<Num> marketcap = YahooConnectorImpl.getLatestValue(Optional.ofNullable(entries.get(TRAILING_MARKET_CAP)));
         log.info("{},{},{},{},{},{},{}", ebitTTM.isPresent(), revenueTTM.isPresent(), retainedEarningsTTM.isPresent(), workingCapital.isPresent(), totalAssets.isPresent(), totalLiabilities.isPresent(), marketcap.isPresent());
-        if(ebitTTM.isEmpty() || revenueTTM.isEmpty() || retainedEarningsTTM.isEmpty() || totalAssets.isEmpty() || totalLiabilities.isEmpty() || marketcap.isEmpty() || workingCapital.isEmpty()) {
+        if (ebitTTM.isEmpty() || revenueTTM.isEmpty() || retainedEarningsTTM.isEmpty() || totalAssets.isEmpty() || totalLiabilities.isEmpty() || marketcap.isEmpty() || workingCapital.isEmpty()) {
             return new CommandResult("Some financials could not be retrieved and the score cannot be calculated.", false);
         }
         Num A = workingCapital.get().dividedBy(totalAssets.get());

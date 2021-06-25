@@ -35,7 +35,7 @@ public class AssetPriceIntraInfo {
     public double round(Num value, int decimals) {
         double exp = Math.pow(10, decimals);
         double d = value.doubleValue() * exp;
-        return  Math.round(d) / exp;
+        return Math.round(d) / exp;
     }
 
     public String formatLong(Num value) {

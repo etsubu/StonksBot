@@ -11,6 +11,7 @@ import java.util.jar.Manifest;
 
 /**
  * Utility class for reading metadata from the application jar file
+ *
  * @author etsubu
  */
 public class ArchiveTools {
@@ -18,6 +19,7 @@ public class ArchiveTools {
 
     /**
      * Reads the application version number from the manifest.mf file in the jar archive
+     *
      * @return Version number of the running application
      */
     public static Optional<String> getApplicationVersion() {
