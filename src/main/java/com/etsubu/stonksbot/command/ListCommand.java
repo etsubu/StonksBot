@@ -12,6 +12,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Lists all available commands in this bot.
+ *
+ * @author etsubu
+ */
 @Component
 public class ListCommand extends Command implements ApplicationContextAware {
     private ApplicationContext applicationContext;

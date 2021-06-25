@@ -19,6 +19,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Displays analyst recommendation related information for the requested stock. Powered by Inderes
+ *
+ * @author etsubu
+ */
 @Component
 public class RecommendationCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(RecommendationCommand.class);

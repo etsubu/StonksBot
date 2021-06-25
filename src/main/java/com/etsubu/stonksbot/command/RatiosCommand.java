@@ -22,6 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Calculates some common valuation related ratios for the requested stock.
+ *
+ * @author etsubu
+ */
 @Component
 public class RatiosCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(RatiosCommand.class);

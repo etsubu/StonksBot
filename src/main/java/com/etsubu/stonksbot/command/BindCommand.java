@@ -17,6 +17,8 @@ import java.util.Optional;
 
 /**
  * Command for binding keywords to tickers
+ *
+ * @author etsubu
  */
 @Component
 public class BindCommand extends Command {

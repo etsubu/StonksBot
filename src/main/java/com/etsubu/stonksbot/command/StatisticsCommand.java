@@ -17,6 +17,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Displays some common statistics related to the requested stock.
+ *
+ * @author etsubu
+ */
 @Component
 public class StatisticsCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(StatisticsCommand.class);

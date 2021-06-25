@@ -20,6 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Calculates altman z-score for a requested stock.
+ *
+ * @author etsubu
+ */
 @Component
 public class AltmanZScoreCommand extends Command {
     private static final String QUARTERLY_TOTAL_ASSETS = "quarterlyTotalAssets";

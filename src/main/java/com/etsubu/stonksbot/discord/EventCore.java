@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Handles incoming discord events and messages
+ *
  * @author etsubu
  * @version 26 Jul 2018
  */
@@ -41,7 +43,7 @@ public class EventCore extends ListenerAdapter {
                      ConfigLoader configLoader,
                      PermissionManager permissionManager,
                      MessageReacter reacter,
-                     FilterHandler filterHandler) throws LoginException {
+                     FilterHandler filterHandler) {
         this.configLoader = configLoader;
         this.commandHandler = commandHandler;
         this.permissionManager = permissionManager;

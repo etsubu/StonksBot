@@ -18,6 +18,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Retrieves upcoming earnings date and its analyst estimations.
+ *
+ * @author etsubu
+ */
 @Component
 public class CalendarCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(CalendarCommand.class);

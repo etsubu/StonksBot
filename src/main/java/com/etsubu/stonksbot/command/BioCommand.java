@@ -18,6 +18,7 @@ import java.util.Optional;
 
 /**
  * Used for retrieving a description of a given company
+ *
  * @author etsubu
  */
 @Component
@@ -26,6 +27,7 @@ public class BioCommand extends Command {
     private static final CommandResult errorResponse = new CommandResult("Failed to retrieve bio for the company", false);
 
     private final YahooConnector yahooConnector;
+
     /**
      * Initializes Command
      */
@@ -46,7 +48,7 @@ public class BioCommand extends Command {
     @Override
     public CommandResult exec(CommandContext context) {
         String command = context.getMessage();
-        if(command.isBlank()) {
+        if (command.isBlank()) {
             return new CommandResult("You need to specify stock name to query, see !help " + this.names.get(0), false);
         }
         try {

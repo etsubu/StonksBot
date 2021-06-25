@@ -22,6 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Calculates piotroski f-score for a requested stock.
+ *
+ * @author etsubu
+ */
 @Component
 public class FscoreCommand extends Command {
     private static final String QUARTERLY_NET_INCOME = "quarterlyNetIncome";

@@ -13,6 +13,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Displays help text for the requested command.
+ *
+ * @author etsubu
+ */
 @Component
 public class HelpCommand extends Command implements ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(HelpCommand.class);
