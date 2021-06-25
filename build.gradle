@@ -26,6 +26,13 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+spotbugs {
+}
+
+spotbugsTest {
+    enabled = false
+}
+
 dependencies {
     implementation 'org.springframework:spring-core:5.3.8'
     implementation 'org.springframework:spring-beans:5.3.8'

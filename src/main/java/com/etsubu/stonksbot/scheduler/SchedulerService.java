@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Service unit for running different tasks on their own schedule.
+ *
+ * @author etsubu
+ */
 @Component
 public class SchedulerService implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(SchedulerService.class);

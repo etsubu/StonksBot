@@ -72,6 +72,11 @@ public class EventCore extends ListenerAdapter {
         return true;
     }
 
+    public void registerJDA(JDA jda) {
+        this.jda = jda;
+        jda.addEventListener(this);
+    }
+
     /**
      * Sends text message to the requested channel on server
      *
@@ -82,9 +87,9 @@ public class EventCore extends ListenerAdapter {
     public boolean sendMessage(List<Long> channelIds, String message, List<AttachmentFile> attachmentFiles) {
         boolean sent = false;
         for (long channelId : channelIds) {
-            GuildChannel guildChannel = jda.getGuildChannelById(channelId);
-            if (guildChannel instanceof TextChannel) {
-                MessageAction msg = ((TextChannel) guildChannel).sendMessage(message);
+            TextChannel textChannel = jda.getTextChannelById(channelId);
+            if (textChannel != null) {
+                MessageAction msg = textChannel.sendMessage(message);
                 if (attachmentFiles != null && !attachmentFiles.isEmpty()) {
                     for (AttachmentFile file : attachmentFiles) {
                         msg = msg.addFile(file.getFile(), file.getFilename());
@@ -100,10 +105,7 @@ public class EventCore extends ListenerAdapter {
     }
 
     public void sendPrivateMessage(User user, String content) {
-        user.openPrivateChannel().queue((channel) ->
-        {
-            channel.sendMessage(content).queue();
-        });
+        user.openPrivateChannel().queue((channel) -> channel.sendMessage(content).queue());
     }
 
     @Override
@@ -145,7 +147,7 @@ public class EventCore extends ListenerAdapter {
                 }
             } catch (Exception e) {
                 log.error("Uncaught exception", e);
-                event.getChannel().sendMessage("Oops, this command caused an unexpected exception. Developer should probably take a look at logs.").queue();
+                event.getMessage().reply("Oops, this command caused an unexpected exception. Developer should probably take a look at logs.").queue();
             }
         }
     }
