@@ -19,5 +19,6 @@ public class Main {
     public static void main(String[] args) {
         log.info("Starting up");
         new AnnotationConfigApplicationContext(Main.class);
+        log.info("Closing.");
     }
 }
