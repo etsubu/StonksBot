@@ -95,7 +95,7 @@ public abstract class Command {
         return new CommandResult("You lack permissions to use this command", false);
     }
 
-    public abstract CommandResult exec(CommandContext context);
+    protected abstract CommandResult exec(CommandContext context);
 
     /**
      * @return Help texts telling the user how to use the command
