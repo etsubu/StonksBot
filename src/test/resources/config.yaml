@@ -9,7 +9,7 @@ shareville:
 servers:
   - name: test_server
     whitelistedChannels:
-      - whitelisted_channel
+      - 472462235222933504
     reactions:
       - message: .*test.*
         react: testReaction

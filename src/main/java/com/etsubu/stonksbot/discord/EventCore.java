@@ -27,7 +27,7 @@ import java.util.Optional;
  * @version 26 Jul 2018
  */
 @Component
-public class EventCore extends ListenerAdapter {
+public final class EventCore extends ListenerAdapter {
     private static final Logger log = LoggerFactory.getLogger(EventCore.class);
     private final CommandHandler commandHandler;
     private JDA jda;
@@ -50,6 +50,7 @@ public class EventCore extends ListenerAdapter {
         this.reacter = reacter;
         this.filterHandler = filterHandler;
         new Thread(this::start).start();
+        log.info("Initialized {}", this.getClass().getName());
     }
 
     public boolean start() {
@@ -69,6 +70,7 @@ public class EventCore extends ListenerAdapter {
             return false;
         }
         jda.addEventListener(this);
+        log.info("JDA connected");
         return true;
     }
 
@@ -110,8 +112,8 @@ public class EventCore extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        if (event.getAuthor().isBot() || event.getAuthor().getName().equalsIgnoreCase(jda.getSelfUser().getName())) {
-            // Skip messages sent by bots or ourselves
+        if (event.getAuthor().getId().equalsIgnoreCase(jda.getSelfUser().getId())) {
+            // Skip messages sent ourselves
             return;
         }
         reacter.react(event).ifPresent(x -> event.getMessage().addReaction(x).queue());

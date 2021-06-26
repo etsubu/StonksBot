@@ -1,8 +1,5 @@
-package com.etsubu.stonksbot.integration;
+package com.etsubu.stonksbot.yahoo;
 
-import com.etsubu.stonksbot.yahoo.TickerStorage;
-import com.etsubu.stonksbot.yahoo.YahooConnector;
-import com.etsubu.stonksbot.yahoo.YahooConnectorImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,8 +13,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -58,7 +54,7 @@ public class YahooFinanceIntegrationTest {
         assertTrue(info.get().getVolume().isGreaterThanOrEqual(DecimalNum.valueOf(0)));
         assertTrue(info.get().getHigh().isGreaterThanOrEqual(info.get().getCurrent()));
         assertTrue(info.get().getLow().isLessThanOrEqual(info.get().getCurrent()));
-        assertTrue(info.get().getChangePercent().isGreaterThan(DecimalNum.valueOf(0)) && info.get().getChangePercent().isLessThan(DecimalNum.valueOf(1000)));
+        assertNotNull(info.get().getChangePercent());
     }
 
     @Test

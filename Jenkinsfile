@@ -8,6 +8,8 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_CREDENTIAL_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_CREDENTIAL_SECRET')
+        OATH1 = credentials('TESTER_BOT_OATH')
+        OATH2 = credentials('STONKSBOT_OATH')
     }
 
     stages {
@@ -26,6 +28,11 @@ pipeline {
         stage('Test') {
             steps {
                 sh './gradlew test'
+            }
+        }
+        stage('Integration test') {
+            steps {
+                sh './gradlew integrationTest'
             }
         }
         stage('Verify') {

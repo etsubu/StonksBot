@@ -1,0 +1,15 @@
+servers:
+    #NagrodusDev
+  - name: 472063951585148930
+    commands:
+      fscore:
+        allowedGroups:
+          - 753955427305259048
+      zscore:
+        allowedGroups:
+          - 753955427305259048
+    whitelistedChannels:
+      - 472462235222933504
+    reactions:
+      - message: .*test.*
+        react: STONKS

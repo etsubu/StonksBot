@@ -20,11 +20,41 @@ test {
     useJUnitPlatform()
 }
 
+sourceSets {
+
+    integrationTest {
+
+        java.srcDir 'src/integration_test/java'
+        resources.srcDir 'src/integration_test/resources'
+
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntime
+}
+
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    environment "oath1",  System.getenv('OATH1')
+    environment "oath2",  System.getenv('OATH2')
+}
+
+integrationTest {
+    useJUnitPlatform()
+}
+
 compileJava.options.encoding = 'UTF-8'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+
 
 spotbugs {
 }

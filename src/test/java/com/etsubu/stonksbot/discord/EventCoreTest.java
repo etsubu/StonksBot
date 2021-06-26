@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class EventCoreTest {
-    private static final String NAME = "bot_user";
+    private static final String ID = "1234";
     @Mock
     private CommandHandler commandHandler;
     @Mock
@@ -80,7 +80,7 @@ public class EventCoreTest {
         when(event.getChannel()).thenReturn(channel);
         when(channel.getName()).thenReturn("test_channel");
         when(channel.sendMessage(anyString())).thenReturn(msgAction);
-        when(selfUser.getName()).thenReturn(NAME);
+        when(selfUser.getId()).thenReturn(ID);
         when(event.getAuthor()).thenReturn(user);
         when(user.openPrivateChannel()).thenReturn(restAction);
         eventCore = new EventCore(commandHandler, configLoader, permissionManager, reacter, filterHandler);
@@ -103,12 +103,9 @@ public class EventCoreTest {
     }
 
     @Test
-    public void testReceiveMessageFromBotUser() {
-        when(user.getName()).thenReturn("some_name");
-        when(user.isBot()).thenReturn(true);
-        eventCore.onMessageReceived(event);
+    public void testReceiveMessageFromSelf() {
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn(NAME);
+        when(user.getId()).thenReturn(ID);
         eventCore.onMessageReceived(event);
         verify(reacter, times(0)).react(any(MessageReceivedEvent.class));
         verify(filterHandler, times(0)).shouldBeFiltered(any(MessageReceivedEvent.class));
@@ -119,7 +116,7 @@ public class EventCoreTest {
     public void testReactsToMessages() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("some_name");
         when(reacter.react(any(MessageReceivedEvent.class))).thenReturn(Optional.empty());
         eventCore.onMessageReceived(event);
         when(reacter.react(any(MessageReceivedEvent.class))).thenReturn(Optional.of(emote));
@@ -133,7 +130,7 @@ public class EventCoreTest {
     public void testMessageFiltering() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("123");
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(true);
         eventCore.onMessageReceived(event);
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
@@ -146,7 +143,7 @@ public class EventCoreTest {
     public void testIgnoreNonCommands() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("123");
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(false);
         eventCore.onMessageReceived(event);
@@ -158,7 +155,7 @@ public class EventCoreTest {
     public void testReplyNotAllowed() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("123");
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(false);
@@ -171,7 +168,7 @@ public class EventCoreTest {
     public void testCommandThrowsException() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("123");
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(true);
@@ -188,7 +185,7 @@ public class EventCoreTest {
     public void testCommandReturnsBlank() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("123");
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(commandHandler.execute(any(MessageReceivedEvent.class))).thenReturn(CommandResult.builder().succeeded(true).response("").build());
@@ -205,7 +202,7 @@ public class EventCoreTest {
     public void testCommandFails() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("123");
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(true);
@@ -223,7 +220,7 @@ public class EventCoreTest {
     public void testCommandReplyToChannel() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("123");
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(commandHandler.execute(any(MessageReceivedEvent.class))).thenReturn(CommandResult.builder().succeeded(true).response("asd").build());
@@ -240,7 +237,7 @@ public class EventCoreTest {
     public void testCommandReplyWithDM() {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
-        when(user.getName()).thenReturn("some_name");
+        when(user.getId()).thenReturn("123");
         when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(true);
