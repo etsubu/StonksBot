@@ -24,7 +24,7 @@ public class Config {
     }
 
     public String getOauth() {
-        return oauth;
+        return Optional.ofNullable(oauth).orElseGet(() -> System.getProperty("STONKSBOT_OATH"));
     }
 
     public FeatureConfig getOmxhNews() {

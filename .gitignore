@@ -50,4 +50,4 @@ out/
 
 logs/
 # Configuration files of the bot
-*.yaml
+/*.yaml

@@ -1,7 +1,5 @@
-package com.etsubu.stonksbot.integration;
+package com.etsubu.stonksbot.inderes;
 
-import com.etsubu.stonksbot.inderes.InderesConnector;
-import com.etsubu.stonksbot.inderes.InderesConnectorImpl;
 import com.etsubu.stonksbot.inderes.model.RecommendationEntry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

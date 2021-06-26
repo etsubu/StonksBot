@@ -24,7 +24,7 @@ public class ConfigLoader {
     private Instant lastModified;
 
     public ConfigLoader() {
-        this(Paths.get("config.yaml"));
+        this(Path.of(Optional.ofNullable(System.getProperty("STONKSBOT_CONFIG_FILE")).orElse("config.yaml")));
     }
 
     public ConfigLoader(Path path) {

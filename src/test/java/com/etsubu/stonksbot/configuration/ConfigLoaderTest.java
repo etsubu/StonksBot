@@ -44,7 +44,7 @@ public class ConfigLoaderTest {
         assertNotNull(testServer.get().getReactions());
         assertEquals(1, testServer.get().getReactions().size());
         assertEquals(1, testServer.get().getWhitelistedChannels().size());
-        assertEquals("whitelisted_channel", testServer.get().getWhitelistedChannels().get(0));
+        assertEquals("472462235222933504", testServer.get().getWhitelistedChannels().get(0));
         Reaction r = testServer.get().getReactions().get(0);
         assertEquals(".*test.*", r.getMessage());
         assertEquals("testReaction", r.getReact());
