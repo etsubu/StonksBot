@@ -1,5 +1,5 @@
 plugins {
-    id "io.freefair.lombok" version "6.0.0-m2"
+    id "io.freefair.lombok" version "6.1.0-m2"
     id "org.owasp.dependencycheck" version "6.2.2"
     id "com.github.spotbugs" version "4.7.1"
     id "com.github.johnrengelman.shadow" version "7.0.0"
@@ -64,17 +64,17 @@ spotbugsTest {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-core:5.3.8'
-    implementation 'org.springframework:spring-beans:5.3.8'
-    implementation 'org.springframework:spring-context:5.3.8'
+    implementation 'org.springframework:spring-core:5.3.9'
+    implementation 'org.springframework:spring-beans:5.3.9'
+    implementation 'org.springframework:spring-context:5.3.9'
     implementation 'org.yaml:snakeyaml:1.29'
     implementation 'org.ta4j:ta4j-core:0.14'
     implementation 'com.google.code.gson:gson:2.8.7'
     implementation 'org.json:json:20210307'
-    implementation ('net.dv8tion:JDA:4.3.0_283') {
+    implementation ('net.dv8tion:JDA:4.3.0_298') {
         exclude module: 'opus-java'
     }
-    implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha2'
     implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
     implementation 'org.apache.logging.log4j:log4j-api:2.14.1'

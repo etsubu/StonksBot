@@ -27,7 +27,7 @@ public class InderesRecommendations implements Schedulable {
     private static final Logger log = LoggerFactory.getLogger(InderesRecommendations.class);
     // ~3 days freshness
     private static final long FRESHNESS_WINDOW = 1000 * 60 * 60 * 24 * 3;
-    private static final int DELAY = 300; // 5min
+    private static final int DELAY = 300; // 5min, 300s
     // This is used for exponential backoff in case the server fails to respond
     private int failureCounter = 0;
     private int failureTempCounter = 0;
@@ -35,14 +35,24 @@ public class InderesRecommendations implements Schedulable {
     private final EventCore eventCore;
     private final ConfigLoader configLoader;
     private final InderesConnector inderesConnector;
+    private final YahooConnector yahooConnector;
 
     public InderesRecommendations(SchedulerService schedulerService, EventCore eventCore, ConfigLoader configLoader,
-                                  InderesConnector inderesConnector) {
+                                  InderesConnector inderesConnector, YahooConnector yahooConnector) {
         this.eventCore = eventCore;
         this.configLoader = configLoader;
         this.inderesConnector = inderesConnector;
+        this.yahooConnector = yahooConnector;
         entries = new HashMap<>();
         schedulerService.registerTask(this, DELAY);
+        // Bootstrap recommendations
+        new Thread(() -> {
+            try {
+                inderesConnector.queryRecommendations();
+            } catch (IOException | InterruptedException e) {
+                log.error("Failed to bootstrap recommendations ", e);
+            }
+        }).start();
     }
 
     private String formatChangePercentage(String from, String to) {
@@ -60,18 +70,49 @@ public class InderesRecommendations implements Schedulable {
         }
     }
 
+    private Optional<AssetPriceIntraInfo> queryCurrentPrice(RecommendationEntry entry) {
+        log.info("Querying asset price for {}", entry.getIsin());
+        Optional<AssetPriceIntraInfo> price = Optional.empty();
+        try {
+            price = yahooConnector.queryCurrentIntraPriceInfo(entry.getIsin());
+        } catch (IOException e) {
+            log.error("Connection to yahoo finance failed", e);
+        } catch (InterruptedException e) {
+            log.error("Connection to yahoo finance timed out", e);
+        }
+        return price;
+    }
+
     private String buildRecommendationChange(Set<Pair<RecommendationEntry, RecommendationEntry>> changes) {
         StringBuilder builder = new StringBuilder(64 * changes.size());
         for (var v : changes) {
+            Optional<AssetPriceIntraInfo> currentPrice = queryCurrentPrice(v.second);
             var from = v.getFirst();
             var to = v.getSecond();
-            builder.append("```\n(Inderes)\nSuositusmuutokset:");
-            builder.append("\nNimi: ").append(from.getName()).append('\n');
-            builder.append("Tavoitehinta: ").append(from.getTarget()).append(" -> ").append(to.getTarget()).append(" (")
-                    .append(formatChangePercentage(from.getTarget(), to.getTarget())).append("%)")
-                    .append('\n');
-            builder.append("Suositus: ").append(from.getRecommendationText()).append(" -> ").append(to.getRecommendationText()).append('\n');
-            builder.append("Riski: ").append(from.getRisk()).append(" -> ").append(to.getRisk()).append("\n--------------```");
+            Num targetPrice = DecimalNum.valueOf(v.second.getTarget().replaceAll(",", "."));
+            if(from != null) {
+                builder.append("```\n(Inderes)\nSuositusmuutos:");
+                builder.append("\nNimi: ").append(from.getName()).append('\n');
+                builder.append("Tavoitehinta: ").append(from.getTarget()).append(" -> ").append(to.getTarget()).append(" (")
+                        .append(formatChangePercentage(from.getTarget(), to.getTarget())).append("%)")
+                        .append('\n');
+                currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(to.getCurrency())
+                        .append("\nNousuvara: ")
+                        .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
+                        .append("%\n"));
+                builder.append("Suositus: ").append(from.getRecommendationText()).append(" -> ").append(to.getRecommendationText()).append('\n');
+                builder.append("Riski: ").append(from.getRisk()).append(" -> ").append(to.getRisk()).append("\n--------------```");
+            } else {
+                builder.append("```\n(Inderes)\nSeurannan aloitus:");
+                builder.append("\nNimi: ").append(to.getName()).append('\n');
+                builder.append("Tavoitehinta: ").append(to.getTarget()).append('\n');
+                currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(to.getCurrency())
+                        .append("\nNousuvara: ")
+                        .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
+                        .append("%\n"));
+                builder.append("Suositus: ").append(to.getRecommendationText()).append('\n');
+                builder.append("Riski: ").append(to.getRisk()).append("\n--------------```");
+            }
         }
         return builder.toString();
     }
@@ -113,13 +154,18 @@ public class InderesRecommendations implements Schedulable {
                                     .map(y -> y.hasChanged(x.getValue())).orElse(false))
                             .map(x -> new Pair<>(existingRecommendations.get(x.getKey()), x.getValue()))
                             .collect(Collectors.toSet());
+            // Check for newly followed stocks
+            if(existingRecommendations.size() > 0) {
+                recommendations.entrySet().stream().filter(x -> !existingRecommendations.containsKey(x.getKey()))
+                        .forEach(x -> changedRecommendations.add(new Pair<>(null, x.getValue())));
+            }
             // These are the recommendations that have at least 3 days between last change. This is used to avoid an issue
             // Where inderes changes recommendation without updating the date of recommendation at the same time and the date
             // is actually updated during the next day
             // Alternatively if the actual recommendation values have changed then display those always
             Set<Pair<RecommendationEntry, RecommendationEntry>> freshRecommendations = changedRecommendations.stream()
-                    .filter(x -> Math.abs(x.first.getLastUpdated() - x.second.getLastUpdated()) > FRESHNESS_WINDOW
-                            || x.first.hasRecommendationChanged(x.second))
+                    .filter(x -> x.first == null || (Math.abs(x.first.getLastUpdated() - x.second.getLastUpdated()) > FRESHNESS_WINDOW
+                            || x.first.hasRecommendationChanged(x.second)))
                     .collect(Collectors.toSet());
             // Refresh recommendations
             synchronized (entries) {

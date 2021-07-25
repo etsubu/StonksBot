@@ -78,7 +78,7 @@ public abstract class Command {
      * @return Name of the command
      */
     public List<String> getNames() {
-        return names;
+        return new ArrayList<>(names);
     }
 
     /**
