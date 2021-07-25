@@ -24,12 +24,12 @@ import java.util.Optional;
 public class BindCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(BindCommand.class);
     private final YahooConnector yahooConnector;
-    private final TickerStorage storage;
+    private final TickerStorage tickerStorage;
 
-    public BindCommand(YahooConnector yahooConnector, TickerStorage storage, ConfigLoader configLoader) {
+    public BindCommand(YahooConnector yahooConnector, TickerStorage tickerStorage, ConfigLoader configLoader) {
         super(List.of("bind", "sido"), configLoader, false);
         this.yahooConnector = yahooConnector;
-        this.storage = storage;
+        this.tickerStorage = tickerStorage;
         log.info("Bind command initialized");
     }
 
@@ -48,7 +48,7 @@ public class BindCommand extends Command {
                 log.error("Failed to find stock with ticker {}", ticker);
                 return new CommandResult("Could not find any stock with ticker " + ticker + " please double check the name", false);
             }
-            storage.setShortcut(keyword.replaceAll(":", ""), name.get());
+            tickerStorage.setShortcut(keyword.replaceAll(":", ""), name.get());
             return new CommandResult("Bound keyword '" + keyword + "' to ticker '" + ticker + "'", true);
         } catch (IOException | InterruptedException e) {
             log.error("Failed to find stock with ticker {}", ticker, e);
