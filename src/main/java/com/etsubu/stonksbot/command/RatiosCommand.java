@@ -31,7 +31,7 @@ import java.util.Optional;
 public class RatiosCommand extends Command {
     private static final Logger log = LoggerFactory.getLogger(RatiosCommand.class);
     private static final String MARKET_CAP = "trailingMarketCap";
-    private static final String ENTERPRISE_VALUE = "trailingMarketCap";
+    private static final String ENTERPRISE_VALUE = "trailingEnterpriseValue";
     private static final String QUARTERLY_NET_INCOME = "quarterlyNetIncome";
     private static final String QUARTERLY_CURRENT_ASSETS = "quarterlyCurrentAssets";
     private static final String QUARTERLY_CURRENT_LIABILITIES = "quarterlyCurrentLiabilities";
@@ -107,6 +107,8 @@ public class RatiosCommand extends Command {
         Optional<FundamentEntry> quarterlyCurrentLiabilities = Optional.ofNullable(entries.get(QUARTERLY_CURRENT_LIABILITIES));
 
         StringBuilder builder = new StringBuilder("```\n").append(response.getFirst().getFullname()).append(" - ").append(response.getFirst().getTicker()).append('\n');
+
+        log.info("{} {}", revenueTTM.get().toString(), enterpriseValue.get().toString());
 
         enterpriseValue.ifPresent(num -> {
             revenueTTM.ifPresent(x -> calculateRatio(num, x, builder, "EV/Revenue:          "));
