@@ -108,8 +108,6 @@ public class RatiosCommand extends Command {
 
         StringBuilder builder = new StringBuilder("```\n").append(response.getFirst().getFullname()).append(" - ").append(response.getFirst().getTicker()).append('\n');
 
-        log.info("{} {}", revenueTTM.get().toString(), enterpriseValue.get().toString());
-
         enterpriseValue.ifPresent(num -> {
             revenueTTM.ifPresent(x -> calculateRatio(num, x, builder, "EV/Revenue:          "));
             ebitda.ifPresent(x -> calculateRatio(num, x, builder, "EV/EBITDA:           "));

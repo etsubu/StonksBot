@@ -3,6 +3,7 @@ package com.etsubu.stonksbot.command;
 import com.etsubu.stonksbot.command.utilities.CommandContext;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.ServerConfig;
+import com.etsubu.stonksbot.utility.LogUtil;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
@@ -84,6 +85,7 @@ public class CommandHandler {
         index = (index == -1) ? command.length() : index;
         String parsed = command.substring(COMMAND_PREFIX.length(), index).toLowerCase();
         Command cmd = this.commandMap.get(parsed);
+        log.info("Executing command '{}' for name={} id={}", LogUtil.sanitizeLogValue(command), event.getAuthor().getName(), event.getAuthor().getId());
         if (cmd == null) {
             log.info("Failed to find command for user input: " + command.replaceAll("\n", ""));
             return new CommandResult("Unknown command!", false);

@@ -180,7 +180,6 @@ public class YahooConnectorImpl implements YahooConnector {
                 log.info("Type was not available");
                 continue;
             }
-            log.info("Parsed type {}", type.get());
             try {
                 JSONArray timeseries = jsonEntry.getJSONArray(type.get());
                 Type valueEntryList = new TypeToken<ArrayList<FundaValue>>() {
