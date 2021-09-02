@@ -74,7 +74,7 @@ public class HttpApi {
                     try {
                         return new Pair<>(x.getKey(), x.getValue().get());
                     } catch (InterruptedException | ExecutionException e) {
-                        log.error("Failed to retrieve wall for profile {}", x.getKey());
+                        log.error("Failed to retrieve wall for profile {}", x.getKey(), e);
                     }
                     return null;
                 })
