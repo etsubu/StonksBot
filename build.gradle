@@ -1,6 +1,6 @@
 plugins {
-    id "io.freefair.lombok" version "6.1.0-m2"
-    id "org.owasp.dependencycheck" version "6.2.2"
+    id "io.freefair.lombok" version "6.1.0"
+    id "org.owasp.dependencycheck" version "6.3.1"
     id "com.github.spotbugs" version "4.7.1"
     id "com.github.johnrengelman.shadow" version "7.0.0"
     id "com.github.ben-manes.versions" version "0.39.0"
@@ -69,19 +69,19 @@ dependencies {
     implementation 'org.springframework:spring-context:5.3.9'
     implementation 'org.yaml:snakeyaml:1.29'
     implementation 'org.ta4j:ta4j-core:0.14'
-    implementation 'com.google.code.gson:gson:2.8.7'
+    implementation 'com.google.code.gson:gson:2.8.8'
     implementation 'org.json:json:20210307'
-    implementation ('net.dv8tion:JDA:4.3.0_298') {
+    implementation ('net.dv8tion:JDA:4.3.0_314') {
         exclude module: 'opus-java'
     }
-    implementation 'org.slf4j:slf4j-api:2.0.0-alpha2'
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
     implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1'
     implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
     implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0-M1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.0-M1'
-    testImplementation 'org.mockito:mockito-core:3.11.2'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.11.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.0-RC1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.0-RC1'
+    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation 'org.mockito:mockito-junit-jupiter:3.12.4'
 }
 
 group = 'com.etsubu.stonksbot'
