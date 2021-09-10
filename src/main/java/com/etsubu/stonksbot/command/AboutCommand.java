@@ -12,6 +12,7 @@ import java.util.List;
 
 /**
  * Command for retrieving "about" text of this bot
+ *
  * @author etsubu
  */
 @Component

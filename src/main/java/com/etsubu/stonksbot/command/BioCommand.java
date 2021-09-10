@@ -54,7 +54,7 @@ public class BioCommand extends Command {
         try {
             Optional<DataResponse> response = yahooConnector.queryData(command, YahooConnectorImpl.ASSET_PROFILE);
             return response.map(x -> x.getAssetProfile()
-                    .map(y -> new CommandResult(buildResponse(y, x.getName()), true)).orElse(errorResponse))
+                            .map(y -> new CommandResult(buildResponse(y, x.getName()), true)).orElse(errorResponse))
                     .orElse(errorResponse);
         } catch (IOException | InterruptedException e) {
             log.error("Failed to retrieve calendar events for ticker", e);

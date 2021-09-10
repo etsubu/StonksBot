@@ -1,6 +1,5 @@
 package com.etsubu.stonksbot.inderes;
 
-import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.utility.HttpApi;
 import com.etsubu.stonksbot.inderes.model.RecommendationEntry;
 import com.google.gson.Gson;

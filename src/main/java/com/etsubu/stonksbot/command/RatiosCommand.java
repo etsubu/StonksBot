@@ -139,8 +139,8 @@ public class RatiosCommand extends Command {
                 .map(x -> x.size() > 0).orElse(false)) {
             Optional<DataValue> assets = quarterlyTotalAssets.get().getValue().get(0).getReportedValue();
             assets.ifPresent(value -> builder.append("ROA: ").append(DoubleTools.round(netIncomeTTM.get()
-                    .dividedBy(DecimalNum.valueOf(value.getRaw()))
-                    .multipliedBy(DecimalNum.valueOf(100)).doubleValue(), 2))
+                            .dividedBy(DecimalNum.valueOf(value.getRaw()))
+                            .multipliedBy(DecimalNum.valueOf(100)).doubleValue(), 2))
                     .append("%\n"));
         }
 

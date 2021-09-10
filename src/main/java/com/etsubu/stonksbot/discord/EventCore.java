@@ -113,7 +113,7 @@ public final class EventCore extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().getId().equalsIgnoreCase(jda.getSelfUser().getId())) {
-            // Skip messages sent ourselves
+            // Skip messages sent by ourselves
             return;
         }
         reacter.react(event).ifPresent(x -> event.getMessage().addReaction(x).queue());

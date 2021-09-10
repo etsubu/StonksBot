@@ -29,5 +29,4 @@ public class CommandResult {
         this(succeeded, false, response, null);
     }
 
-
 }
