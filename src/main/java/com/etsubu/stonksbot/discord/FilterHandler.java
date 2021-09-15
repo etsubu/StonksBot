@@ -5,6 +5,7 @@ import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.GuildChannel;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
@@ -24,7 +25,8 @@ public class FilterHandler {
 
     public boolean shouldBeFiltered(MessageReceivedEvent event) {
         // No reactions to DMs
-        if (event.getChannelType() != ChannelType.TEXT) {
+        Member member = event.getMember();
+        if (event.getChannelType() != ChannelType.TEXT || member == null) {
             return false;
         }
         Config config = configLoader.getConfig();
@@ -35,6 +37,18 @@ public class FilterHandler {
         }
         if (config.getGlobalAdmins().stream().anyMatch(x -> x.equalsIgnoreCase(event.getAuthor().getId()))) {
             // Ignore global admins
+            return false;
+        }
+        // Ignore trusted groups
+        if(Optional.ofNullable(serverConfig.get().getTrustedGroup())
+                .map(x -> member.getRoles().stream().anyMatch(y -> y.getId().equals(x)))
+                .orElse(false)) {
+            return false;
+        }
+        // Ignore admin group
+        if(Optional.ofNullable(serverConfig.get().getAdminGroup())
+                .map(x -> member.getRoles().stream().anyMatch(y -> y.getId().equals(x)))
+                .orElse(false)) {
             return false;
         }
         if (serverConfig.get().getFilters().getRegexPatterns()
