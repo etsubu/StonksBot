@@ -24,7 +24,6 @@ import static org.mockito.Mockito.when;
 public class PermissionManagerTest {
     private static final String NAME_ID = "123456";
     private static final String GUILD_ID= "1234567";
-    private static final String TRUSTED_ROLE = "123";
     private static final String ADMIN_ROLE = "12";
     private static final String WHITELISTED_CHANNEL = "12345";
     @Mock
@@ -107,26 +106,6 @@ public class PermissionManagerTest {
         when(event.getGuild()).thenReturn(guild);
         assertTrue(permissionManager.isReplyAllowed(event));
     }
-
-    /**
-     * Trusted group should receive a response, no matter what channel
-     */
-    @Test
-    public void testRespondsToServerTrustedUsers() {
-        // Create server config
-        ServerConfig serverConfig = new ServerConfig();
-        serverConfig.setName(GUILD_ID);
-        serverConfig.setTrustedGroup(TRUSTED_ROLE);
-        config.setServers(List.of(serverConfig));
-        when(event.getChannelType()).thenReturn(ChannelType.TEXT);
-        when(guild.getId()).thenReturn(GUILD_ID);
-        when(role.getId()).thenReturn(TRUSTED_ROLE);
-        when(member.getRoles()).thenReturn(List.of(role));
-        when(event.getMember()).thenReturn(member);
-        when(event.getGuild()).thenReturn(guild);
-        assertTrue(permissionManager.isReplyAllowed(event));
-    }
-
     /**
      * All users should receive a response if they are using whitelisted channel
      */

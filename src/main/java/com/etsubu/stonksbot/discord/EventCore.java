@@ -124,7 +124,7 @@ public final class EventCore extends ListenerAdapter {
         if (this.commandHandler.isCommand(event.getMessage().getContentDisplay()) && event.getMessage().getContentDisplay().length() > 1) {
             if (!permissionManager.isReplyAllowed(event)) {
                 log.info("Prevented reply for {}  on channel {}", event.getAuthor().getName(), event.getChannel().getName());
-                event.getChannel().sendMessage("Please use whitelisted channel for performing commands").queue();
+                //event.getChannel().sendMessage("Please use whitelisted channel for performing commands").queue();
                 return;
             }
             try {
