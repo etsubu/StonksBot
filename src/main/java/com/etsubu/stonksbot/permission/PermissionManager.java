@@ -41,11 +41,8 @@ public class PermissionManager {
         boolean isInServerAdminGroup = userRoles.map(x -> x.stream()
                 .anyMatch(y -> y.getId().trim().equalsIgnoreCase(serverConfig.get().getAdminGroup())))
                 .orElse(false);
-        boolean isInServerTrustedGroup = userRoles.map(x -> x.stream()
-                .anyMatch(y -> y.getId().trim().equalsIgnoreCase(serverConfig.get().getTrustedGroup())))
-                .orElse(false);
-        log.debug("Is admin: {}, is trusted: {}", isInServerAdminGroup, isInServerTrustedGroup);
-        if (isInServerAdminGroup || isInServerTrustedGroup) {
+        log.debug("Is admin: {}", isInServerAdminGroup);
+        if (isInServerAdminGroup) {
             return true;
         }
         // If no special permissions then check if the channel is allowed
