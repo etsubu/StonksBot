@@ -18,6 +18,7 @@ public class Main {
      */
     public static void main(String[] args) {
         log.info("Starting up");
+        log.info("Java version: {}", System.getProperty("java.version"));
         new AnnotationConfigApplicationContext(Main.class);
         log.info("Closing.");
     }
