@@ -1,5 +1,6 @@
 package com.etsubu.stonksbot.discord;
 
+import com.etsubu.stonksbot.administrative.GuildRoleManager;
 import com.etsubu.stonksbot.command.CommandResult;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.scheduler.omxnordic.Model.AttachmentFile;
@@ -9,9 +10,15 @@ import com.etsubu.stonksbot.permission.PermissionManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.GenericEvent;
+import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.role.RoleCreateEvent;
+import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
+import net.dv8tion.jda.api.events.role.update.RoleUpdatePositionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.internal.handle.GuildRoleUpdateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -35,6 +42,7 @@ public final class EventCore extends ListenerAdapter {
     private final MessageReacter reacter;
     private final FilterHandler filterHandler;
     private final ConfigLoader configLoader;
+    private final GuildRoleManager guildRoleManager;
 
     /**
      * Initializes EventCore
@@ -43,12 +51,14 @@ public final class EventCore extends ListenerAdapter {
                      ConfigLoader configLoader,
                      PermissionManager permissionManager,
                      MessageReacter reacter,
-                     FilterHandler filterHandler) {
+                     FilterHandler filterHandler,
+                     GuildRoleManager guildRoleManager) {
         this.configLoader = configLoader;
         this.commandHandler = commandHandler;
         this.permissionManager = permissionManager;
         this.reacter = reacter;
         this.filterHandler = filterHandler;
+        this.guildRoleManager = guildRoleManager;
         new Thread(this::start).start();
         log.info("Initialized {}", this.getClass().getName());
     }
@@ -69,7 +79,7 @@ public final class EventCore extends ListenerAdapter {
             log.error("Login failed, check the network connection and oath token");
             return false;
         }
-        jda.addEventListener(this);
+        jda.addEventListener(this, guildRoleManager);
         log.info("JDA connected");
         return true;
     }
