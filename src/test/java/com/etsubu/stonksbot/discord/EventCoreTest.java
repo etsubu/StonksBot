@@ -1,5 +1,6 @@
 package com.etsubu.stonksbot.discord;
 
+import com.etsubu.stonksbot.administrative.GuildRoleManager;
 import com.etsubu.stonksbot.command.CommandHandler;
 import com.etsubu.stonksbot.command.CommandResult;
 import com.etsubu.stonksbot.configuration.Config;
@@ -65,6 +66,8 @@ public class EventCoreTest {
     private TextChannel guildChannel;
     @Captor
     private ArgumentCaptor<String> messageCaptor;
+    @Mock
+    private GuildRoleManager roleManager;
 
 
     private EventCore eventCore;
@@ -83,7 +86,7 @@ public class EventCoreTest {
         when(selfUser.getId()).thenReturn(ID);
         when(event.getAuthor()).thenReturn(user);
         when(user.openPrivateChannel()).thenReturn(restAction);
-        eventCore = new EventCore(commandHandler, configLoader, permissionManager, reacter, filterHandler);
+        eventCore = new EventCore(commandHandler, configLoader, permissionManager, reacter, filterHandler, roleManager);
         eventCore.registerJDA(jda);
     }
 

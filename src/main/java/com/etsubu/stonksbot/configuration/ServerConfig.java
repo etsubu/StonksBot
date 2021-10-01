@@ -15,6 +15,7 @@ public class ServerConfig {
     private String adminGroup;
     private String trustedGroup;
     private Map<String, CommandConfig> commands;
+    private List<String> requiredRoleOrders;
     private Long newsChannel;
     private Long recommendationChannel;
     private SharevilleConfig shareville;
@@ -41,5 +42,9 @@ public class ServerConfig {
     public SharevilleConfig getShareville() { return Optional.ofNullable(shareville).orElseGet(SharevilleConfig::new); }
 
     public String getVotelinkTemplate() { return votelinkTemplate; }
+
+    public List<String> getRequiredRoleOrders() { return Optional.ofNullable(requiredRoleOrders).orElseGet(LinkedList::new); }
+
+    public void setRequiredRoleOrders(List<String> requiredRoleOrders) { this.requiredRoleOrders = requiredRoleOrders; }
 
 }
