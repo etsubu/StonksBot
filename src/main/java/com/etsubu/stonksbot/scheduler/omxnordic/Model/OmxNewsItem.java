@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
@@ -76,5 +77,18 @@ public class OmxNewsItem implements Comparable<OmxNewsItem> {
     public int compareTo(@NotNull OmxNewsItem o) {
         // Descending order
         return o.disclosureId.compareTo(disclosureId);
+    }
+
+    @Override
+    public int hashCode() {
+        return disclosureId != null ? disclosureId.hashCode() : 1001;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null || o.getClass() != getClass()) {
+            return false;
+        }
+        return Objects.equals(((OmxNewsItem) (o)).getDisclosureId(), getDisclosureId());
     }
 }
