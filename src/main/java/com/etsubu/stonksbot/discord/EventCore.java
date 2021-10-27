@@ -7,6 +7,7 @@ import com.etsubu.stonksbot.scheduler.omxnordic.Model.AttachmentFile;
 import com.etsubu.stonksbot.command.CommandHandler;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.permission.PermissionManager;
+import com.etsubu.stonksbot.utility.MessageUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -101,7 +102,7 @@ public final class EventCore extends ListenerAdapter {
         for (long channelId : channelIds) {
             TextChannel textChannel = jda.getTextChannelById(channelId);
             if (textChannel != null) {
-                MessageAction msg = textChannel.sendMessage(message);
+                MessageAction msg = textChannel.sendMessage(MessageUtils.cleanMessage(message));
                 if (attachmentFiles != null && !attachmentFiles.isEmpty()) {
                     for (AttachmentFile file : attachmentFiles) {
                         msg = msg.addFile(file.getFile(), file.getFilename());
@@ -147,7 +148,7 @@ public final class EventCore extends ListenerAdapter {
                         sendPrivateMessage(event.getAuthor(), result.getResponse());
                         event.getMessage().reply("Responded with DM.").queue();
                     } else {
-                        event.getMessage().reply(result.getResponse()).queue();
+                        event.getMessage().reply(MessageUtils.cleanMessage(result.getResponse())).queue();
                     }
                     log.info("Successfully executed user command: {}", event.getMessage().getContentDisplay().replaceAll("\n", ""));
                 } else {
