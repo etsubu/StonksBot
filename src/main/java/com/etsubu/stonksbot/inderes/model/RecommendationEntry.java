@@ -40,20 +40,14 @@ public class RecommendationEntry {
         if (recommendation == null || recommendation.isEmpty()) {
             return "tuntematon suositus";
         }
-        switch (recommendation.charAt(0)) {
-            case '1':
-                return "myy";
-            case '2':
-                return "vähennä";
-            case '3':
-                return "pidä";
-            case '4':
-                return "lisää";
-            case '5':
-                return "osta";
-            default:
-                return "tuntematon suositus";
-        }
+        return switch (recommendation.charAt(0)) {
+            case '1' -> "myy";
+            case '2' -> "vähennä";
+            case '3' -> "pidä";
+            case '4' -> "lisää";
+            case '5' -> "osta";
+            default -> "tuntematon suositus";
+        };
     }
 
     public long getLastUpdated() {

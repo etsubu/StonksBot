@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Component
 public class NasdaqOmxNordicNews implements Schedulable {
     private static final Logger log = LoggerFactory.getLogger(NasdaqOmxNordicNews.class);
-    private final int DELAY_IN_TASK = 120; // 2min'
+    private static final int DELAY_IN_TASK = 120; // 2min'
     private int latestIdOmxh;
     private int latestIdFirstNorth;
     private final Gson gson;
@@ -61,6 +61,8 @@ public class NasdaqOmxNordicNews implements Schedulable {
                     if (news.isEmpty()) {
                         return Optional.empty();
                     }
+                    // Sort the items
+                    Collections.sort(news);
                     return Optional.of(news);
                 } else {
                     log.error("Omx nordic response json did not contain results section");
@@ -93,8 +95,8 @@ public class NasdaqOmxNordicNews implements Schedulable {
         if (items.isPresent()) {
             // Filter only latest news
             return items.get().stream().filter(x ->
-                    Optional.ofNullable(x.getDisclosureId()).map(y -> y > latestId).orElse(false) &&
-                            Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false))
+                            Optional.ofNullable(x.getDisclosureId()).map(y -> y > latestId).orElse(false) &&
+                                    Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false))
                     .collect(Collectors.toList());
         } else {
             log.error("Failed to process api.news.eu.nasdaq.com response");
@@ -121,13 +123,12 @@ public class NasdaqOmxNordicNews implements Schedulable {
                 totalNewsItems.addAll(firstNorthItems);
             }
             if (omxhItems.size() > 0) {
-                latestIdOmxh = omxhItems.get(0).getDisclosureId();
+                latestIdOmxh = omxhItems.stream().map(OmxNewsItem::getDisclosureId).max(Integer::compare).orElse(-1);
             }
             if (firstNorthItems.size() > 0) {
-                latestIdFirstNorth = firstNorthItems.get(0).getDisclosureId();
+                latestIdFirstNorth = firstNorthItems.stream().map(OmxNewsItem::getDisclosureId).max(Integer::compare).orElse(-1);
             }
             if (totalNewsItems.size() > 0) {
-                omxhItems.addAll(totalNewsItems);
                 sendNewsPosts(totalNewsItems);
             }
         } catch (IOException | InterruptedException e) {
