@@ -22,6 +22,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.internal.handle.GuildRoleUpdateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
@@ -37,6 +38,9 @@ import java.util.Optional;
 @Component
 public final class EventCore extends ListenerAdapter {
     private static final Logger log = LoggerFactory.getLogger(EventCore.class);
+    public static final String SERVER_ID = "server_id";
+    public static final String CHANNEL_ID = "channel_id";
+    public static final String USER_ID = "user_id";
     private final CommandHandler commandHandler;
     private JDA jda;
     private final PermissionManager permissionManager;
@@ -123,6 +127,10 @@ public final class EventCore extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        MDC.put(SERVER_ID, event.getMessage().isFromGuild() ? event.getGuild().getId() : "no_server");
+        MDC.put(USER_ID, event.getAuthor().getId());
+        MDC.put(CHANNEL_ID, event.getChannel().getId());
+
         if (event.getAuthor().getId().equalsIgnoreCase(jda.getSelfUser().getId())) {
             // Skip messages sent by ourselves
             return;
