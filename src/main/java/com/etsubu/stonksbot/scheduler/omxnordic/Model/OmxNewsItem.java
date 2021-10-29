@@ -3,17 +3,19 @@ package com.etsubu.stonksbot.scheduler.omxnordic.Model;
 import com.etsubu.stonksbot.utility.HttpApi;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
-public class OmxNewsItem {
+public class OmxNewsItem implements Comparable<OmxNewsItem> {
     private static final Logger log = LoggerFactory.getLogger(OmxNewsItem.class);
     private final Integer disclosureId;
     private final Integer categoryId;
@@ -69,5 +71,24 @@ public class OmxNewsItem {
         } else {
             return "Missing news item info";
         }
+    }
+
+    @Override
+    public int compareTo(@NotNull OmxNewsItem o) {
+        // Descending order
+        return o.disclosureId.compareTo(disclosureId);
+    }
+
+    @Override
+    public int hashCode() {
+        return disclosureId != null ? disclosureId.hashCode() : 1001;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o == null || o.getClass() != getClass()) {
+            return false;
+        }
+        return Objects.equals(((OmxNewsItem) (o)).getDisclosureId(), getDisclosureId());
     }
 }

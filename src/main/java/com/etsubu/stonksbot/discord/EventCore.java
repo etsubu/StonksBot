@@ -7,6 +7,7 @@ import com.etsubu.stonksbot.scheduler.omxnordic.Model.AttachmentFile;
 import com.etsubu.stonksbot.command.CommandHandler;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.permission.PermissionManager;
+import com.etsubu.stonksbot.utility.MessageUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -21,6 +22,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.internal.handle.GuildRoleUpdateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
@@ -36,6 +38,9 @@ import java.util.Optional;
 @Component
 public final class EventCore extends ListenerAdapter {
     private static final Logger log = LoggerFactory.getLogger(EventCore.class);
+    public static final String SERVER_ID = "server_id";
+    public static final String CHANNEL_ID = "channel_id";
+    public static final String USER_ID = "user_id";
     private final CommandHandler commandHandler;
     private JDA jda;
     private final PermissionManager permissionManager;
@@ -101,7 +106,7 @@ public final class EventCore extends ListenerAdapter {
         for (long channelId : channelIds) {
             TextChannel textChannel = jda.getTextChannelById(channelId);
             if (textChannel != null) {
-                MessageAction msg = textChannel.sendMessage(message);
+                MessageAction msg = textChannel.sendMessage(MessageUtils.cleanMessage(message));
                 if (attachmentFiles != null && !attachmentFiles.isEmpty()) {
                     for (AttachmentFile file : attachmentFiles) {
                         msg = msg.addFile(file.getFile(), file.getFilename());
@@ -122,6 +127,10 @@ public final class EventCore extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        MDC.put(SERVER_ID, event.getMessage().isFromGuild() ? event.getGuild().getId() : "no_server");
+        MDC.put(USER_ID, event.getAuthor().getId());
+        MDC.put(CHANNEL_ID, event.getChannel().getId());
+
         if (event.getAuthor().getId().equalsIgnoreCase(jda.getSelfUser().getId())) {
             // Skip messages sent by ourselves
             return;
@@ -147,7 +156,7 @@ public final class EventCore extends ListenerAdapter {
                         sendPrivateMessage(event.getAuthor(), result.getResponse());
                         event.getMessage().reply("Responded with DM.").queue();
                     } else {
-                        event.getMessage().reply(result.getResponse()).queue();
+                        event.getMessage().reply(MessageUtils.cleanMessage(result.getResponse())).queue();
                     }
                     log.info("Successfully executed user command: {}", event.getMessage().getContentDisplay().replaceAll("\n", ""));
                 } else {

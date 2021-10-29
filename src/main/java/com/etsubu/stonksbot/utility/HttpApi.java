@@ -44,12 +44,12 @@ public class HttpApi {
     public static Optional<String> sendGet(String url) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .timeout(Duration.ofSeconds(30))
+                .timeout(Duration.ofSeconds(TIMEOUT))
                 .GET()
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() != 200) {
-            log.error("Request returned invalid status code {}", response.statusCode());
+            log.error("Request returned invalid status code {}, for url {}", response.statusCode(), url);
             return Optional.empty();
         }
         return Optional.of(response.body());
@@ -61,8 +61,7 @@ public class HttpApi {
         for (String url : urls) {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
-                    .setHeader("User-Agent", USER_AGENT_PRODUCT + "/" + VERSION)
-                    .timeout(Duration.ofSeconds(30))
+                    .timeout(Duration.ofSeconds(TIMEOUT))
                     .GET()
                     .build();
             CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
@@ -86,7 +85,7 @@ public class HttpApi {
     public static Optional<byte[]> downloadFile(String url) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(url))
-                .timeout(Duration.ofSeconds(30))
+                .timeout(Duration.ofSeconds(TIMEOUT))
                 .GET()
                 .build();
         HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
