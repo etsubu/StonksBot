@@ -5,8 +5,6 @@ import com.etsubu.stonksbot.configuration.ServerConfig;
 import com.etsubu.stonksbot.discord.EventCore;
 import com.etsubu.stonksbot.utility.HttpApi;
 import com.etsubu.stonksbot.scheduler.omxnordic.Model.DisclosureItem;
-import com.etsubu.stonksbot.scheduler.Schedulable;
-import com.etsubu.stonksbot.scheduler.SchedulerService;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import org.json.JSONArray;
@@ -14,6 +12,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,7 +22,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class NasdaqNordicDisclosures implements Schedulable {
+@EnableAsync
+public class NasdaqNordicDisclosures {
     private static final Logger log = LoggerFactory.getLogger(NasdaqNordicDisclosures.class);
     private static final int OMXH_ID = 0;
     private static final int FIRST_NORTH_ID = 1;
@@ -35,12 +37,11 @@ public class NasdaqNordicDisclosures implements Schedulable {
     private final EventCore eventCore;
     private final ConfigLoader configLoader;
 
-    public NasdaqNordicDisclosures(SchedulerService schedulerService, ConfigLoader configLoader, EventCore eventCore) {
+    public NasdaqNordicDisclosures(ConfigLoader configLoader, EventCore eventCore) {
         this.configLoader = configLoader;
         this.eventCore = eventCore;
         gson = new Gson();
         log.info("Registering scheduled task {}", getClass().getName());
-        schedulerService.registerTask(this, DELAY_IN_TASK);
     }
 
     public Optional<List<DisclosureItem>> parseResponse(String raw) {
@@ -125,7 +126,9 @@ public class NasdaqNordicDisclosures implements Schedulable {
         return items;
     }
 
-    @Override
+    @Async
+    /* Every other minute during weekdays */
+    @Scheduled(cron = "2 * 7-23 ? * MON-FRI", zone = "Europe/Helsinki")
     public void invoke() {
         if (Optional.ofNullable(configLoader.getConfig().getOmxhNews()).map(x -> !Boolean.parseBoolean(x.getEnabled())).orElse(false)) {
             // Not enabled, skip
