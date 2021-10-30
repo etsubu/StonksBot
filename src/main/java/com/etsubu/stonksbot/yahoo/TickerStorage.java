@@ -42,7 +42,7 @@ public class TickerStorage {
                 String[] shortcut = x.split(":");
                 tickerMap.put(shortcut[0], new StockName(shortcut[1], shortcut[2]));
             });
-            Files.writeString(tickerFile, String.join("\n", lines));
+            Files.writeString(tickerFile, String.join("\n", lines) + "\n");
             log.info("Writing ticker storage {} lines", lines.size());
         } else {
             Files.createFile(tickerFile);
@@ -54,7 +54,7 @@ public class TickerStorage {
             if (!tickerMap.containsKey(shortcut)) {
                 tickerMap.put(shortcut.toLowerCase(), name);
                 try {
-                    Files.writeString(tickerFile, shortcut.toLowerCase() + ":" + name.toString() + "\n", StandardOpenOption.APPEND);
+                    Files.writeString(tickerFile, shortcut.toLowerCase() + ":" + name.getTicker() + ":" + name.getFullname() + "\n", StandardOpenOption.APPEND);
                 } catch (IOException e) {
                     log.error("Failed to store ticker shortcut to file", e);
                 }
@@ -64,7 +64,7 @@ public class TickerStorage {
 
     public Optional<StockName> findTicker(String shortcut) {
         synchronized (tickerMap) {
-            return Optional.ofNullable(tickerMap.get(shortcut));
+            return Optional.ofNullable(tickerMap.get(shortcut.toLowerCase()));
         }
     }
 }
