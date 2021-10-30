@@ -11,6 +11,7 @@ import java.util.Optional;
 @NoArgsConstructor
 public class Config {
     private String oauth;
+    private S3Config s3;
     private FeatureConfig omxhNews;
     private FeatureConfig shareville;
     private List<String> globalAdmins;
@@ -41,5 +42,9 @@ public class Config {
 
     public FeatureConfig getShareville() {
         return Optional.ofNullable(shareville).orElseGet(() -> new FeatureConfig("false"));
+    }
+
+    public S3Config getS3() {
+        return s3;
     }
 }

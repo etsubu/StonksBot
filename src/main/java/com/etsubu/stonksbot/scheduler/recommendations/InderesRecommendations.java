@@ -1,6 +1,7 @@
 package com.etsubu.stonksbot.scheduler.recommendations;
 
 import com.etsubu.stonksbot.configuration.ConfigLoader;
+import com.etsubu.stonksbot.configuration.ConfigurationSync;
 import com.etsubu.stonksbot.inderes.model.RecommendationEntry;
 import com.etsubu.stonksbot.inderes.InderesConnector;
 import com.etsubu.stonksbot.configuration.Config;
@@ -10,6 +11,7 @@ import com.etsubu.stonksbot.utility.DoubleTools;
 import com.etsubu.stonksbot.utility.Pair;
 import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.AssetPriceIntraInfo;
+import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -27,9 +29,11 @@ import java.util.stream.Collectors;
 @EnableAsync
 public class InderesRecommendations {
     private static final Logger log = LoggerFactory.getLogger(InderesRecommendations.class);
+    private static final String CACHE_KEY = "inderes";
     // ~3 days freshness
     private static final long FRESHNESS_WINDOW = 1000 * 60 * 60 * 24 * 3;
     private static final int DELAY = 300; // 5min, 300s
+    private static final long CACHE_TTL = 1000 * 60 * 60 * 24 * 2; // 2 day
     // This is used for exponential backoff in case the server fails to respond
     private int failureCounter = 0;
     private int failureTempCounter = 0;
@@ -38,14 +42,30 @@ public class InderesRecommendations {
     private final ConfigLoader configLoader;
     private final InderesConnector inderesConnector;
     private final YahooConnector yahooConnector;
+    private final ConfigurationSync configSync;
 
     public InderesRecommendations(EventCore eventCore, ConfigLoader configLoader,
-                                  InderesConnector inderesConnector, YahooConnector yahooConnector) {
+                                  InderesConnector inderesConnector, YahooConnector yahooConnector,
+                                  ConfigurationSync configSync) {
         this.eventCore = eventCore;
         this.configLoader = configLoader;
         this.inderesConnector = inderesConnector;
         this.yahooConnector = yahooConnector;
+        this.configSync = configSync;
         entries = new HashMap<>();
+
+        Optional<CachedRecommendations> cached = configSync.loadConfiguration(CACHE_KEY, CachedRecommendations.class);
+        log.info("Cache present == {}", cached.isPresent());
+        if (cached.isPresent()) {
+            long freshness = System.currentTimeMillis() - cached.get().getTimestamp();
+            if (freshness < 0 || freshness > CACHE_TTL) {
+                log.info("Cached values are stale. Starting from scratch.");
+            } else {
+                entries.putAll(cached.get().getEntries());
+            }
+        }
+        log.info("Initial entries size {}", entries.size());
+
         // Bootstrap recommendations
         new Thread(() -> {
             try {
@@ -84,36 +104,34 @@ public class InderesRecommendations {
         return price;
     }
 
-    private String buildRecommendationChange(Set<Pair<RecommendationEntry, RecommendationEntry>> changes) {
-        StringBuilder builder = new StringBuilder(64 * changes.size());
-        for (var v : changes) {
-            Optional<AssetPriceIntraInfo> currentPrice = queryCurrentPrice(v.second);
-            var from = v.getFirst();
-            var to = v.getSecond();
-            Num targetPrice = DecimalNum.valueOf(v.second.getTarget().replaceAll(",", "."));
-            if(from != null) {
-                builder.append("```\n(Inderes)\nSuositusmuutos:");
-                builder.append("\nNimi: ").append(from.getName()).append('\n');
-                builder.append("Tavoitehinta: ").append(from.getTarget()).append(" -> ").append(to.getTarget()).append(" (")
-                        .append(formatChangePercentage(from.getTarget(), to.getTarget())).append("%)")
-                        .append('\n');
-                currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(to.getCurrency())
-                        .append("\nNousuvara: ")
-                        .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
-                        .append("%\n"));
-                builder.append("Suositus: ").append(from.getRecommendationText()).append(" -> ").append(to.getRecommendationText()).append('\n');
-                builder.append("Riski: ").append(from.getRisk()).append(" -> ").append(to.getRisk()).append("\n--------------```");
-            } else {
-                builder.append("```\n(Inderes)\nSeurannan aloitus:");
-                builder.append("\nNimi: ").append(to.getName()).append('\n');
-                builder.append("Tavoitehinta: ").append(to.getTarget()).append('\n');
-                currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(to.getCurrency())
-                        .append("\nNousuvara: ")
-                        .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
-                        .append("%\n"));
-                builder.append("Suositus: ").append(to.getRecommendationText()).append('\n');
-                builder.append("Riski: ").append(to.getRisk()).append("\n--------------```");
-            }
+    private String buildRecommendationChange(Pair<RecommendationEntry, RecommendationEntry> v) {
+        StringBuilder builder = new StringBuilder(64);
+        Optional<AssetPriceIntraInfo> currentPrice = queryCurrentPrice(v.second);
+        var from = v.getFirst();
+        var to = v.getSecond();
+        Num targetPrice = DecimalNum.valueOf(v.second.getTarget().replaceAll(",", "."));
+        if (from != null) {
+            builder.append("```\n(Inderes)\nSuositusmuutos:");
+            builder.append("\nNimi: ").append(from.getName()).append('\n');
+            builder.append("Tavoitehinta: ").append(from.getTarget()).append(" -> ").append(to.getTarget()).append(" (")
+                    .append(formatChangePercentage(from.getTarget(), to.getTarget())).append("%)")
+                    .append('\n');
+            currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(to.getCurrency())
+                    .append("\nNousuvara: ")
+                    .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
+                    .append("%\n"));
+            builder.append("Suositus: ").append(from.getRecommendationText()).append(" -> ").append(to.getRecommendationText()).append('\n');
+            builder.append("Riski: ").append(from.getRisk()).append(" -> ").append(to.getRisk()).append("\n```");
+        } else {
+            builder.append("```\n(Inderes)\nSeurannan aloitus:");
+            builder.append("\nNimi: ").append(to.getName()).append('\n');
+            builder.append("Tavoitehinta: ").append(to.getTarget()).append('\n');
+            currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(to.getCurrency())
+                    .append("\nNousuvara: ")
+                    .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
+                    .append("%\n"));
+            builder.append("Suositus: ").append(to.getRecommendationText()).append('\n');
+            builder.append("Riski: ").append(to.getRisk()).append("\n```");
         }
         return builder.toString();
     }
@@ -128,11 +146,33 @@ public class InderesRecommendations {
                     .collect(Collectors.toList());
             if (!channels.isEmpty()) {
                 log.info("Sending message");
-                eventCore.sendMessage(channels, buildRecommendationChange(changes), null);
+                changes.stream().map(this::buildRecommendationChange).forEach(x-> eventCore.sendMessage(channels, x, null));
                 log.info("Notified channels about recommendation changes");
             } else {
                 log.info("No channels to notify");
             }
+        }
+    }
+
+    private void saveRecommendations(Map<String, RecommendationEntry> recommendations) {
+        CachedRecommendations cache = new CachedRecommendations(System.currentTimeMillis(), recommendations);
+        if (configSync.saveConfiguration(CACHE_KEY, cache)) {
+            log.info("Saved recommendations.");
+        } else {
+            log.error("Failed to save recommendations.");
+        }
+    }
+
+    @Async
+    /* Once a day */
+    @Scheduled(cron = "0 0 * ? * *", zone = "Europe/Helsinki")
+    /**
+     * Saves latest recommendations to ensure that the timestamp value is fresh.
+     */
+    public void saveRecommendations() {
+        log.info("Scheduled saving recommendations task.");
+        synchronized (entries) {
+            saveRecommendations(entries);
         }
     }
 
@@ -158,7 +198,7 @@ public class InderesRecommendations {
                             .map(x -> new Pair<>(existingRecommendations.get(x.getKey()), x.getValue()))
                             .collect(Collectors.toSet());
             // Check for newly followed stocks
-            if(existingRecommendations.size() > 0) {
+            if (existingRecommendations.size() > 0) {
                 recommendations.entrySet().stream().filter(x -> !existingRecommendations.containsKey(x.getKey()))
                         .forEach(x -> changedRecommendations.add(new Pair<>(null, x.getValue())));
             }
@@ -183,6 +223,10 @@ public class InderesRecommendations {
             // Let's avoid this by updating the recommendation time to current
             notifyRecommendationChanges(freshRecommendations);
             failureCounter = 0;
+            // Save the changes.
+            if (freshRecommendations.size() > 0 || existingRecommendations.isEmpty()) {
+                saveRecommendations(recommendations);
+            }
         } catch (IOException | InterruptedException e) {
             log.error("Failed to retrieve recommendations from inderes", e);
             failureCounter = Math.min(failureCounter + 1, Integer.MAX_VALUE - 1);
