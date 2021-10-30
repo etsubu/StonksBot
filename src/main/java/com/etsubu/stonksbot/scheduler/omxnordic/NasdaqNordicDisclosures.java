@@ -33,7 +33,7 @@ public class NasdaqNordicDisclosures {
             "https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&market=Main%20Market%2C+Helsinki&cnscategory=&company=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=fi&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&dir=DESC&start=",
             "https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=First%20North+Finland&cnscategory=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicFirstNorth&displayLanguage=en&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&dir=DESC&start="
     };
-    private final int[] LATEST_DISCLOSURE_IDS;
+    private final List<Integer> LATEST_DISCLOSURE_IDS;
     private static final int DELAY_IN_TASK = 120; // 2min'
     private static final long CACHE_TTL = 1000 * 60 * 60; // 1 hour
     private final Gson gson;
@@ -52,13 +52,13 @@ public class NasdaqNordicDisclosures {
             long freshness = System.currentTimeMillis() - cache.get().getTimestamp();
             if(freshness < 0 || freshness > CACHE_TTL) {
                 log.info("Cache is stale, {} ms. Starting from scratch", freshness);
-                LATEST_DISCLOSURE_IDS = new int[]{-1, -1};
+                LATEST_DISCLOSURE_IDS = List.of(-1, -1);
             } else {
                 LATEST_DISCLOSURE_IDS = cache.get().getLatestIds();
                 log.info("Cache loaded.");
             }
         } else {
-            LATEST_DISCLOSURE_IDS = new int[]{-1, -1};
+            LATEST_DISCLOSURE_IDS = List.of(-1, -1);
         }
     }
 
@@ -128,13 +128,13 @@ public class NasdaqNordicDisclosures {
                 return new LinkedList<>();
             }
             List<DisclosureItem> itemList = items.get();
-            if(LATEST_DISCLOSURE_IDS[id] == -1 || itemList.get(itemList.size() - 1).getDisclosureId() < LATEST_DISCLOSURE_IDS[id]) {
+            if(LATEST_DISCLOSURE_IDS.get(id) == -1 || itemList.get(itemList.size() - 1).getDisclosureId() < LATEST_DISCLOSURE_IDS.get(id)) {
                 // Found earlier disclosure than the previously latest one
                 lastIdFound = true;
             }
             // Collect new disclosures
             newDisclosures.addAll(items.get().stream().filter(x ->
-                            Optional.ofNullable(x.getDisclosureId()).map(y -> y > LATEST_DISCLOSURE_IDS[id]).orElse(false) &&
+                            Optional.ofNullable(x.getDisclosureId()).map(y -> y > LATEST_DISCLOSURE_IDS.get(id)).orElse(false) &&
                                     Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false))
                     .collect(Collectors.toList()));
             start += itemList.size();
@@ -155,15 +155,15 @@ public class NasdaqNordicDisclosures {
         try {
             List<DisclosureItem> disclosureItems = new ArrayList<>();
             boolean initRun = false;
-            for(int i = 0; i < LATEST_DISCLOSURE_IDS.length; i++) {
+            for(int i = 0; i < LATEST_DISCLOSURE_IDS.size(); i++) {
                 List<DisclosureItem> items = loadDisclosureItems(i);
-                if (LATEST_DISCLOSURE_IDS[i] != -1) {
+                if (LATEST_DISCLOSURE_IDS.get(i) != -1) {
                     disclosureItems.addAll(items);
                 } else {
                     initRun = true;
                 }
                 if(items.size() > 0) {
-                    LATEST_DISCLOSURE_IDS[i] = items.stream().map(DisclosureItem::getDisclosureId).max(Integer::compare).orElse(-1);
+                    LATEST_DISCLOSURE_IDS.set(i, items.stream().map(DisclosureItem::getDisclosureId).max(Integer::compare).orElse(-1));
                 }
             }
             if (!disclosureItems.isEmpty()) {
