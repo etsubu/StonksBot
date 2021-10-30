@@ -15,7 +15,6 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.Optional;
 
-@Component
 public class ConfigLoader {
     private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
     private static final Config DEFAULT_CONFIG = new Config();
