@@ -1,8 +1,8 @@
 plugins {
     id "io.freefair.lombok" version "6.2.0"
-    id "org.owasp.dependencycheck" version "6.3.2"
+    id "org.owasp.dependencycheck" version "6.4.1.1"
     id "com.github.spotbugs" version "4.7.1"
-    id "com.github.johnrengelman.shadow" version "7.0.0"
+    id "com.github.johnrengelman.shadow" version "7.1.0"
     id "com.github.ben-manes.versions" version "0.39.0"
     id 'se.patrikerdes.use-latest-versions' version '0.2.17'
     id "java"
@@ -64,14 +64,14 @@ spotbugsTest {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-core:5.3.10'
-    implementation 'org.springframework:spring-beans:5.3.10'
-    implementation 'org.springframework:spring-context:5.3.10'
+    implementation 'org.springframework:spring-core:5.3.12'
+    implementation 'org.springframework:spring-beans:5.3.12'
+    implementation 'org.springframework:spring-context:5.3.12'
     implementation 'org.yaml:snakeyaml:1.29'
     implementation 'org.ta4j:ta4j-core:0.14'
-    implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.json:json:20210307'
-    implementation ('net.dv8tion:JDA:4.3.0_331') {
+    implementation ('net.dv8tion:JDA:4.3.0_339') {
         exclude module: 'opus-java'
     }
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha5'
@@ -80,8 +80,8 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.12.4'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.0.0'
 }
 
 group = 'com.etsubu.stonksbot'

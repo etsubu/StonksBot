@@ -3,8 +3,6 @@ package com.etsubu.stonksbot.scheduler.recommendations;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.inderes.model.RecommendationEntry;
 import com.etsubu.stonksbot.inderes.InderesConnector;
-import com.etsubu.stonksbot.scheduler.Schedulable;
-import com.etsubu.stonksbot.scheduler.SchedulerService;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import com.etsubu.stonksbot.discord.EventCore;
@@ -14,6 +12,9 @@ import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.AssetPriceIntraInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.ta4j.core.num.DecimalNum;
 import org.ta4j.core.num.Num;
@@ -23,7 +24,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class InderesRecommendations implements Schedulable {
+@EnableAsync
+public class InderesRecommendations {
     private static final Logger log = LoggerFactory.getLogger(InderesRecommendations.class);
     // ~3 days freshness
     private static final long FRESHNESS_WINDOW = 1000 * 60 * 60 * 24 * 3;
@@ -37,14 +39,13 @@ public class InderesRecommendations implements Schedulable {
     private final InderesConnector inderesConnector;
     private final YahooConnector yahooConnector;
 
-    public InderesRecommendations(SchedulerService schedulerService, EventCore eventCore, ConfigLoader configLoader,
+    public InderesRecommendations(EventCore eventCore, ConfigLoader configLoader,
                                   InderesConnector inderesConnector, YahooConnector yahooConnector) {
         this.eventCore = eventCore;
         this.configLoader = configLoader;
         this.inderesConnector = inderesConnector;
         this.yahooConnector = yahooConnector;
         entries = new HashMap<>();
-        schedulerService.registerTask(this, DELAY);
         // Bootstrap recommendations
         new Thread(() -> {
             try {
@@ -135,7 +136,9 @@ public class InderesRecommendations implements Schedulable {
         }
     }
 
-    @Override
+    @Async
+    /* Every other minute */
+    @Scheduled(cron = "2 0/2 * ? * *", zone = "Europe/Helsinki")
     public void invoke() {
         if (failureTempCounter > 0) {
             log.info("Skipping inderes recommendation query due to exponential backoff. Counter={}", failureTempCounter);

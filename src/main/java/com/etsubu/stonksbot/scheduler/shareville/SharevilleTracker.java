@@ -5,11 +5,12 @@ import com.etsubu.stonksbot.utility.HttpApi;
 import com.etsubu.stonksbot.scheduler.shareville.Model.SharevilleUser;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import com.etsubu.stonksbot.discord.EventCore;
-import com.etsubu.stonksbot.scheduler.Schedulable;
-import com.etsubu.stonksbot.scheduler.SchedulerService;
 import com.etsubu.stonksbot.scheduler.shareville.Model.WallEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -21,7 +22,8 @@ import java.util.stream.Collectors;
  * a discord channel
  */
 @Component
-public class SharevilleTracker implements Schedulable {
+@EnableAsync
+public class SharevilleTracker {
     private static final Logger log = LoggerFactory.getLogger(SharevilleTracker.class);
     private static final String PROFILE_URL_TEMPLATE = "https://www.shareville.fi/api/v1/profiles/%s/stream";
     private static final int DELAY = 300; // 5min
@@ -29,12 +31,10 @@ public class SharevilleTracker implements Schedulable {
     private final Map<String, SharevilleUser> profileMap;
     private final EventCore eventCore;
 
-    public SharevilleTracker(ConfigLoader configLoader, SchedulerService schedulerService, EventCore eventCore) {
+    public SharevilleTracker(ConfigLoader configLoader, EventCore eventCore) {
         this.configLoader = configLoader;
         this.eventCore = eventCore;
         profileMap = new HashMap<>();
-        // Only request updates between 5am-21pm UTC time and not during the weekends.
-        schedulerService.registerTask(this, DELAY, 5, 21, false);
     }
 
     private String buildNotification(List<SharevilleUser> users) {
@@ -82,7 +82,9 @@ public class SharevilleTracker implements Schedulable {
         }
     }
 
-    @Override
+    @Async
+    /* Every other minute during weekdays from 8am-23 Helsinki time */
+    @Scheduled(cron = "2 0/2 7-23 ? * MON-FRI", zone = "Europe/Helsinki")
     public void invoke() {
         if (!Boolean.parseBoolean(configLoader.getConfig().getShareville().getEnabled())) {
             // feature is not enabled;
