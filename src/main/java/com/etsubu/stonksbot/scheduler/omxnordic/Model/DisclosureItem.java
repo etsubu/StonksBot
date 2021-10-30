@@ -15,8 +15,8 @@ import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
-public class OmxNewsItem implements Comparable<OmxNewsItem> {
-    private static final Logger log = LoggerFactory.getLogger(OmxNewsItem.class);
+public class DisclosureItem implements Comparable<DisclosureItem> {
+    private static final Logger log = LoggerFactory.getLogger(DisclosureItem.class);
     private final Integer disclosureId;
     private final Integer categoryId;
     private final String headline;
@@ -74,7 +74,7 @@ public class OmxNewsItem implements Comparable<OmxNewsItem> {
     }
 
     @Override
-    public int compareTo(@NotNull OmxNewsItem o) {
+    public int compareTo(@NotNull DisclosureItem o) {
         // Descending order
         return o.disclosureId.compareTo(disclosureId);
     }
@@ -89,6 +89,6 @@ public class OmxNewsItem implements Comparable<OmxNewsItem> {
         if(o == null || o.getClass() != getClass()) {
             return false;
         }
-        return Objects.equals(((OmxNewsItem) (o)).getDisclosureId(), getDisclosureId());
+        return Objects.equals(((DisclosureItem) (o)).getDisclosureId(), getDisclosureId());
     }
 }
