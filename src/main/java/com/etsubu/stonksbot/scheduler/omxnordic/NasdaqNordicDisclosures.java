@@ -40,7 +40,8 @@ public class NasdaqNordicDisclosures implements Schedulable {
         this.eventCore = eventCore;
         gson = new Gson();
         log.info("Registering scheduled task {}", getClass().getName());
-        schedulerService.registerTask(this, DELAY_IN_TASK);
+        // Only request updates between 5am-21pm UTC time and not during the weekends.
+        schedulerService.registerTask(this, DELAY_IN_TASK, 5, 21, false);
     }
 
     public Optional<List<DisclosureItem>> parseResponse(String raw) {

@@ -46,6 +46,13 @@ public class SchedulerService implements Runnable {
         log.info("Registered new task");
     }
 
+    public void registerTask(Schedulable task, int delay, int fromHour, int toHour, boolean weekend) {
+        synchronized (tasks) {
+            tasks.add(new TaskEntry(task, delay, fromHour, toHour, weekend));
+        }
+        log.info("Registered new task");
+    }
+
     public void deregisterTask(Schedulable task) {
         synchronized (tasks) {
             tasks.removeIf(x -> x.getTask().equals(task));

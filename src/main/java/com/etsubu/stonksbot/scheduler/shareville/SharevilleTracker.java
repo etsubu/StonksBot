@@ -33,7 +33,8 @@ public class SharevilleTracker implements Schedulable {
         this.configLoader = configLoader;
         this.eventCore = eventCore;
         profileMap = new HashMap<>();
-        schedulerService.registerTask(this, DELAY);
+        // Only request updates between 5am-21pm UTC time and not during the weekends.
+        schedulerService.registerTask(this, DELAY, 5, 21, false);
     }
 
     private String buildNotification(List<SharevilleUser> users) {

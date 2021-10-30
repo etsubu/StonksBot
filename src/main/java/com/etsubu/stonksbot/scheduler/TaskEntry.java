@@ -3,7 +3,6 @@ package com.etsubu.stonksbot.scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -17,6 +16,7 @@ public class TaskEntry {
     private final long delay;
     private final int fromHour;
     private final int toHour;
+    private final boolean weekend;
 
     public TaskEntry(Schedulable task, int delay) {
         this.task = task;
@@ -25,20 +25,34 @@ public class TaskEntry {
         this.fromHour = -1;
         this.toHour = -1;
         this.active = true;
+        this.weekend = true;
     }
 
-    public TaskEntry(Schedulable task, int delay, int fromHour, int toHour) {
+    public TaskEntry(Schedulable task, int delay, int fromHour, int toHour, boolean weekend) {
         this.task = task;
         this.delay = delay;
         this.ticks = 0;
         this.fromHour = -1;
         this.toHour = -1;
         this.active = true;
+        this.weekend = weekend;
     }
 
     public boolean tick() {
+        Calendar calendar = Calendar.getInstance(TIME_ZONE);
+        if(!weekend) {
+            int day = calendar.get(Calendar.DAY_OF_WEEK);
+            if(day == Calendar.SATURDAY || day == Calendar.SUNDAY) {
+                // No triggers during weekend
+                if(active) {
+                    log.info("Entering sleep for the weekend for task {}", task.getClass().getName());
+                }
+                active = false;
+                return false;
+            }
+        }
         if (fromHour != -1 && toHour != -1) {
-            int hour = Calendar.getInstance(TIME_ZONE).get(Calendar.HOUR_OF_DAY);
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
             if (!(hour >= fromHour || hour <= toHour)) {
                 if (active) {
                     log.info("Entering sleep for task {}", task.getClass().getName());
