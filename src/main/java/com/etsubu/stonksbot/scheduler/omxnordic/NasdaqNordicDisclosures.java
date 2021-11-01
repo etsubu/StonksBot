@@ -4,6 +4,7 @@ import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.ConfigurationSync;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import com.etsubu.stonksbot.discord.EventCore;
+import com.etsubu.stonksbot.scheduler.omxnordic.Model.TransactionItem;
 import com.etsubu.stonksbot.utility.HttpApi;
 import com.etsubu.stonksbot.scheduler.omxnordic.Model.DisclosureItem;
 import com.google.gson.Gson;
@@ -144,6 +145,21 @@ public class NasdaqNordicDisclosures {
         return items;
     }
 
+    private void processDisclosures(List<DisclosureItem> items) {
+        for(int i = 0; i < items.size(); i++) {
+            var item = items.get(i);
+            if(item.isValid() && item.isTransaction()) {
+                try {
+                    TransactionItem transaction = new TransactionItem(item);
+                    transaction.loadValues();
+                    items.set(i, transaction);
+                } catch (Exception e) {
+                    log.error("Failed to map transaction", e);
+                }
+            }
+        }
+    }
+
     @Async
     /* Every other minute during weekdays */
     @Scheduled(cron = "2 * 7-23 ? * MON-FRI", zone = "Europe/Helsinki")
@@ -167,6 +183,7 @@ public class NasdaqNordicDisclosures {
                 }
             }
             if (!disclosureItems.isEmpty()) {
+                processDisclosures(disclosureItems);
                 sendNewDisclosures(disclosureItems);
                 configSync.saveConfiguration(CACHE_KEY, new DisclosureCache(System.currentTimeMillis(), LATEST_DISCLOSURE_IDS));
             } else if(initRun) {

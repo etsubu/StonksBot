@@ -17,19 +17,20 @@ import java.util.Optional;
 @AllArgsConstructor
 public class DisclosureItem implements Comparable<DisclosureItem> {
     private static final Logger log = LoggerFactory.getLogger(DisclosureItem.class);
-    private final Integer disclosureId;
-    private final Integer categoryId;
-    private final String headline;
-    private final String language;
-    private final List<String> languages;
-    private final String company;
-    private final String cnsCategory;
-    private final String messageUrl;
-    private final String releaseTime;
-    private final String published;
-    private final String cnsTypeId;
-    private final List<OmxNewsAttachment> attachment;
-    private List<AttachmentFile> files;
+    private static final Integer TRANSACTION_CATEGORY_ID = 66;
+    protected final Integer disclosureId;
+    protected final Integer categoryId;
+    protected final String headline;
+    protected final String language;
+    protected final List<String> languages;
+    protected final String company;
+    protected final String cnsCategory;
+    protected final String messageUrl;
+    protected final String releaseTime;
+    protected final String published;
+    protected final String cnsTypeId;
+    protected final List<OmxNewsAttachment> attachment;
+    protected List<AttachmentFile> files;
 
     public boolean isValid() {
         return headline != null && company != null && cnsCategory != null && messageUrl != null;
@@ -52,6 +53,10 @@ public class DisclosureItem implements Comparable<DisclosureItem> {
                 }
             }
         }
+    }
+
+    public boolean isTransaction() {
+        return Optional.ofNullable(categoryId).map(x -> x.equals(TRANSACTION_CATEGORY_ID)).orElse(false);
     }
 
     @Override
