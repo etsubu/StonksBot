@@ -106,11 +106,11 @@ public class InderesRecommendations {
 
     private String buildRecommendationChange(Pair<RecommendationEntry, RecommendationEntry> v) {
         StringBuilder builder = new StringBuilder(64);
-        Optional<AssetPriceIntraInfo> currentPrice = queryCurrentPrice(v.second);
+        Optional<AssetPriceIntraInfo> currentPrice = queryCurrentPrice(Optional.ofNullable(v.second).orElse(v.first));
         var from = v.getFirst();
         var to = v.getSecond();
-        Num targetPrice = DecimalNum.valueOf(v.second.getTarget().replaceAll(",", "."));
-        if (from != null) {
+        if (from != null && to != null) {
+            Num targetPrice = DecimalNum.valueOf(v.second.getTarget().replaceAll(",", "."));
             builder.append("```\n(Inderes)\nSuositusmuutos:");
             builder.append("\nNimi: ").append(from.getName()).append('\n');
             builder.append("Tavoitehinta: ").append(from.getTarget()).append(" -> ").append(to.getTarget()).append(" (")
@@ -122,7 +122,19 @@ public class InderesRecommendations {
                     .append("%\n"));
             builder.append("Suositus: ").append(from.getRecommendationText()).append(" -> ").append(to.getRecommendationText()).append('\n');
             builder.append("Riski: ").append(from.getRisk()).append(" -> ").append(to.getRisk()).append("\n```");
+        } else if(to == null) {
+            Num targetPrice = DecimalNum.valueOf(v.first.getTarget().replaceAll(",", "."));
+            builder.append("```\n(Inderes)\nSeurannan lopetus:");
+            builder.append("\nNimi: ").append(from.getName()).append('\n');
+            builder.append("Tavoitehinta: ").append(from.getTarget()).append('\n');
+            currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(from.getCurrency())
+                    .append("\nNousuvara: ")
+                    .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
+                    .append("%\n"));
+            builder.append("Suositus: ").append(from.getRecommendationText()).append('\n');
+            builder.append("Riski: ").append(from.getRisk()).append("\n```");
         } else {
+            Num targetPrice = DecimalNum.valueOf(v.first.getTarget().replaceAll(",", "."));
             builder.append("```\n(Inderes)\nSeurannan aloitus:");
             builder.append("\nNimi: ").append(to.getName()).append('\n');
             builder.append("Tavoitehinta: ").append(to.getTarget()).append('\n');
@@ -197,17 +209,20 @@ public class InderesRecommendations {
                                     .map(y -> y.hasChanged(x.getValue())).orElse(false))
                             .map(x -> new Pair<>(existingRecommendations.get(x.getKey()), x.getValue()))
                             .collect(Collectors.toSet());
-            // Check for newly followed stocks
             if (existingRecommendations.size() > 0) {
+                // Check for newly followed stocks
                 recommendations.entrySet().stream().filter(x -> !existingRecommendations.containsKey(x.getKey()))
                         .forEach(x -> changedRecommendations.add(new Pair<>(null, x.getValue())));
+                // Check for those stocks that are no longer followed
+                existingRecommendations.entrySet().stream().filter(x -> !recommendations.containsKey(x.getKey()))
+                        .forEach(x -> changedRecommendations.add(new Pair<>(x.getValue(), null)));
             }
             // These are the recommendations that have at least 3 days between last change. This is used to avoid an issue
             // Where inderes changes recommendation without updating the date of recommendation at the same time and the date
             // is actually updated during the next day
             // Alternatively if the actual recommendation values have changed then display those always
             Set<Pair<RecommendationEntry, RecommendationEntry>> freshRecommendations = changedRecommendations.stream()
-                    .filter(x -> x.first == null || (Math.abs(x.first.getLastUpdated() - x.second.getLastUpdated()) > FRESHNESS_WINDOW
+                    .filter(x -> x.first == null || x.second == null || (Math.abs(x.first.getLastUpdated() - x.second.getLastUpdated()) > FRESHNESS_WINDOW
                             || x.first.hasRecommendationChanged(x.second)))
                     .collect(Collectors.toSet());
             // Refresh recommendations
@@ -220,7 +235,7 @@ public class InderesRecommendations {
                     entries.put(x.getIsin(), x);
                 });
                 // Updated those that had actually changed
-                changedRecommendations.stream().map(x -> x.second).forEach(x -> {
+                changedRecommendations.stream().map(x -> x.second).filter(Objects::nonNull).forEach(x -> {
                     x.updateLastUpdated();
                     entries.put(x.getIsin(), x);
                 });
@@ -233,7 +248,6 @@ public class InderesRecommendations {
             if (freshRecommendations.size() > 0 || existingRecommendations.isEmpty()) {
                 saveRecommendations(entries);
             }
-            log.info("asd");
         } catch (IOException | InterruptedException e) {
             log.error("Failed to retrieve recommendations from inderes", e);
             failureCounter = Math.min(failureCounter + 1, Integer.MAX_VALUE - 1);
