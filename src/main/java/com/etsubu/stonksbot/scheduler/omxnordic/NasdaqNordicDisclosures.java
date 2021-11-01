@@ -52,13 +52,13 @@ public class NasdaqNordicDisclosures {
             long freshness = System.currentTimeMillis() - cache.get().getTimestamp();
             if(freshness < 0 || freshness > CACHE_TTL) {
                 log.info("Cache is stale, {} ms. Starting from scratch", freshness);
-                LATEST_DISCLOSURE_IDS = List.of(-1, -1);
+                LATEST_DISCLOSURE_IDS = Arrays.asList(-1, -1);
             } else {
                 LATEST_DISCLOSURE_IDS = cache.get().getLatestIds();
                 log.info("Cache loaded.");
             }
         } else {
-            LATEST_DISCLOSURE_IDS = List.of(-1, -1);
+            LATEST_DISCLOSURE_IDS = Arrays.asList(-1, -1);
         }
     }
 
