@@ -215,9 +215,15 @@ public class InderesRecommendations {
                 // Delete those that are not followed by inderes anymore
                 entries.entrySet().removeIf(x -> !recommendations.containsKey(x.getKey()));
                 // Add new newly followed
-                recommendations.values().stream().filter(x -> !entries.containsKey(x.getIsin())).forEach(x -> entries.put(x.getIsin(), x));
+                recommendations.values().stream().filter(x -> !entries.containsKey(x.getIsin())).forEach(x -> {
+                    x.updateLastUpdated();
+                    entries.put(x.getIsin(), x);
+                });
                 // Updated those that had actually changed
-                changedRecommendations.stream().map(x -> x.second).forEach(x -> entries.put(x.getIsin(), x));
+                changedRecommendations.stream().map(x -> x.second).forEach(x -> {
+                    x.updateLastUpdated();
+                    entries.put(x.getIsin(), x);
+                });
             }
             // Inderes can change recommendation values before changing the actual date of the recommendation
             // Let's avoid this by updating the recommendation time to current
@@ -225,8 +231,9 @@ public class InderesRecommendations {
             failureCounter = 0;
             // Save the changes.
             if (freshRecommendations.size() > 0 || existingRecommendations.isEmpty()) {
-                saveRecommendations(recommendations);
+                saveRecommendations(entries);
             }
+            log.info("asd");
         } catch (IOException | InterruptedException e) {
             log.error("Failed to retrieve recommendations from inderes", e);
             failureCounter = Math.min(failureCounter + 1, Integer.MAX_VALUE - 1);
