@@ -104,26 +104,22 @@ public class SharevilleTracker {
             // No profiles to track, skip
             return;
         }
-        try {
-            // Query profile walls from shareville
-            Map<String, String> walls = HttpApi.sendMultipleGet(profileIds);
-            // Convert to valid profiles
-            List<SharevilleUser> wallProfiles = walls.entrySet().stream().map(x -> {
-                try {
-                    return new SharevilleUser(x.getValue(), x.getKey());
-                } catch (IllegalArgumentException e) {
-                    log.error("Failed to map profile page ", e);
-                }
-                return null;
-            }).filter(Objects::nonNull).collect(Collectors.toList());
-            // Remove profiles that are not tracked anymore
-            profileMap.entrySet().removeIf(x -> !profileIds.contains(x.getKey()));
-            // Filter profiles that have new transactions
-            notify(serverConfigs, wallProfiles);
-            // Update profiles
-            wallProfiles.forEach(x -> profileMap.put(x.getUrl(), x));
-        } catch (IOException | InterruptedException e) {
-            log.error("Connection error while retrieving profile walls", e);
-        }
+        // Query profile walls from shareville
+        List<SharevilleUser> wallProfiles = profileIds.stream().map(x -> {
+            try {
+                return HttpApi.sendGet(x)
+                        .map(y -> new SharevilleUser(y, x))
+                        .orElse(null);
+            } catch (IOException | InterruptedException e) {
+                log.error("Failed to retrieve wall for profile {}", x, e);
+            }
+            return null;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+        // Remove profiles that are not tracked anymore
+        profileMap.entrySet().removeIf(x -> !profileIds.contains(x.getKey()));
+        // Filter profiles that have new transactions
+        notify(serverConfigs, wallProfiles);
+        // Update profiles
+        wallProfiles.forEach(x -> profileMap.put(x.getUrl(), x));
     }
 }
