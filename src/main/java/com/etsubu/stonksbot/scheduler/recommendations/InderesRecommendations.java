@@ -134,7 +134,7 @@ public class InderesRecommendations {
             builder.append("Suositus: ").append(from.getRecommendationText()).append('\n');
             builder.append("Riski: ").append(from.getRisk()).append("\n```");
         } else {
-            Num targetPrice = DecimalNum.valueOf(v.first.getTarget().replaceAll(",", "."));
+            Num targetPrice = DecimalNum.valueOf(to.getTarget().replaceAll(",", "."));
             builder.append("```\n(Inderes)\nSeurannan aloitus:");
             builder.append("\nNimi: ").append(to.getName()).append('\n');
             builder.append("Tavoitehinta: ").append(to.getTarget()).append('\n');
