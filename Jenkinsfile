@@ -30,11 +30,6 @@ pipeline {
                 sh './gradlew test'
             }
         }
-        stage('Verify') {
-            steps {
-                sh './gradlew spotbugsMain'
-            }
-        }
         stage('Integration test') {
             steps {
                 sh './gradlew integrationTest'
