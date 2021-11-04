@@ -80,7 +80,7 @@ public class TransactionItem extends DisclosureItem {
                     .append("`\n**Ilmoitus**: ")
                     .append(messageUrl);
             if(volume != null && avgPrice != null && transactionType != null) {
-                builder.append("`\n**Toimeksiannon tyyppi**: `")
+                builder.append("\n**Toimeksiannon tyyppi**: `")
                         .append(transactionType);
                 if(avgPrice == 0) {
                     builder.append("`\n**Volyymi**: `")
