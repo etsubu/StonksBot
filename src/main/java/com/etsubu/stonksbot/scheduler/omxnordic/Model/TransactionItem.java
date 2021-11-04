@@ -58,6 +58,7 @@ public class TransactionItem extends DisclosureItem {
             String volumeStr = content.substring(volumeIndex + VOLUME_PREFIX.length(), content.indexOf('K', volumeIndex + VOLUME_PREFIX.length()))
                     .replaceAll(" ", "")
                     .replaceAll(",", "")
+                    .replaceAll(" ", "")
                     .trim();
             String avgPriceStr = content.substring(avgPriceIndex + AVG_PRICE_PREFIX.length());
             String currency = avgPriceStr.substring(avgPriceStr.indexOf(' ') + 1, avgPriceStr.indexOf('<'))
