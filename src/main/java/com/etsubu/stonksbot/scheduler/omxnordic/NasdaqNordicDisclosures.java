@@ -162,7 +162,7 @@ public class NasdaqNordicDisclosures {
 
     @Async
     /* Every other minute during weekdays */
-    @Scheduled(cron = "2 * 7-23 ? * MON-FRI", zone = "Europe/Helsinki")
+    @Scheduled(cron = "5 * 7-23 ? * MON-FRI", zone = "Europe/Helsinki")
     public void invoke() {
         if (Optional.ofNullable(configLoader.getConfig().getOmxhNews()).map(x -> !Boolean.parseBoolean(x.getEnabled())).orElse(false)) {
             // Not enabled, skip

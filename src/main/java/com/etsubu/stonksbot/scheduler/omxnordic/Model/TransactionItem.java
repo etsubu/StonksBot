@@ -39,23 +39,42 @@ public class TransactionItem extends DisclosureItem {
         transactions = new HashMap<>();
     }
 
+    private boolean isNumber(String str) {
+        try{
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     private Optional<Transaction> parseTransaction(String content) {
         try {
             int typeIndex = content.indexOf(TRANSACTION_TYPE_PREFIX);
             int volumeIndex = content.lastIndexOf(VOLUME_PREFIX);
             int avgPriceIndex = content.lastIndexOf(AVG_PRICE_PREFIX);
-            String transactionType = content.substring(typeIndex + TRANSACTION_TYPE_PREFIX.length(), content.indexOf('<', typeIndex + TRANSACTION_TYPE_PREFIX.length()));
+            String transactionType = content.substring(typeIndex + TRANSACTION_TYPE_PREFIX.length(), content.indexOf('<', typeIndex + TRANSACTION_TYPE_PREFIX.length()))
+                    .trim().replaceAll("&Auml;", "Ä");
             String volumeStr = content.substring(volumeIndex + VOLUME_PREFIX.length(), content.indexOf('K', volumeIndex + VOLUME_PREFIX.length()))
                     .replaceAll(" ", "")
                     .replaceAll(",", "")
+                    .replaceAll(" ", "")
                     .trim();
             String avgPriceStr = content.substring(avgPriceIndex + AVG_PRICE_PREFIX.length());
-            String currency = avgPriceStr.substring(avgPriceStr.indexOf(' ') + 1, avgPriceStr.indexOf('<'));
+            String currency = avgPriceStr.substring(avgPriceStr.indexOf(' ') + 1, avgPriceStr.indexOf('<'))
+                    .replaceAll("&nbsp;","").replaceAll("&ouml;", "").trim();
 
             avgPriceStr = avgPriceStr.substring(0, avgPriceStr.indexOf(' '))
                     .replaceAll(",", ".")
                     .replaceAll(" ", "")
+                    .replaceAll("&nbsp;","")
+                    .replaceAll("&ouml;", "")
                     .trim();
+            if(isNumber(currency)) {
+                String tmp = currency;
+                currency = avgPriceStr;
+                avgPriceStr = tmp;
+            }
 
             int volume = Integer.parseInt(volumeStr);
             double avgPrice = Double.parseDouble(avgPriceStr);
@@ -110,7 +129,7 @@ public class TransactionItem extends DisclosureItem {
                     double sum = transactionsOfType.stream().map(Transaction::totalSum).reduce(0D, Double::sum);
                     builder.append("\n**Toimeksiannon tyyppi**: `")
                             .append(type).append("`");
-                    if(volume == 0) {
+                    if(sum == 0) {
                         builder.append("\n**Volyymi**: `")
                                 .append(NumberTools.formatToUserFriendly(volume)).append('`').append('\n');
                     } else {

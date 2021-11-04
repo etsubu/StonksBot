@@ -8,16 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 @AllArgsConstructor
 public class DisclosureItem implements Comparable<DisclosureItem> {
     private static final Logger log = LoggerFactory.getLogger(DisclosureItem.class);
-    private static final Integer TRANSACTION_CATEGORY_ID = 66;
+    private static final Set<Integer> TRANSACTION_CATEGORY_IDS = Set.of(66, 231);
     protected final Integer disclosureId;
     protected final Integer categoryId;
     protected final String headline;
@@ -56,7 +53,7 @@ public class DisclosureItem implements Comparable<DisclosureItem> {
     }
 
     public boolean isTransaction() {
-        return Optional.ofNullable(categoryId).map(x -> x.equals(TRANSACTION_CATEGORY_ID)).orElse(false);
+        return Optional.ofNullable(categoryId).map(TRANSACTION_CATEGORY_IDS::contains).orElse(false);
     }
 
     @Override
