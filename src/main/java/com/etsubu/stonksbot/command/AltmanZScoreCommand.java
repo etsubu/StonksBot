@@ -51,7 +51,7 @@ public class AltmanZScoreCommand extends Command {
     private final YahooConnector yahooConnector;
 
     public AltmanZScoreCommand(ConfigLoader configLoader, YahooConnector yahooConnector) {
-        super(List.of("z", "zscore", "zluku"), configLoader, false);
+        super(List.of("z", "zscore", "zluku"), configLoader, true);
         this.yahooConnector = yahooConnector;
     }
 

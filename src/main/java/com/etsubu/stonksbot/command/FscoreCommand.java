@@ -59,7 +59,7 @@ public class FscoreCommand extends Command {
     private final YahooConnector yahooConnector;
 
     public FscoreCommand(YahooConnector yahooConnector, ConfigLoader configLoader) {
-        super(List.of("fscore", "fluku", "f"), configLoader, false);
+        super(List.of("fscore", "fluku", "f"), configLoader, true);
         this.yahooConnector = yahooConnector;
         log.info("Initialized f-score command");
     }
