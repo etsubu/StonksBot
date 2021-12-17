@@ -39,9 +39,9 @@ public class BioCommand extends Command {
 
     private String buildResponse(AssetProfile assetProfile, StockName name) {
         StringBuilder builder = new StringBuilder();
-        builder.append("```");
+        builder.append("```\n");
         Optional.ofNullable(assetProfile.getLongBusinessSummary()).ifPresentOrElse(builder::append, () -> builder.append("Business description is missing"));
-        builder.append("```");
+        builder.append("\n```");
         return builder.toString();
     }
 

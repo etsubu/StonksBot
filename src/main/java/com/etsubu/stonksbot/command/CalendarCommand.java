@@ -39,7 +39,7 @@ public class CalendarCommand extends Command {
 
     private String buildResponse(CalendarEarnings earnings, StockName name) {
         StringBuilder builder = new StringBuilder();
-        builder.append("```");
+        builder.append("```\n");
         builder.append(name.getFullname()).append(" - ").append(name.getTicker()).append('\n');
         if (earnings.getEarnings().isPresent()) {
             CalendarEvent event = earnings.getEarnings().get();
@@ -57,7 +57,7 @@ public class CalendarCommand extends Command {
         }
         earnings.getExDividendDate().ifPresent(x -> builder.append("Previous dividend date: ").append(TimeUtils.formatEpocSeconds(Long.parseLong(x.getRaw()))).append('\n'));
         earnings.getDividendDate().ifPresent(x -> builder.append("Next dividend date: ").append(TimeUtils.formatEpocSeconds(Long.parseLong(x.getRaw()))).append('\n'));
-        builder.append("```");
+        builder.append("\n```");
         return builder.toString();
     }
 
