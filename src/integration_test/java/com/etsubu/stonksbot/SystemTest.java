@@ -246,7 +246,7 @@ public class SystemTest extends ListenerAdapter {
         Message message = action.submit().get();
         Message response = readMessage(message.getId());
         assertNotNull(response);
-        assertTrue(response.getContentDisplay().contains("Ravintola"));
+        assertTrue(response.getContentDisplay().contains("Ravintola") || response.getContentDisplay().contains("chili"));
         log.info(response.getContentDisplay());
     }
 }
