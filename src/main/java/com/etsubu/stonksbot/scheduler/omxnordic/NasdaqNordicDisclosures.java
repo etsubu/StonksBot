@@ -136,7 +136,8 @@ public class NasdaqNordicDisclosures {
             // Collect new disclosures
             newDisclosures.addAll(items.get().stream().filter(x ->
                             Optional.ofNullable(x.getDisclosureId()).map(y -> y > LATEST_DISCLOSURE_IDS.get(id)).orElse(false) &&
-                                    Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false))
+                                    (Optional.ofNullable(x.getLanguage()).map(y -> y.equals("fi")).orElse(false)
+                                    || Optional.ofNullable(x.getLanguages()).map(y -> y.contains("fi")).orElse(false)))
                     .collect(Collectors.toList()));
             start += itemList.size();
         }
