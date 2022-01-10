@@ -16,7 +16,7 @@ The features focus on fetching stock market related data and calculating differe
 ## Installation
 
 ### Prerequisites
-You need to have Java 11 JDK installed on your system to run and compile the application.
+You need to have Java 17 JDK installed on your system to run and compile the application.
 
 ### Building
 
@@ -37,7 +37,7 @@ StonksBot requires you to provide discord oauth key in the configuration file.
 Place config.yaml file in the same directory with the .jar file and place the oauth key in there. 
 About the available configs:
 * globalAdmins:
-  * This list of user names defines admin users across all servers, the bot does not check server specific
+  * This list of user ids defines admin users across all servers, the bot does not check server specific
      permissions for these users and allows them to send DM messages and commands as well
 * servers:
   * This list contains separate configurations for different servers where the bot has joined
@@ -50,6 +50,10 @@ About the available configs:
     * This list defines server specific admins which can bypass the whitelistedChannels restriction
   * trustedGroup:
     * Less permissive version of the adminGroup allows to bypass whitelistedChannels restriction
+
+Note that instead of names, the configs require you to use ID values. The benefit is that if channel/user/server names change 
+this does not affect the unique id values. In order to be able to copy ID values you need to enable developer mode in discord.
+Instructions on how to do this are provided at https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
     
 Example: 
 
@@ -57,16 +61,16 @@ Example:
 # Example configuration file which is also used for testing
 oauth: AAAAAAAAAAAAAAAAAAAAAAAAAAA
 globalAdmins:
-  - nagrodus
+  - some_id_value
 servers:
-  - name: NagrodusDev
+  - name: some_id_value
     whitelistedChannels:
-      - bot-kyselyt
+      - some_id_value
     reactions:
       - message: .*test.*
         react: STONKS
-    adminGroup: admin
-    trustedGroup: trusted
+    adminGroup: some_id_value
+    trustedGroup: some_id_value
 ```
 
 ## Contributing
@@ -259,11 +263,4 @@ means that you can either use the stock ticker for searching or the prefix of th
 The commands are able to fetch stock data by either their name, ticker or ISIN code, the search functionality uses 
 yahoo finance's search API with exception being !recommendation command which uses inderes API.
 Using ticker or ISIN is the most precise way to define what stock should be queried but using prefix of the name 
-is also supported but the results might be unexpected. 
-
-The bot should prefer home region stocks in the search results and stocks over other asset types for commands like !stats 
-which cannot be calculated for ETFs and such.
-
-By default OMXH stocks should be preferred and in future this should be configurable in configs.
-Query results are cached in the bot instance so that search keywords can be looked up instantly avoiding 
-the need to run new search query. 
+is also supported but the results might be unexpected.
