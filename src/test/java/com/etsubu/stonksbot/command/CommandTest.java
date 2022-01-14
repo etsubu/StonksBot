@@ -5,7 +5,6 @@ import com.etsubu.stonksbot.configuration.CommandConfig;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ServerConfig;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -92,7 +91,6 @@ public class CommandTest {
         verify(config, times(2)).getServerConfig(SERVER_ID);
     }
 
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test
     public void testNoCommandConfigs() {
         when(config.getServerConfig(anyString())).thenReturn(Optional.of(serverConfig));
@@ -108,7 +106,6 @@ public class CommandTest {
         verify(serverConfig, times(2)).getCommands();
     }
 
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test
     public void testCommandNotAllowed() {
         CommandConfig commandConfig = new CommandConfig();
@@ -127,7 +124,6 @@ public class CommandTest {
         verify(serverConfig, times(2)).getCommands();
     }
 
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test
     public void testCommandAllowed() {
         CommandConfig commandConfig = new CommandConfig();
@@ -144,7 +140,6 @@ public class CommandTest {
         verify(role, times(1)).getId();
     }
 
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT")
     @Test
     public void testNoRoles() {
         when(config.getGlobalAdmins()).thenReturn(new LinkedList<>());
