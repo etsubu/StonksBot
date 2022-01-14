@@ -60,7 +60,7 @@ Example:
 ```
 # Example configuration file which is also used for testing
 oauth: oath_key_for_the_discord_bot_goes_here
-#bot admins
+# bot admins
 globalAdmins:
   - user_id_that_is_admin_in_every_server
 omxhNews:
@@ -68,22 +68,17 @@ omxhNews:
 shareville:
   enabled: true/false
 servers:
-  #configs for a single server
+  # configs for a single server
   - name: server_id
-    # yhtiötiedotteet
     newsChannel: channel_id_to_post_disclosure_items
-    # bot-kyselyt
     whitelistedChannels:
       - channel_id_that_everyone_is_allowed_to_use_for_commands
-    # admin group
     adminGroup: admin_group_id
-    # aktiivit
     trustedGroup: 00
     recommendationChannel: some_channel_id
     filters:
       patterns:
         - (http|https|www).*(some-blackisted-word-in-url).*
-      # ylläpitäjät
       notifyChannel: channel_id_to_post_filter_action_notifications
     shareville:
       sharevilleProfiles:
