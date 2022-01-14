@@ -59,18 +59,39 @@ Example:
 
 ```
 # Example configuration file which is also used for testing
-oauth: AAAAAAAAAAAAAAAAAAAAAAAAAAA
+oauth: oath_key_for_the_discord_bot_goes_here
+#bot admins
 globalAdmins:
-  - some_id_value
+  - user_id_that_is_admin_in_every_server
+omxhNews:
+  enabled: true/false
+shareville:
+  enabled: true/false
 servers:
-  - name: some_id_value
+  #configs for a single server
+  - name: server_id
+    # yhtiötiedotteet
+    newsChannel: channel_id_to_post_disclosure_items
+    # bot-kyselyt
     whitelistedChannels:
-      - some_id_value
-    reactions:
-      - message: .*test.*
-        react: STONKS
-    adminGroup: some_id_value
-    trustedGroup: some_id_value
+      - channel_id_that_everyone_is_allowed_to_use_for_commands
+    # admin group
+    adminGroup: admin_group_id
+    # aktiivit
+    trustedGroup: 00
+    recommendationChannel: some_channel_id
+    filters:
+      patterns:
+        - (http|https|www).*(some-blackisted-word-in-url).*
+      # ylläpitäjät
+      notifyChannel: channel_id_to_post_filter_action_notifications
+    shareville:
+      sharevilleProfiles:
+        - some_user_id
+      sharevilleChannel: some_channel_id
+    requiredRoleOrders:
+      - some_role_id_that_should_be_above
+      - some_role_id_that_should_be_below
 ```
 
 ## Contributing

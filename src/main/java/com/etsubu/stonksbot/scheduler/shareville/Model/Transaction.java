@@ -1,6 +1,7 @@
 package com.etsubu.stonksbot.scheduler.shareville.Model;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -9,6 +10,7 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class Transaction {
     private final Long id;
     private final Instrument instrument;
@@ -23,13 +25,10 @@ public class Transaction {
         if (side == null) {
             return null;
         }
-        switch (side) {
-            case 1:
-                return "Osto";
-            case 2:
-                return "Myynti";
-            default:
-                return "Tuntematon toimeksianto";
-        }
+        return switch (side) {
+            case 1 -> "Osto";
+            case 2 -> "Myynti";
+            default -> "Tuntematon toimeksianto";
+        };
     }
 }
