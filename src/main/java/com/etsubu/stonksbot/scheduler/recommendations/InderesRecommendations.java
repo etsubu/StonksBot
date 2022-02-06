@@ -160,6 +160,15 @@ public class InderesRecommendations {
     }
 
     private void notifyRecommendationChanges(Set<Pair<RecommendationEntry, RecommendationEntry>> changes) {
+        // Some heuristic check
+        if(changes.stream().filter(x -> x.second == null).count() > 5) {
+            log.error("Received unfollow for too many stocks. Skipping notify");
+            return;
+        }
+        if(changes.stream().filter(x -> x.first == null).count() > 5) {
+            log.error("Received follow for too many stocks. Skipping notify");
+            return;
+        }
         if (!changes.isEmpty()) {
             log.info("Found recommendation changes in {} stocks", changes.size());
             Config config = configLoader.getConfig();
@@ -214,6 +223,7 @@ public class InderesRecommendations {
         }
         try {
             Map<String, RecommendationEntry> recommendations = inderesConnector.queryRecommendationsMap();
+            recommendations.values().stream().filter(x -> !x.isValid()).forEach(x -> log.error("Invalid value {}", x));
             Map<String, RecommendationEntry> existingRecommendations;
             synchronized (entries) {
                 existingRecommendations = new HashMap<>(entries);

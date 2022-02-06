@@ -69,6 +69,10 @@ public class InderesConnectorImpl implements InderesConnector {
             entries.clear();
             entries.putAll(recommendations);
         }
+        if(recommendations.size() <= 1) {
+            log.error("Received too few recommendations. Raising exception");
+            throw new IOException("Too few recommendations " + recommendations.size());
+        }
         return recommendations;
     }
 }
