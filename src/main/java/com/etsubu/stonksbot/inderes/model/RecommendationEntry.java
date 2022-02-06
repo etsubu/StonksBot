@@ -50,6 +50,10 @@ public class RecommendationEntry {
         };
     }
 
+    public boolean isValid() {
+        return name != null && target != null && currency != null && recommendation != null && risk != null && date != null && isin != null;
+    }
+
     public long getLastUpdated() {
         if (lastUpdated == null) {
             lastUpdated = System.currentTimeMillis();

@@ -109,8 +109,19 @@ public class InderesRecommendations {
         Optional<AssetPriceIntraInfo> currentPrice = queryCurrentPrice(Optional.ofNullable(v.second).orElse(v.first));
         var from = v.getFirst();
         var to = v.getSecond();
+        if(Optional.ofNullable(from).map(x -> !x.isValid()).orElse(false)) {
+            log.error("Invalid value in from field {}", from.toString());
+            builder.append("```\n(Inderes)\nSuositusmuutos:");
+            builder.append("\nNimi: ").append(Optional.ofNullable(from.getName()).orElse("[null]")).append("\nRikkinäinen arvo\n```");
+            return builder.toString();
+        } else if(Optional.ofNullable(to).map(x -> !x.isValid()).orElse(false)) {
+            log.error("Invalid value in from field {}", to.toString());
+            builder.append("```\n(Inderes)\nSuositusmuutos:");
+            builder.append("\nNimi: ").append(Optional.ofNullable(to.getName()).orElse("[null]")).append("\nRikkinäinen arvo\n```");
+            return builder.toString();
+        }
         if (from != null && to != null) {
-            Num targetPrice = DecimalNum.valueOf(v.second.getTarget().replaceAll(",", "."));
+            Num targetPrice = DecimalNum.valueOf(to.getTarget().replaceAll(",", "."));
             builder.append("```\n(Inderes)\nSuositusmuutos:");
             builder.append("\nNimi: ").append(from.getName()).append('\n');
             builder.append("Tavoitehinta: ").append(from.getTarget()).append(" -> ").append(to.getTarget()).append(" (")
@@ -158,7 +169,11 @@ public class InderesRecommendations {
                     .collect(Collectors.toList());
             if (!channels.isEmpty()) {
                 log.info("Sending message");
-                changes.stream().map(this::buildRecommendationChange).forEach(x-> eventCore.sendMessage(channels, x, null));
+                try {
+                    changes.stream().map(this::buildRecommendationChange).forEach(x -> eventCore.sendMessage(channels, x, null));
+                } catch (Exception e) {
+                    log.error("Error while sending recommendation updates", e);
+                }
                 log.info("Notified channels about recommendation changes");
             } else {
                 log.info("No channels to notify");
