@@ -54,7 +54,7 @@ public class InderesConnectorImpl implements InderesConnector {
         baseObject.keySet().forEach(x -> {
             try {
                 RecommendationEntry entry = gson.fromJson(baseObject.getJSONObject(x).toString(), RecommendationEntry.class);
-                if (entry.getIsin() != null) {
+                if (entry.getIsin() != null && entry.isValid()) {
                     recommendations.put(entry.getIsin(), entry);
                 } else {
                     log.info("Null isin value for recommendation entry {}", gson.toJson(entry));
@@ -64,7 +64,6 @@ public class InderesConnectorImpl implements InderesConnector {
             }
         });
         // Update last updated timestamp
-        recommendations.values().forEach(x -> x.setLastUpdated(System.currentTimeMillis()));
         synchronized (entries) {
             entries.clear();
             entries.putAll(recommendations);

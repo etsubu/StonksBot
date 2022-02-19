@@ -7,22 +7,22 @@ import com.etsubu.stonksbot.inderes.InderesConnector;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import com.etsubu.stonksbot.discord.EventCore;
-import com.etsubu.stonksbot.utility.DoubleTools;
-import com.etsubu.stonksbot.utility.Pair;
+import com.etsubu.stonksbot.scheduler.recommendations.model.ChangedRecommendation;
+import com.etsubu.stonksbot.scheduler.recommendations.model.NewRecommendation;
+import com.etsubu.stonksbot.scheduler.recommendations.model.RecommendationChange;
+import com.etsubu.stonksbot.scheduler.recommendations.model.RemovedRecommendation;
 import com.etsubu.stonksbot.yahoo.YahooConnector;
 import com.etsubu.stonksbot.yahoo.model.AssetPriceIntraInfo;
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.ta4j.core.num.DecimalNum;
-import org.ta4j.core.num.Num;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,14 +30,14 @@ import java.util.stream.Collectors;
 public class InderesRecommendations {
     private static final Logger log = LoggerFactory.getLogger(InderesRecommendations.class);
     private static final String CACHE_KEY = "inderes";
-    // ~3 days freshness
-    private static final long FRESHNESS_WINDOW = 1000 * 60 * 60 * 24 * 3;
-    private static final int DELAY = 300; // 5min, 300s
+    // ~1 days freshness
+    private static final long FRESHNESS_WINDOW = 1000 * 60 * 60 * 24;
     private static final long CACHE_TTL = 1000 * 60 * 60 * 24 * 2; // 2 day
     // This is used for exponential backoff in case the server fails to respond
     private int failureCounter = 0;
     private int failureTempCounter = 0;
     private final Map<String, RecommendationEntry> entries;
+    private final Map<String, Long> lastUpdatedMap;
     private final EventCore eventCore;
     private final ConfigLoader configLoader;
     private final InderesConnector inderesConnector;
@@ -53,6 +53,7 @@ public class InderesRecommendations {
         this.yahooConnector = yahooConnector;
         this.configSync = configSync;
         entries = new HashMap<>();
+        lastUpdatedMap = new ConcurrentHashMap<>();
 
         Optional<CachedRecommendations> cached = configSync.loadConfiguration(CACHE_KEY, CachedRecommendations.class);
         log.info("Cache present == {}", cached.isPresent());
@@ -61,7 +62,8 @@ public class InderesRecommendations {
             if (freshness < 0 || freshness > CACHE_TTL) {
                 log.info("Cached values are stale. Starting from scratch.");
             } else {
-                entries.putAll(cached.get().getEntries());
+                cached.get().getEntries().entrySet().stream().filter(x -> x.getValue().isValid())
+                        .forEach(x -> entries.put(x.getKey(), x.getValue()));
             }
         }
         log.info("Initial entries size {}", entries.size());
@@ -76,26 +78,11 @@ public class InderesRecommendations {
         }).start();
     }
 
-    private String formatChangePercentage(String from, String to) {
-        try {
-            Num f = DecimalNum.valueOf(from);
-            Num t = DecimalNum.valueOf(to);
-            if (f.isZero()) {
-                return "-";
-            }
-            Num change = (t.minus(f)).dividedBy(f);
-            return DoubleTools.roundToFormat(change.multipliedBy(DecimalNum.valueOf(100)).doubleValue());
-        } catch (NumberFormatException e) {
-            log.error("Invalid number", e);
-            return "-";
-        }
-    }
-
-    private Optional<AssetPriceIntraInfo> queryCurrentPrice(RecommendationEntry entry) {
-        log.info("Querying asset price for {}", entry.getIsin());
+    private Optional<AssetPriceIntraInfo> queryCurrentPrice(String isin) {
+        log.info("Querying asset price for {}", isin);
         Optional<AssetPriceIntraInfo> price = Optional.empty();
         try {
-            price = yahooConnector.queryCurrentIntraPriceInfo(entry.getIsin());
+            price = yahooConnector.queryCurrentIntraPriceInfo(isin);
         } catch (IOException e) {
             log.error("Connection to yahoo finance failed", e);
         } catch (InterruptedException e) {
@@ -104,68 +91,18 @@ public class InderesRecommendations {
         return price;
     }
 
-    private String buildRecommendationChange(Pair<RecommendationEntry, RecommendationEntry> v) {
-        StringBuilder builder = new StringBuilder(64);
-        Optional<AssetPriceIntraInfo> currentPrice = queryCurrentPrice(Optional.ofNullable(v.second).orElse(v.first));
-        var from = v.getFirst();
-        var to = v.getSecond();
-        if(Optional.ofNullable(from).map(x -> !x.isValid()).orElse(false)) {
-            log.error("Invalid value in from field {}", from.toString());
-            builder.append("```\n(Inderes)\nSuositusmuutos:");
-            builder.append("\nNimi: ").append(Optional.ofNullable(from.getName()).orElse("[null]")).append("\nRikkinäinen arvo\n```");
-            return builder.toString();
-        } else if(Optional.ofNullable(to).map(x -> !x.isValid()).orElse(false)) {
-            log.error("Invalid value in from field {}", to.toString());
-            builder.append("```\n(Inderes)\nSuositusmuutos:");
-            builder.append("\nNimi: ").append(Optional.ofNullable(to.getName()).orElse("[null]")).append("\nRikkinäinen arvo\n```");
-            return builder.toString();
-        }
-        if (from != null && to != null) {
-            Num targetPrice = DecimalNum.valueOf(to.getTarget().replaceAll(",", "."));
-            builder.append("```\n(Inderes)\nSuositusmuutos:");
-            builder.append("\nNimi: ").append(from.getName()).append('\n');
-            builder.append("Tavoitehinta: ").append(from.getTarget()).append(" -> ").append(to.getTarget()).append(" (")
-                    .append(formatChangePercentage(from.getTarget(), to.getTarget())).append("%)")
-                    .append('\n');
-            currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(to.getCurrency())
-                    .append("\nNousuvara: ")
-                    .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
-                    .append("%\n"));
-            builder.append("Suositus: ").append(from.getRecommendationText()).append(" -> ").append(to.getRecommendationText()).append('\n');
-            builder.append("Riski: ").append(from.getRisk()).append(" -> ").append(to.getRisk()).append("\n```");
-        } else if(to == null) {
-            Num targetPrice = DecimalNum.valueOf(v.first.getTarget().replaceAll(",", "."));
-            builder.append("```\n(Inderes)\nSeurannan lopetus:");
-            builder.append("\nNimi: ").append(from.getName()).append('\n');
-            builder.append("Tavoitehinta: ").append(from.getTarget()).append('\n');
-            currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(from.getCurrency())
-                    .append("\nNousuvara: ")
-                    .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
-                    .append("%\n"));
-            builder.append("Suositus: ").append(from.getRecommendationText()).append('\n');
-            builder.append("Riski: ").append(from.getRisk()).append("\n```");
-        } else {
-            Num targetPrice = DecimalNum.valueOf(to.getTarget().replaceAll(",", "."));
-            builder.append("```\n(Inderes)\nSeurannan aloitus:");
-            builder.append("\nNimi: ").append(to.getName()).append('\n');
-            builder.append("Tavoitehinta: ").append(to.getTarget()).append('\n');
-            currentPrice.ifPresent(x -> builder.append("Nykyinen hinta: ").append(DoubleTools.round(x.getCurrent().toString(), 3)).append(to.getCurrency())
-                    .append("\nNousuvara: ")
-                    .append(DoubleTools.round(targetPrice.minus(x.getCurrent()).dividedBy(x.getCurrent()).multipliedBy(DecimalNum.valueOf(100)).toString(), 2))
-                    .append("%\n"));
-            builder.append("Suositus: ").append(to.getRecommendationText()).append('\n');
-            builder.append("Riski: ").append(to.getRisk()).append("\n```");
-        }
-        return builder.toString();
+    private String buildRecommendationChange(RecommendationChange recommendationChange){
+        Optional<AssetPriceIntraInfo> currentPrice = queryCurrentPrice(recommendationChange.getIsin());
+        return recommendationChange.buildNotificationMessage(currentPrice.orElse(null));
     }
 
-    private void notifyRecommendationChanges(Set<Pair<RecommendationEntry, RecommendationEntry>> changes) {
+    private void notifyRecommendationChanges(Set<RecommendationChange> changes) {
         // Some heuristic check
-        if(changes.stream().filter(x -> x.second == null).count() > 5) {
+        if(changes.stream().filter(x -> x instanceof RemovedRecommendation).count() > 5) {
             log.error("Received unfollow for too many stocks. Skipping notify");
             return;
         }
-        if(changes.stream().filter(x -> x.first == null).count() > 5) {
+        if(changes.stream().filter(x -> x instanceof NewRecommendation).count() > 5) {
             log.error("Received follow for too many stocks. Skipping notify");
             return;
         }
@@ -222,49 +159,38 @@ public class InderesRecommendations {
             return;
         }
         try {
-            Map<String, RecommendationEntry> recommendations = inderesConnector.queryRecommendationsMap();
-            recommendations.values().stream().filter(x -> !x.isValid()).forEach(x -> log.error("Invalid value {}", x));
+            Map<String, RecommendationEntry> newRecommendations = inderesConnector.queryRecommendationsMap();
             Map<String, RecommendationEntry> existingRecommendations;
             synchronized (entries) {
                 existingRecommendations = new HashMap<>(entries);
             }
-            Set<Pair<RecommendationEntry, RecommendationEntry>> changedRecommendations =
-                    recommendations.entrySet().stream()
-                            .filter(x -> Optional.ofNullable(existingRecommendations.get(x.getKey()))
-                                    .map(y -> y.hasChanged(x.getValue())).orElse(false))
-                            .map(x -> new Pair<>(existingRecommendations.get(x.getKey()), x.getValue()))
-                            .collect(Collectors.toSet());
+            Set<RecommendationChange> changedRecommendations = newRecommendations.entrySet()
+                    .stream()
+                    .filter(x -> Optional.ofNullable(existingRecommendations.get(x.getKey()))
+                            .map(y -> y.hasChanged(x.getValue()))
+                            .orElse(false)).map(x -> new ChangedRecommendation(existingRecommendations.get(x.getKey()), x.getValue()))
+                    .collect(Collectors.toSet());
             if (existingRecommendations.size() > 0) {
                 // Check for newly followed stocks
-                recommendations.entrySet().stream().filter(x -> !existingRecommendations.containsKey(x.getKey()))
-                        .forEach(x -> changedRecommendations.add(new Pair<>(null, x.getValue())));
+                newRecommendations.entrySet().stream().filter(x -> !existingRecommendations.containsKey(x.getKey()))
+                        .forEach(x -> changedRecommendations.add(new NewRecommendation(x.getValue())));
                 // Check for those stocks that are no longer followed
-                existingRecommendations.entrySet().stream().filter(x -> !recommendations.containsKey(x.getKey()))
-                        .forEach(x -> changedRecommendations.add(new Pair<>(x.getValue(), null)));
+                existingRecommendations.entrySet().stream().filter(x -> !newRecommendations.containsKey(x.getKey()))
+                        .forEach(x -> changedRecommendations.add(new RemovedRecommendation(x.getValue())));
             }
-            // These are the recommendations that have at least 3 days between last change. This is used to avoid an issue
+            // These are the newRecommendations that have at least 3 days between last change. This is used to avoid an issue
             // Where inderes changes recommendation without updating the date of recommendation at the same time and the date
             // is actually updated during the next day
             // Alternatively if the actual recommendation values have changed then display those always
-            Set<Pair<RecommendationEntry, RecommendationEntry>> freshRecommendations = changedRecommendations.stream()
-                    .filter(x -> x.first == null || x.second == null || (Math.abs(x.first.getLastUpdated() - x.second.getLastUpdated()) > FRESHNESS_WINDOW
-                            || x.first.hasRecommendationChanged(x.second)))
-                    .collect(Collectors.toSet());
-            // Refresh recommendations
+            Set<RecommendationChange> freshRecommendations = changedRecommendations.stream()
+                    .filter(x -> Math.abs(System.currentTimeMillis() - Optional.ofNullable(lastUpdatedMap.get(x.getIsin())).orElse(0L)) > FRESHNESS_WINDOW)
+                    .collect(Collectors.toUnmodifiableSet());
+            // Refresh newRecommendations
             synchronized (entries) {
-                // Delete those that are not followed by inderes anymore
-                entries.entrySet().removeIf(x -> !recommendations.containsKey(x.getKey()));
-                // Add new newly followed
-                recommendations.values().stream().filter(x -> !entries.containsKey(x.getIsin())).forEach(x -> {
-                    x.updateLastUpdated();
-                    entries.put(x.getIsin(), x);
-                });
-                // Updated those that had actually changed
-                changedRecommendations.stream().map(x -> x.second).filter(Objects::nonNull).forEach(x -> {
-                    x.updateLastUpdated();
-                    entries.put(x.getIsin(), x);
-                });
+                entries.clear();
+                entries.putAll(newRecommendations);
             }
+            changedRecommendations.forEach(x -> lastUpdatedMap.put(x.getIsin(), System.currentTimeMillis()));
             // Inderes can change recommendation values before changing the actual date of the recommendation
             // Let's avoid this by updating the recommendation time to current
             notifyRecommendationChanges(freshRecommendations);
