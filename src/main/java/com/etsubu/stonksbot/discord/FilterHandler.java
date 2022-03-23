@@ -3,10 +3,8 @@ package com.etsubu.stonksbot.discord;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ServerConfig;
-import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +21,8 @@ public class FilterHandler {
         this.configLoader = configLoader;
     }
 
-    public boolean shouldBeFiltered(MessageReceivedEvent event) {
+    public boolean shouldBeFiltered(Message message, Member member, User author, GenericMessageEvent event) {
         // No reactions to DMs
-        Member member = event.getMember();
         if (event.getChannelType() != ChannelType.TEXT || member == null) {
             return false;
         }
@@ -35,7 +32,7 @@ public class FilterHandler {
         if (serverConfig.isEmpty()) {
             return false;
         }
-        if (config.getGlobalAdmins().stream().anyMatch(x -> x.equalsIgnoreCase(event.getAuthor().getId()))) {
+        if (config.getGlobalAdmins().stream().anyMatch(x -> x.equalsIgnoreCase(author.getId()))) {
             // Ignore global admins
             return false;
         }
@@ -52,23 +49,23 @@ public class FilterHandler {
             return false;
         }
         if (serverConfig.get().getFilters().getRegexPatterns()
-                .stream().anyMatch(x -> x.matcher(event.getMessage().getContentDisplay().toLowerCase()).matches())) {
+                .stream().anyMatch(x -> x.matcher(message.getContentDisplay().toLowerCase()).matches())) {
             // Filter pattern matches
             log.info("Filtering message '{}' by '{}' id='{}'",
-                    event.getMessage().getContentDisplay().replaceAll("\n", ""),
-                    event.getAuthor().getName(),
-                    event.getAuthor().getId());
+                    message.getContentDisplay().replaceAll("\n", ""),
+                    author.getName(),
+                    author.getId());
             if (serverConfig.get().getFilters().getNotifyChannel() != null) {
                 GuildChannel guildChannel = event.getJDA().getGuildChannelById(serverConfig.get().getFilters().getNotifyChannel());
                 if (guildChannel instanceof TextChannel) {
                     TextChannel channel = (TextChannel) guildChannel;
                     // Remove the message
-                    event.getMessage().delete().queue();
+                    message.delete().queue();
                     // Send notification to admin channel
                     channel.sendMessage(String.format("Filtered message:%n```%s```%nnUser: %s, id=%s, channel=%s",
-                            event.getMessage().getContentDisplay().replaceAll("`", ""),
-                            event.getAuthor().getName(),
-                            event.getAuthor().getId(),
+                            message.getContentDisplay().replaceAll("`", ""),
+                            author.getName(),
+                            author.getId(),
                             event.getChannel().getName())).queue();
                     log.info("Filtered message");
                 }

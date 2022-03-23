@@ -13,7 +13,9 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.role.RoleCreateEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.events.role.update.RoleUpdatePositionEvent;
@@ -126,6 +128,22 @@ public final class EventCore extends ListenerAdapter {
     }
 
     @Override
+    public void onMessageUpdate(MessageUpdateEvent event) {
+        MDC.put(SERVER_ID, event.getMessage().isFromGuild() ? event.getGuild().getId() : "no_server");
+        MDC.put(USER_ID, event.getAuthor().getId());
+        MDC.put(CHANNEL_ID, event.getChannel().getId());
+
+        if (event.getAuthor().getId().equalsIgnoreCase(jda.getSelfUser().getId())) {
+            // Skip messages sent by ourselves
+            return;
+        }
+        if (filterHandler.shouldBeFiltered(event.getMessage(), event.getMember(), event.getAuthor(), event)) {
+            return;
+        }
+        log.info("modify {}", event.getMessage().getContentRaw());
+    }
+
+    @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         MDC.put(SERVER_ID, event.getMessage().isFromGuild() ? event.getGuild().getId() : "no_server");
         MDC.put(USER_ID, event.getAuthor().getId());
@@ -136,7 +154,7 @@ public final class EventCore extends ListenerAdapter {
             return;
         }
         reacter.react(event).ifPresent(x -> event.getMessage().addReaction(x).queue());
-        if (filterHandler.shouldBeFiltered(event)) {
+        if (filterHandler.shouldBeFiltered(event.getMessage(), event.getMember(), event.getAuthor(), event)) {
             return;
         }
 

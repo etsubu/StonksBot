@@ -9,6 +9,7 @@ import com.etsubu.stonksbot.permission.PermissionManager;
 import com.etsubu.stonksbot.scheduler.omxnordic.Model.AttachmentFile;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
@@ -56,6 +57,8 @@ public class EventCoreTest {
     private SelfUser selfUser;
     @Mock
     private Message message;
+    @Mock
+    private Member member;
     @Mock
     private Emote emote;
     @Mock
@@ -111,7 +114,7 @@ public class EventCoreTest {
         when(user.getId()).thenReturn(ID);
         eventCore.onMessageReceived(event);
         verify(reacter, times(0)).react(any(MessageReceivedEvent.class));
-        verify(filterHandler, times(0)).shouldBeFiltered(any(MessageReceivedEvent.class));
+        verify(filterHandler, times(0)).shouldBeFiltered(any(Message.class), any(Member.class), any(User.class), any(GenericMessageEvent.class));
         verify(commandHandler, times(0)).isCommand(anyString());
     }
 
@@ -134,11 +137,11 @@ public class EventCoreTest {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
         when(user.getId()).thenReturn("123");
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(true);
+        when(filterHandler.shouldBeFiltered(any(Message.class), nullable(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(true);
         eventCore.onMessageReceived(event);
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
+        when(filterHandler.shouldBeFiltered(any(Message.class), nullable(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(false);
         eventCore.onMessageReceived(event);
-        verify(filterHandler, times(2)).shouldBeFiltered(any(MessageReceivedEvent.class));
+        verify(filterHandler, times(2)).shouldBeFiltered(any(Message.class), nullable(Member.class), any(User.class), any(GenericMessageEvent.class));
         verify(commandHandler, times(1)).isCommand(anyString());
     }
 
@@ -147,7 +150,7 @@ public class EventCoreTest {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
         when(user.getId()).thenReturn("123");
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
+        when(filterHandler.shouldBeFiltered(any(Message.class), nullable(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(false);
         eventCore.onMessageReceived(event);
         verify(permissionManager, times(0)).isReplyAllowed(any(MessageReceivedEvent.class));
@@ -159,7 +162,7 @@ public class EventCoreTest {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
         when(user.getId()).thenReturn("123");
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
+        when(filterHandler.shouldBeFiltered(any(Message.class), nullable(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(false);
         eventCore.onMessageReceived(event);
@@ -172,7 +175,7 @@ public class EventCoreTest {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
         when(user.getId()).thenReturn("123");
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
+        when(filterHandler.shouldBeFiltered(any(Message.class), any(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(true);
         when(commandHandler.execute(any(MessageReceivedEvent.class))).thenThrow(new NumberFormatException("asd"));
@@ -189,7 +192,7 @@ public class EventCoreTest {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
         when(user.getId()).thenReturn("123");
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
+        when(filterHandler.shouldBeFiltered(any(Message.class), any(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(commandHandler.execute(any(MessageReceivedEvent.class))).thenReturn(CommandResult.builder().succeeded(true).response("").build());
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(true);
@@ -206,7 +209,7 @@ public class EventCoreTest {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
         when(user.getId()).thenReturn("123");
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
+        when(filterHandler.shouldBeFiltered(any(Message.class), any(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(true);
         when(commandHandler.execute(any(MessageReceivedEvent.class))).thenReturn(CommandResult.builder().succeeded(false).response("asd").build());
@@ -224,7 +227,7 @@ public class EventCoreTest {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
         when(user.getId()).thenReturn("123");
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
+        when(filterHandler.shouldBeFiltered(any(Message.class), any(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(commandHandler.execute(any(MessageReceivedEvent.class))).thenReturn(CommandResult.builder().succeeded(true).response("asd").build());
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(true);
@@ -241,7 +244,7 @@ public class EventCoreTest {
         when(message.getContentDisplay()).thenReturn("asd");
         when(user.isBot()).thenReturn(false);
         when(user.getId()).thenReturn("123");
-        when(filterHandler.shouldBeFiltered(any(MessageReceivedEvent.class))).thenReturn(false);
+        when(filterHandler.shouldBeFiltered(any(Message.class), any(Member.class), any(User.class), any(GenericMessageEvent.class))).thenReturn(false);
         when(commandHandler.isCommand(anyString())).thenReturn(true);
         when(permissionManager.isReplyAllowed(any(MessageReceivedEvent.class))).thenReturn(true);
         when(commandHandler.execute(any(MessageReceivedEvent.class))).thenReturn(CommandResult.builder().succeeded(true).respondWithDM(true).response("asd").build());
