@@ -9,6 +9,7 @@ import com.etsubu.stonksbot.permission.PermissionManager;
 import com.etsubu.stonksbot.scheduler.omxnordic.Model.AttachmentFile;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -60,7 +61,7 @@ public class EventCoreTest {
     @Mock
     private Member member;
     @Mock
-    private Emote emote;
+    private RichCustomEmoji emote;
     @Mock
     private MessageChannel channel;
     @Mock
@@ -126,7 +127,7 @@ public class EventCoreTest {
         when(reacter.react(any(MessageReceivedEvent.class))).thenReturn(Optional.empty());
         eventCore.onMessageReceived(event);
         when(reacter.react(any(MessageReceivedEvent.class))).thenReturn(Optional.of(emote));
-        when(message.addReaction(any(Emote.class))).thenReturn(restActionVoid);
+        when(message.addReaction(any(RichCustomEmoji.class))).thenReturn(restActionVoid);
         eventCore.onMessageReceived(event);
         verify(message, times(1)).addReaction(emote);
         verify(restActionVoid, times(1)).queue();

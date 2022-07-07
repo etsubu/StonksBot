@@ -4,6 +4,8 @@ import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.Reaction;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +34,7 @@ public class MessageReacter {
      * @param event Event that was received on server
      * @return Emote that should be used to react to the message
      */
-    public Optional<Emote> react(MessageReceivedEvent event) {
+    public Optional<RichCustomEmoji> react(MessageReceivedEvent event) {
         // No reactions to DMs
         if (!event.isFromGuild() || !event.isFromType(ChannelType.TEXT)) {
             return Optional.empty();
@@ -48,10 +50,8 @@ public class MessageReacter {
             for (Reaction reaction : reactions) {
                 if (reaction.getPattern().matcher(event.getMessage().getContentDisplay().toLowerCase()).matches()) {
                     log.info("Matched message {} with emote {}", event.getMessage().getContentDisplay(), reaction.getReact());
-                    List<Emote> emotes = event.getGuild().getEmotesByName(reaction.getReact(), true);
-                    if (emotes.size() >= 1) {
-                        return Optional.of(emotes.get(0));
-                    }
+                    List<RichCustomEmoji> emotes = event.getGuild().getEmojisByName(reaction.getReact(), true);
+                    return emotes.stream().findFirst();
                 }
             }
         }

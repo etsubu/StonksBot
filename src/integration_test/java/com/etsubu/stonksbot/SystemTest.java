@@ -2,6 +2,7 @@ package com.etsubu.stonksbot;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -36,7 +37,7 @@ import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 public class SystemTest extends ListenerAdapter {
     private static final Logger log = LoggerFactory.getLogger(SystemTest.class);
     private static JDA jda;
-    private static TextChannel channel;
+    private static BaseGuildMessageChannel channel;
     private static final Map<String, Message> messages = Collections.synchronizedMap(new HashMap<>());
 
     /**
