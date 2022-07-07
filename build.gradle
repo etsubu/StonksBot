@@ -56,7 +56,7 @@ tasks.withType(JavaCompile) {
 
 dependencies {
     implementation 'org.springframework:spring-core:5.3.15'
-    implementation 'org.springframework:spring-beans:5.3.15'
+    implementation 'org.springframework:spring-beans:5.3.21'
     implementation 'org.springframework:spring-context:5.3.15'
     implementation 'org.yaml:snakeyaml:1.30'
     implementation 'org.ta4j:ta4j-core:0.14'
