@@ -3,7 +3,6 @@ package com.etsubu.stonksbot.inderes.model;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Objects;
@@ -14,22 +13,19 @@ import java.util.Objects;
  * @author etsubu
  */
 @Getter
-@Setter
 @AllArgsConstructor
 @ToString
 public class RecommendationEntry {
-    /* This is internal value and not from inderes */
-    private Long lastUpdated;
-    private String isin;
-    private String name;
+    private final String isin;
+    private final String name;
     @SerializedName("date_of_recommendation")
-    private String date;
+    private final String date;
     @SerializedName("target_price")
-    private String target;
-    private String currency;
-    private String recommendation;
+    private final String target;
+    private final String currency;
+    private final String recommendation;
     @SerializedName("risk_level")
-    private String risk;
+    private final String risk;
 
     /**
      * Converts numeric recommendation to descriptive text format
@@ -52,17 +48,6 @@ public class RecommendationEntry {
 
     public boolean isValid() {
         return name != null && target != null && currency != null && recommendation != null && risk != null && date != null && isin != null;
-    }
-
-    public long getLastUpdated() {
-        if (lastUpdated == null) {
-            lastUpdated = System.currentTimeMillis();
-        }
-        return lastUpdated;
-    }
-
-    public void updateLastUpdated() {
-        lastUpdated = System.currentTimeMillis();
     }
 
     public boolean hasChanged(RecommendationEntry entry) {
