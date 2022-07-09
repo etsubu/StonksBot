@@ -40,6 +40,11 @@ jobs:
       with:
         arguments: integrationTest
 
+    - name: Create fat jar
+      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+      with:
+        arguments: shadowJar -x test
+
     - name: push to s3
       if: github.ref_name == 'main'
       env:
