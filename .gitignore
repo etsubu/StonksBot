@@ -51,3 +51,6 @@ out/
 logs/
 # Configuration files of the bot
 /*.yaml
+
+configs/
+tickers.txt
