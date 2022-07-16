@@ -20,31 +20,64 @@ public class ServerConfig {
     private Long recommendationChannel;
     private SharevilleConfig shareville;
     private String votelinkTemplate;
+    private EventConfig registration;
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public List<String> getWhitelistedChannels() { return Optional.ofNullable(whitelistedChannels).orElseGet(LinkedList::new); }
+    public List<String> getWhitelistedChannels() {
+        return Optional.ofNullable(whitelistedChannels).orElseGet(LinkedList::new);
+    }
 
-    public List<Reaction> getReactions() { return Optional.ofNullable(reactions).orElseGet(LinkedList::new); }
+    public List<Reaction> getReactions() {
+        return Optional.ofNullable(reactions).orElseGet(LinkedList::new);
+    }
 
-    public FilterConfig getFilters() { return Optional.ofNullable(filters).orElseGet(FilterConfig::new); }
+    public FilterConfig getFilters() {
+        return Optional.ofNullable(filters).orElseGet(FilterConfig::new);
+    }
 
-    public String getAdminGroup() { return adminGroup; }
+    public String getAdminGroup() {
+        return adminGroup;
+    }
 
-    public String getTrustedGroup() { return trustedGroup; }
+    public String getTrustedGroup() {
+        return trustedGroup;
+    }
 
-    public Map<String, CommandConfig> getCommands() { return Optional.ofNullable(commands).orElseGet(HashMap::new); }
+    public Map<String, CommandConfig> getCommands() {
+        return Optional.ofNullable(commands).orElseGet(HashMap::new);
+    }
 
-    public Long getNewsChannel() { return newsChannel; }
+    public Long getNewsChannel() {
+        return newsChannel;
+    }
 
-    public Long getRecommendationChannel() { return recommendationChannel; }
+    public Long getRecommendationChannel() {
+        return recommendationChannel;
+    }
 
-    public SharevilleConfig getShareville() { return Optional.ofNullable(shareville).orElseGet(SharevilleConfig::new); }
+    public SharevilleConfig getShareville() {
+        return Optional.ofNullable(shareville).orElseGet(SharevilleConfig::new);
+    }
 
-    public String getVotelinkTemplate() { return votelinkTemplate; }
+    public String getVotelinkTemplate() {
+        return votelinkTemplate;
+    }
 
-    public List<String> getRequiredRoleOrders() { return Optional.ofNullable(requiredRoleOrders).orElseGet(LinkedList::new); }
+    public List<String> getRequiredRoleOrders() {
+        return Optional.ofNullable(requiredRoleOrders).orElseGet(LinkedList::new);
+    }
 
-    public void setRequiredRoleOrders(List<String> requiredRoleOrders) { this.requiredRoleOrders = requiredRoleOrders; }
+    public void setRequiredRoleOrders(List<String> requiredRoleOrders) {
+        this.requiredRoleOrders = requiredRoleOrders;
+    }
+
+    public EventConfig getRegistration() {
+        return registration;
+    }
+
+    public void setRegistrationConfig(EventConfig config) { this.registration = config; }
 
 }
