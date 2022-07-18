@@ -43,6 +43,7 @@ public class InderesRecommendations {
     private final InderesConnector inderesConnector;
     private final YahooConnector yahooConnector;
     private final ConfigurationSync configSync;
+    private final Set<RecommendationChange> dateOnlyChangedCache;
 
     public InderesRecommendations(EventCore eventCore, ConfigLoader configLoader,
                                   InderesConnector inderesConnector, YahooConnector yahooConnector,
@@ -54,6 +55,7 @@ public class InderesRecommendations {
         this.configSync = configSync;
         entries = new HashMap<>();
         lastUpdatedMap = new ConcurrentHashMap<>();
+        dateOnlyChangedCache = new HashSet<>();
 
         Optional<CachedRecommendations> cached = configSync.loadConfiguration(CACHE_KEY, CachedRecommendations.class);
         log.info("Cache present == {}", cached.isPresent());
@@ -167,7 +169,13 @@ public class InderesRecommendations {
             Set<RecommendationChange> changedRecommendations = newRecommendations.entrySet()
                     .stream()
                     .filter(x -> Optional.ofNullable(existingRecommendations.get(x.getKey()))
-                            .map(y -> y.hasChanged(x.getValue()))
+                            .map(y -> y.hasChanged(x.getValue()) && !y.isDateOnlyChanged(x.getValue()))
+                            .orElse(false)).map(x -> new ChangedRecommendation(existingRecommendations.get(x.getKey()), x.getValue()))
+                    .collect(Collectors.toSet());
+            Set<RecommendationChange> dateOnlyChangedRecommendations = newRecommendations.entrySet()
+                    .stream()
+                    .filter(x -> Optional.ofNullable(existingRecommendations.get(x.getKey()))
+                            .map(y -> y.isDateOnlyChanged(x.getValue()))
                             .orElse(false)).map(x -> new ChangedRecommendation(existingRecommendations.get(x.getKey()), x.getValue()))
                     .collect(Collectors.toSet());
             if (existingRecommendations.size() > 0) {
@@ -184,13 +192,18 @@ public class InderesRecommendations {
             // Alternatively if the actual recommendation values have changed then display those always
             Set<RecommendationChange> freshRecommendations = changedRecommendations.stream()
                     .filter(x -> Math.abs(System.currentTimeMillis() - Optional.ofNullable(lastUpdatedMap.get(x.getIsin())).orElse(0L)) > FRESHNESS_WINDOW)
-                    .collect(Collectors.toUnmodifiableSet());
+                    .collect(Collectors.toSet());
             // Refresh newRecommendations
             synchronized (entries) {
                 entries.clear();
                 entries.putAll(newRecommendations);
             }
             changedRecommendations.forEach(x -> lastUpdatedMap.put(x.getIsin(), System.currentTimeMillis()));
+            dateOnlyChangedRecommendations.forEach(x -> lastUpdatedMap.put(x.getIsin(), System.currentTimeMillis()));
+            dateOnlyChangedCache.stream().filter(x -> !freshRecommendations.contains(x)).forEach(freshRecommendations::add);
+            dateOnlyChangedCache.clear();
+            dateOnlyChangedCache.addAll(dateOnlyChangedRecommendations);
+
             // Inderes can change recommendation values before changing the actual date of the recommendation
             // Let's avoid this by updating the recommendation time to current
             notifyRecommendationChanges(freshRecommendations);
