@@ -26,6 +26,11 @@ public class ChangedRecommendation extends RecommendationChange {
 
 
     @Override
+    boolean lightChange() {
+        return from.isDateOnlyChanged(to);
+    }
+
+    @Override
     public String buildNotificationMessage(AssetPriceIntraInfo currentPrice) {
         StringBuilder builder = new StringBuilder();
         Num targetPrice = DecimalNum.valueOf(to.getTarget().replaceAll(",", "."));
