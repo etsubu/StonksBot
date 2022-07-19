@@ -59,6 +59,12 @@ public class EventCommand extends Command {
         return new CommandResult("Unregistered from event!", true);
     }
 
+    public CommandResult status(CommandContext context, EventConfig config) {
+        Integer max = config.getMax();
+        int entries = itemStorage.entries(context.getGuild().get().getId());
+        return new CommandResult("Currently registered to event: " + entries + (max != null ? ("/" + max) : ""), true);
+    }
+
     @Override
     public CommandResult exec(CommandContext context) {
         if(context.getGuild().isEmpty()) {
@@ -74,7 +80,10 @@ public class EventCommand extends Command {
             return register(context, event);
         } else if (context.getMessage().equals("unregister")) {
             return unregister(context, event);
-        } else if(context.getMessage().isEmpty()) {
+        } else if (context.getMessage().equals("status")) {
+            return status(context, event);
+        }
+        else if(context.getMessage().isEmpty()) {
             return new CommandResult("Active event scheduled \"" + Optional.ofNullable(event.getTitle()).orElse(DEFAULT_EVENT_TITLE) + "\"", true);
         }
         return new CommandResult(help(), false);

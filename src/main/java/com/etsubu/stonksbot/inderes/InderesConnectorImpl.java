@@ -56,8 +56,6 @@ public class InderesConnectorImpl implements InderesConnector {
                 RecommendationEntry entry = gson.fromJson(baseObject.getJSONObject(x).toString(), RecommendationEntry.class);
                 if (entry.getIsin() != null && entry.isValid()) {
                     recommendations.put(entry.getIsin(), entry);
-                } else {
-                    log.info("Null isin value for recommendation entry {}", gson.toJson(entry));
                 }
             } catch (JsonParseException e) {
                 log.error("Failed to parse recommendation json entry ", e);
