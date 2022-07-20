@@ -17,11 +17,6 @@ public class RemovedRecommendation extends RecommendationChange {
     }
 
     @Override
-    boolean lightChange() {
-        return false;
-    }
-
-    @Override
     public String buildNotificationMessage(AssetPriceIntraInfo currentPrice) {
         StringBuilder builder = new StringBuilder();
         Num targetPrice = DecimalNum.valueOf(last.getTarget().replaceAll(",", "."));

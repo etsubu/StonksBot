@@ -15,11 +15,6 @@ public class NewRecommendation extends RecommendationChange {
         super(entry);
         this.initial = entry;
     }
-
-    @Override
-    boolean lightChange() {
-        return false;
-    }
     @Override
     public String buildNotificationMessage(AssetPriceIntraInfo currentPrice) {
         StringBuilder builder = new StringBuilder();
