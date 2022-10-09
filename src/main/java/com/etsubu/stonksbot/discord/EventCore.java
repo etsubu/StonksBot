@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.events.role.RoleCreateEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.events.role.update.RoleUpdatePositionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.AttachedFile;
 import net.dv8tion.jda.internal.handle.GuildRoleUpdateHandler;
@@ -77,12 +78,15 @@ public final class EventCore extends ListenerAdapter {
             jda.shutdown();
         }
         Config config = configLoader.getConfig();
-        Optional<String> oauth = Optional.ofNullable(config.getOauth());
-        if (oauth.isEmpty()) {
+        Optional<String> oath = Optional.ofNullable(config.getOauth());
+        Optional<String> oathProperty = Optional.ofNullable(System.getProperty("STONKSBOT_OATH"));
+        if (oath.isEmpty() && oathProperty.isEmpty()) {
             log.error("No oath token present");
             return false;
         }
-        this.jda = JDABuilder.createDefault(oauth.get()).build();
+        this.jda = JDABuilder.createDefault(oath.orElseGet(oathProperty::get))
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .build();
         jda.addEventListener(this, guildRoleManager);
         log.info("JDA connected");
         return true;
