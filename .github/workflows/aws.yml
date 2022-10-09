@@ -79,7 +79,7 @@ jobs:
       id: docker-scan
       uses: alexjurkiewicz/ecr-scan-image@v1.7.0
       with:
-        repository: myorg/myimage
+        repository: $ECR_REGISTRY/$ECR_REPOSITORY
         tag: ${{ steps.build-image.outputs.tag }}
         fail_threshold: medium
         # ignore_list: |
