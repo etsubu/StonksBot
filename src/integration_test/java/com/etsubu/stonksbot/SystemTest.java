@@ -2,10 +2,10 @@ package com.etsubu.stonksbot;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.BaseGuildMessageChannel;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.DefaultGuildChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.parallel.ExecutionMode.SAME_THREAD;
 public class SystemTest extends ListenerAdapter {
     private static final Logger log = LoggerFactory.getLogger(SystemTest.class);
     private static JDA jda;
-    private static BaseGuildMessageChannel channel;
+    private static TextChannel channel;
     private static final Map<String, Message> messages = Collections.synchronizedMap(new HashMap<>());
 
     /**
@@ -54,7 +54,7 @@ public class SystemTest extends ListenerAdapter {
         log.info("Initializing system tests {}", System.getProperty("user.dir"));
         jda = JDABuilder.createDefault(System.getenv("oath1")).build();
         jda.awaitReady();
-        channel = jda.getGuilds().get(0).getDefaultChannel();
+        channel = jda.getGuilds().get(0).getDefaultChannel().asTextChannel();
     }
 
     @Override
