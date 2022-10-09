@@ -50,7 +50,7 @@ out/
 
 logs/
 # Configuration files of the bot
-config2.yaml
+config.yaml
 
 configs/
 tickers.txt
