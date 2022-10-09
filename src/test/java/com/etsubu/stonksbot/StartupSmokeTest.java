@@ -13,6 +13,7 @@ public class StartupSmokeTest {
 
     @Test
     public void springInitializeSmokeTest() {
+        System.setProperty("environment", "test");
         try {
             new AnnotationConfigApplicationContext(Main.class);
         } catch (Exception e) {

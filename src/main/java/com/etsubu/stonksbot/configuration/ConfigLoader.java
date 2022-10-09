@@ -22,13 +22,20 @@ public class ConfigLoader {
     private static final Config DEFAULT_CONFIG = new Config();
     private final Path configFile;
     private final IConfigLoader configLoaderImpl;
+    private boolean testFlag;
 
     public ConfigLoader() {
         this(Path.of(Optional.ofNullable(System.getProperty("STONKSBOT_CONFIG_FILE")).orElse("config.yaml")));
     }
 
     public ConfigLoader(Path path) {
+        testFlag = Optional.ofNullable(System.getProperty("environment")).map(x -> x.equals("test")).orElse(false);
         this.configFile = path;
+        if(testFlag) {
+            log.info("Enabled test mode");
+            configLoaderImpl = null;
+            return;
+        }
         var awsConfig = Path.of("aws-config.yaml");
         if(!Files.exists(path) && Files.exists(awsConfig)) {
             log.info("Attempting to load configs from AWS");
@@ -45,6 +52,9 @@ public class ConfigLoader {
     }
 
     public Config getConfig() {
+        if(testFlag) {
+            return new Config();
+        }
         return Optional.ofNullable(configLoaderImpl.loadConfig()).orElse(DEFAULT_CONFIG);
     }
 }
