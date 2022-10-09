@@ -74,12 +74,13 @@ jobs:
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:stonksbot .
         docker push --all-tags $ECR_REGISTRY/$ECR_REPOSITORY
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+        echo "::set-output name=tag::$IMAGE_TAG"
     - name: Scan Docker image
       id: docker-scan
       uses: alexjurkiewicz/ecr-scan-image@v1.7.0
       with:
         repository: myorg/myimage
-        tag: ${{ steps.docker-build.outputs.tag }}
+        tag: ${{ steps.build-image.outputs.tag }}
         fail_threshold: medium
         # ignore_list: |
         #   CVE-2014-7654321
