@@ -69,7 +69,7 @@ dependencies {
     implementation 'org.ta4j:ta4j-core:0.14'
     implementation 'com.google.code.gson:gson:2.9.0'
     implementation 'org.json:json:20220320'
-    implementation ('net.dv8tion:JDA:5.0.0-alpha.13') {
+    implementation ('net.dv8tion:JDA:5.0.0-alpha.21') {
         exclude module: 'opus-java'
     }
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha7'
