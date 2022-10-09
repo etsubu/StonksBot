@@ -3,8 +3,10 @@ package com.etsubu.stonksbot.configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.representer.Representer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,9 +20,8 @@ import java.util.Optional;
 public class ConfigLoader {
     private static final Logger log = LoggerFactory.getLogger(ConfigLoader.class);
     private static final Config DEFAULT_CONFIG = new Config();
-    private Config config;
     private final Path configFile;
-    private Instant lastModified;
+    private final IConfigLoader configLoaderImpl;
 
     public ConfigLoader() {
         this(Path.of(Optional.ofNullable(System.getProperty("STONKSBOT_CONFIG_FILE")).orElse("config.yaml")));
@@ -28,38 +29,22 @@ public class ConfigLoader {
 
     public ConfigLoader(Path path) {
         this.configFile = path;
-        loadConfigs();
-    }
-
-    private void loadConfigs() {
-        Yaml yaml = new Yaml(new Constructor(Config.class));
-        try {
-            config = yaml.load(Files.readString(configFile));
-            log.info("Configs loaded");
-            // Compile all regex patterns
-            config.getServers().forEach(y -> {
-                y.getReactions().forEach(Reaction::buildPattern);
-                y.getFilters().update();
-            });
-        } catch (IOException e) {
-            log.error("Failed to load configuration");
+        var awsConfig = Path.of("aws-config.yaml");
+        if(!Files.exists(path) && Files.exists(awsConfig)) {
+            log.info("Attempting to load configs from AWS");
+            var s3 = new Yaml(new Constructor(S3Config.class));
+            try {
+                configLoaderImpl = new S3ConfigLoader(s3.load(Files.readString(awsConfig)));
+            } catch (IOException e) {
+                throw new RuntimeException("AWS configuration file could not be loaded");
+            }
+        } else {
+            configLoaderImpl = new FileConfigLoader(configFile);
         }
-        lastModified = Instant.now();
+        getConfig();
     }
 
     public Config getConfig() {
-        try {
-            FileTime time = Files.getLastModifiedTime(configFile);
-            if (time.toInstant().isAfter(lastModified)) {
-                log.info("Changes in config files, reloading.");
-                loadConfigs();
-            }
-        } catch (NoSuchFileException e) {
-            log.error("No config file present");
-            return new Config();
-        } catch (IOException e) {
-            log.error("Failed to get last modified time for config file. Assuming it has not changed", e);
-        }
-        return Optional.ofNullable(config).orElse(DEFAULT_CONFIG);
+        return Optional.ofNullable(configLoaderImpl.loadConfig()).orElse(DEFAULT_CONFIG);
     }
 }

@@ -1,0 +1,3 @@
+s3bucket: stonksbot
+file: config.yaml
+region: eu-west-1
