@@ -51,17 +51,9 @@ public class RecommendationEntry {
     }
 
     public boolean hasChanged(RecommendationEntry entry) {
-        return Objects.equals(isin, entry.isin) && (!Objects.equals(date, entry.getDate())
-                || !Objects.equals(target, entry.getTarget())
+        return Objects.equals(isin, entry.isin) && (!Objects.equals(target, entry.getTarget())
                 || !Objects.equals(recommendation, entry.getRecommendation())
                 || !Objects.equals(risk, entry.getRisk()));
-    }
-
-    public boolean isDateOnlyChanged(RecommendationEntry entry) {
-        return Objects.equals(isin, entry.isin) && (!Objects.equals(date, entry.getDate())
-                && Objects.equals(target, entry.getTarget())
-                && Objects.equals(recommendation, entry.getRecommendation())
-                && Objects.equals(risk, entry.getRisk()));
     }
 
     @Override

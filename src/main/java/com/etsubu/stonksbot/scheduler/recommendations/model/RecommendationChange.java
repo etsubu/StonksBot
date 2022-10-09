@@ -19,7 +19,5 @@ public abstract class RecommendationChange {
 
     public String getIsin() { return isin; }
 
-    abstract boolean lightChange();
-
     public abstract String buildNotificationMessage(AssetPriceIntraInfo currentPrice);
 }
