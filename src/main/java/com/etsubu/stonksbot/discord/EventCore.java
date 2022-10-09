@@ -11,6 +11,7 @@ import com.etsubu.stonksbot.utility.MessageUtils;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GenericGuildEvent;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
@@ -20,7 +21,8 @@ import net.dv8tion.jda.api.events.role.RoleCreateEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.events.role.update.RoleUpdatePositionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.AttachedFile;
 import net.dv8tion.jda.internal.handle.GuildRoleUpdateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,12 +82,7 @@ public final class EventCore extends ListenerAdapter {
             log.error("No oath token present");
             return false;
         }
-        try {
-            this.jda = JDABuilder.createDefault(oauth.get()).build();
-        } catch (LoginException e) {
-            log.error("Login failed, check the network connection and oath token");
-            return false;
-        }
+        this.jda = JDABuilder.createDefault(oauth.get()).build();
         jda.addEventListener(this, guildRoleManager);
         log.info("JDA connected");
         return true;
@@ -108,11 +105,9 @@ public final class EventCore extends ListenerAdapter {
         for (long channelId : channelIds) {
             TextChannel textChannel = jda.getTextChannelById(channelId);
             if (textChannel != null) {
-                MessageAction msg = textChannel.sendMessage(MessageUtils.cleanMessage(message));
+                MessageCreateAction msg = textChannel.sendMessage(MessageUtils.cleanMessage(message));
                 if (attachmentFiles != null && !attachmentFiles.isEmpty()) {
-                    for (AttachmentFile file : attachmentFiles) {
-                        msg = msg.addFile(file.getFile(), file.getFilename());
-                    }
+                    msg = msg.addFiles(attachmentFiles.stream().map(x -> AttachedFile.fromData(x.getFile(), x.getFilename())).toList());
                 }
                 msg.queue();
                 sent = true;
@@ -161,7 +156,6 @@ public final class EventCore extends ListenerAdapter {
         if (this.commandHandler.isCommand(event.getMessage().getContentDisplay()) && event.getMessage().getContentDisplay().length() > 1) {
             if (!permissionManager.isReplyAllowed(event)) {
                 log.info("Prevented reply for {}  on channel {}", event.getAuthor().getName(), event.getChannel().getName());
-                //event.getChannel().sendMessage("Please use whitelisted channel for performing commands").queue();
                 return;
             }
             try {

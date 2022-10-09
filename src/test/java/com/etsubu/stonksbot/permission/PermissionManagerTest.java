@@ -4,6 +4,9 @@ import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +42,7 @@ public class PermissionManagerTest {
     @Mock
     private Role role;
     @Mock
-    private MessageChannel channel;
+    private MessageChannelUnion channel;
     private Config config;
     private PermissionManager permissionManager;
 

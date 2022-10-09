@@ -3,6 +3,8 @@ package com.etsubu.stonksbot.permission;
 import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
