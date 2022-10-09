@@ -77,12 +77,13 @@ public final class EventCore extends ListenerAdapter {
             jda.shutdown();
         }
         Config config = configLoader.getConfig();
-        Optional<String> oauth = Optional.ofNullable(config.getOauth());
-        if (oauth.isEmpty()) {
+        Optional<String> oath = Optional.ofNullable(config.getOauth());
+        Optional<String> oathProperty = Optional.ofNullable(System.getProperty("STONKSBOT_OATH"));
+        if (oath.isEmpty() && oathProperty.isEmpty()) {
             log.error("No oath token present");
             return false;
         }
-        this.jda = JDABuilder.createDefault(oauth.get()).build();
+        this.jda = JDABuilder.createDefault(oath.orElse(oathProperty.get())).build();
         jda.addEventListener(this, guildRoleManager);
         log.info("JDA connected");
         return true;
