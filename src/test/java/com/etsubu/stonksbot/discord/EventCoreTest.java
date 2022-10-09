@@ -9,11 +9,17 @@ import com.etsubu.stonksbot.permission.PermissionManager;
 import com.etsubu.stonksbot.scheduler.omxnordic.Model.AttachmentFile;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.RestAction;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.CacheRestAction;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,9 +54,9 @@ public class EventCoreTest {
     @Mock
     private User user;
     @Mock
-    private RestAction<PrivateChannel> restAction;
+    private CacheRestAction<PrivateChannel> restAction;
     @Mock
-    private RestAction<Void> restActionVoid;
+    private CacheRestAction<Void> restActionVoid;
     @Mock
     private MessageReceivedEvent event;
     @Mock
@@ -63,9 +70,9 @@ public class EventCoreTest {
     @Mock
     private RichCustomEmoji emote;
     @Mock
-    private MessageChannel channel;
+    private MessageChannelUnion channel;
     @Mock
-    private MessageAction msgAction;
+    private MessageCreateAction msgAction;
     @Mock
     private TextChannel guildChannel;
     @Captor
@@ -103,10 +110,10 @@ public class EventCoreTest {
 
     @Test
     public void testSendMessage() {
-        when(msgAction.addFile(any(byte[].class), anyString())).thenReturn(msgAction);
+        when(msgAction.addFiles(anyCollection())).thenReturn(msgAction);
         assertTrue(eventCore.sendMessage(List.of(1L, 2L), "msg", List.of(new AttachmentFile(new byte[]{}, "asd"))));
         verify(msgAction, times(1)).queue();
-        verify(msgAction, times(1)).addFile(any(byte[].class), anyString());
+        verify(msgAction, times(1)).addFiles(anyCollection());
     }
 
     @Test

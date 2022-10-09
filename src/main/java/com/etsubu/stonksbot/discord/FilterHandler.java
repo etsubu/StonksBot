@@ -4,8 +4,10 @@ import com.etsubu.stonksbot.configuration.ConfigLoader;
 import com.etsubu.stonksbot.configuration.Config;
 import com.etsubu.stonksbot.configuration.ServerConfig;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.message.GenericMessageEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -52,18 +54,17 @@ public class FilterHandler {
                 .stream().anyMatch(x -> x.matcher(message.getContentDisplay().toLowerCase()).matches())) {
             // Filter pattern matches
             log.info("Filtering message '{}' by '{}' id='{}'",
-                    message.getContentDisplay().replaceAll("\n", ""),
+                    message.getContentDisplay().replace("\n", ""),
                     author.getName(),
                     author.getId());
             if (serverConfig.get().getFilters().getNotifyChannel() != null) {
                 GuildChannel guildChannel = event.getJDA().getGuildChannelById(serverConfig.get().getFilters().getNotifyChannel());
-                if (guildChannel instanceof TextChannel) {
-                    TextChannel channel = (TextChannel) guildChannel;
+                if (guildChannel instanceof TextChannel channel) {
                     // Remove the message
                     message.delete().queue();
                     // Send notification to admin channel
                     channel.sendMessage(String.format("Filtered message:%n```%s```%nnUser: %s, id=%s, channel=%s",
-                            message.getContentDisplay().replaceAll("`", ""),
+                            message.getContentDisplay().replace("`", ""),
                             author.getName(),
                             author.getId(),
                             event.getChannel().getName())).queue();
