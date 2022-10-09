@@ -19,5 +19,6 @@ public class StartupSmokeTest {
         } catch (Exception e) {
             fail("Spring failed to initialize", e);
         }
+        System.setProperty("environment", "");
     }
 }
