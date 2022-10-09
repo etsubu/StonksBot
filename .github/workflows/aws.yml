@@ -78,6 +78,7 @@ jobs:
     - name: Download task definition
       run: |
         aws ecs describe-task-definition --task-definition stonksbot-task --query taskDefinition > task-definition.json
+        aws ecs list-tasks --cluster stonksbot-cluster --service stonksbot-service --output text --query taskArns[0]
 
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
