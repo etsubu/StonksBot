@@ -31,8 +31,8 @@ public class NasdaqNordicDisclosures {
     private static final int OMXH_ID = 0;
     private static final int FIRST_NORTH_ID = 1;
     private static final String[] DISCLOSURE_URL_TEMPLATES = {
-            "https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&market=Main%20Market%2C+Helsinki&cnscategory=&company=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=fi&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&dir=DESC&start=",
-            "https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=First%20North+Finland&cnscategory=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicFirstNorth&displayLanguage=en&language=&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&dir=DESC&start="
+            "https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&market=Main%20Market%2C+Helsinki&cnscategory=&company=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicMainMarkets&displayLanguage=fi&language=fi&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&dir=DESC&start=",
+            "https://api.news.eu.nasdaq.com/news/query.action?type=json&showAttachments=true&showCnsSpecific=true&showCompany=true&callback=handleResponse&countResults=false&freeText=&company=&market=First%20North+Finland&cnscategory=&fromDate=&toDate=&globalGroup=exchangeNotice&globalName=NordicFirstNorth&displayLanguage=fi&language=fi&timeZone=CET&dateMask=yyyy-MM-dd+HH%3Amm%3Ass&limit=20&dir=DESC&start="
     };
     private final List<Integer> LATEST_DISCLOSURE_IDS;
     private static final int DELAY_IN_TASK = 120; // 2min'
