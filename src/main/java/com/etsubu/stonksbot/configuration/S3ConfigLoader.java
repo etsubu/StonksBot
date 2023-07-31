@@ -4,6 +4,8 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -27,9 +29,9 @@ public class S3ConfigLoader implements IConfigLoader{
         this.s3Config = s3Config;
         s3 = AmazonS3ClientBuilder.standard().withRegion(s3Config.getRegion()).build();
         lastLoaded = 0;
-        Representer representer = new Representer();
+        Representer representer = new Representer(new DumperOptions());
         representer.getPropertyUtils().setSkipMissingProperties(true);
-        yaml = new Yaml(new Constructor(Config.class), representer);
+        yaml = new Yaml(new Constructor(Config.class, new LoaderOptions()), representer);
     }
     @Override
     public Config loadConfig() {

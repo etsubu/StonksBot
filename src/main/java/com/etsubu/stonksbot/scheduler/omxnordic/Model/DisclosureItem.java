@@ -68,7 +68,7 @@ public class DisclosureItem implements Comparable<DisclosureItem> {
                     .append(cnsCategory)
                     .append("`\n**Ilmoitus**: ")
                     .append(messageUrl)
-                    .append("\n````");
+                    .append('\n');
             return builder.toString();
         } else {
             return "Missing news item info";

@@ -8,7 +8,10 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
@@ -39,10 +42,10 @@ public class ConfigLoader {
         var awsConfig = Path.of("aws-config.yaml");
         if(!Files.exists(path) && Files.exists(awsConfig)) {
             log.info("Attempting to load configs from AWS");
-            var s3 = new Yaml(new Constructor(S3Config.class));
-            try {
-                configLoaderImpl = new S3ConfigLoader(s3.load(Files.readString(awsConfig)));
-            } catch (IOException e) {
+            try (Reader reader = Files.newBufferedReader(awsConfig, StandardCharsets.UTF_8)) {
+                Yaml yaml = new Yaml();
+                configLoaderImpl = yaml.loadAs(reader, S3Config.class);
+            } catch (Exception e) {
                 throw new RuntimeException("AWS configuration file could not be loaded");
             }
         } else {
