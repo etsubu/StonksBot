@@ -1,11 +1,8 @@
 package com.etsubu.stonksbot.yahoo;
 
-import com.etsubu.stonksbot.yahoo.model.AssetPriceIntraInfo;
-import com.etsubu.stonksbot.yahoo.model.DataResponse;
-import com.etsubu.stonksbot.yahoo.model.DataValue;
+import com.etsubu.stonksbot.yahoo.model.*;
 import com.etsubu.stonksbot.yahoo.model.fundament.FundaValue;
 import com.etsubu.stonksbot.yahoo.model.fundament.FundamentEntry;
-import com.etsubu.stonksbot.yahoo.model.GeneralResponse;
 import com.etsubu.stonksbot.yahoo.model.price.ChartResult;
 import com.etsubu.stonksbot.utility.Pair;
 import com.etsubu.stonksbot.yahoo.model.search.SearchResponse;
@@ -14,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -23,6 +21,7 @@ import org.ta4j.core.num.DecimalNum;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -43,16 +42,65 @@ public class YahooConnectorImpl implements YahooConnector {
     public static final String DEFAULT_STATISTICS = "defaultKeyStatistics";
     public static final String CALENDAR_EVENTS = "calendarEvents";
     public static final String ASSET_PROFILE = "assetProfile";
-    private final HttpClient client;
+
+    private final Map<String, String> headers = new HashMap<>();
+    private HttpClient client;
     private int loadBalanceIndex;
     private final TickerStorage tickerStorage;
     private final Gson gson;
 
+    private String crumb;
+
     public YahooConnectorImpl(TickerStorage tickerStorage) {
-        client = HttpClient.newHttpClient();
+        headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0");
+        headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8");
+        headers.put("Accept-Language", "en-US,en;q=0.5");
+        //headers.put("Accept-Encoding",  "gzip, deflate, br");
+        headers.put("DNT", "1");
+        headers.put("Upgrade-Insecure-Requests", "1");
+        headers.put("Sec-Fetch-Dest", "document");
+        headers.put("Sec-Fetch-Mode", "navigate");
+        headers.put("Sec-Fetch-Site", "none");
+        headers.put("Sec-Fetch-User", "?1");
+        headers.put("Pragma", "no-cache");
+        headers.put("Cache-Control", "no-cache");
+
         loadBalanceIndex = 1;
         gson = new Gson();
         this.tickerStorage = tickerStorage;
+        bootstrapCookies();
+    }
+
+    private void bootstrapCookies() {
+        client = HttpClient.newBuilder().cookieHandler(new CustomCookieHandler()).connectTimeout(Duration.ofSeconds(15)).followRedirects(HttpClient.Redirect.NORMAL).build();
+        log.info("bootstrapping cookies");
+        try {
+            // bootstrap cookies
+            var requestBuilder = HttpRequest.newBuilder()
+                    .uri(URI.create("https://finance.yahoo.com/quote/AAPL"))
+                    .GET();
+            headers.forEach(requestBuilder::setHeader);
+            var request = requestBuilder.build();
+            var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            String consentUrl = response.uri().getScheme() + "://" + response.uri().getHost() + response.uri().getPath();
+            String body = response.body();
+            var document = Jsoup.parse(body);
+            var doneUrl = document.getElementsByAttributeValue("name", "originalDoneUrl");
+            var id = document.getElementsByAttributeValue("name", "sessionId");
+            var csrf = document.getElementsByAttributeValue("name", "csrfToken");
+
+            String content = String.format("csrfToken=%s&sessionId=%s&originalDoneUrl=%s&namespace=yahoo&agree=agree&agree=agree",
+                    csrf.attr("value"), id.attr("value"), URLEncoder.encode(doneUrl.attr("value"), StandardCharsets.UTF_8));
+
+            var postBuilder = HttpRequest.newBuilder()
+                    .uri(URI.create(consentUrl))
+                    .POST(HttpRequest.BodyPublishers.ofString(content));
+            headers.forEach(postBuilder::setHeader);
+            postBuilder.setHeader("Content-Type", "application/x-www-form-urlencoded");
+            client.send(postBuilder.build(), HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            log.error("Failed to bootstrap cookies", e);
+        }
     }
 
     private int getLoadBalanceIndex() {
@@ -61,16 +109,65 @@ public class YahooConnectorImpl implements YahooConnector {
         return index;
     }
 
-    private Optional<String> requestHttp(String url) throws IOException, InterruptedException {
+    public void updateCrumb() {
+        log.info("Refresh crumb");
+        try {
+            var requestBuilder = HttpRequest.newBuilder()
+                    .uri(URI.create("https://query1.finance.yahoo.com/v1/test/getcrumb"))
+                    .GET();
+            headers.forEach(requestBuilder::setHeader);
+            var request = requestBuilder.build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) {
+                this.crumb = response.body();
+                log.info("Loaded crumb: {}", crumb);
+            } else {
+                this.crumb = null;
+                log.error("Failed to retrieve crumb {}, {}", response.statusCode(), response.body());
+            }
+        } catch (IOException | InterruptedException e) {
+            log.error("Failed to request crumb", e);
+        }
+    }
+
+    private HttpResponse<String> request(String url) throws IOException, InterruptedException {
+        if (crumb == null) {
+            updateCrumb();
+        }
+        if (url.contains("?") && crumb != null) {
+            url += "&crumb=" + crumb;
+        } else if (crumb != null) {
+            url += "?crumb=" + crumb;
+        }
         URI uri = URI.create(url);
-        log.info("Sending request to {}", uri.toString());
-        HttpRequest request = HttpRequest.newBuilder()
+        log.info("Sending request to {}", uri);
+        var requestBuilder = HttpRequest.newBuilder()
                 .uri(uri)
-                .timeout(Duration.ofSeconds(30))
-                .GET()
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                .GET();
+        headers.forEach(requestBuilder::setHeader);
+        var request = requestBuilder.build();
+        return client.send(request, HttpResponse.BodyHandlers.ofString());
+    }
+
+    public Optional<String> requestHttp(String url) throws IOException, InterruptedException {
+        var response = request(url);
         if (response.statusCode() != 200) {
+            Optional<ErrorResponse> errorResponse = ErrorResponse.parseErrorResponse(response.body());
+            if (errorResponse.map(ErrorResponse::missingCrumb).orElse(false)) {
+                updateCrumb();
+                response = request(url);
+                if (response.statusCode() != 200) {
+                    log.error("Request returned invalid status code {}", response.statusCode());
+                    return Optional.empty();
+                }
+            } else if (errorResponse.map(ErrorResponse::missingCookie).orElse(false)) {
+                bootstrapCookies();
+                response = request(url);
+                if (response.statusCode() != 200) {
+                    log.error("Request returned invalid status code {}", response.statusCode());
+                    return Optional.empty();
+                }
+            }
             log.error("Request returned invalid status code {}", response.statusCode());
             return Optional.empty();
         }

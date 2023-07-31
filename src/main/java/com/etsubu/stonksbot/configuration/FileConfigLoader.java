@@ -2,6 +2,8 @@ package com.etsubu.stonksbot.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.representer.Representer;
@@ -21,9 +23,9 @@ public class FileConfigLoader implements IConfigLoader {
 
     public FileConfigLoader(Path configFile) {
         this.configFile = configFile;
-        Representer representer = new Representer();
+        Representer representer = new Representer(new DumperOptions());
         representer.getPropertyUtils().setSkipMissingProperties(true);
-        yaml = new Yaml(new Constructor(Config.class));
+        yaml = new Yaml(new Constructor(Config.class, new LoaderOptions()));
     }
     @Override
     public Config loadConfig() {

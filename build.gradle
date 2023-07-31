@@ -1,10 +1,10 @@
 plugins {
-    id "io.freefair.lombok" version "6.5.1"
-    id "org.owasp.dependencycheck" version "7.2.1"
-    id "com.github.johnrengelman.shadow" version "7.1.2"
-    id "com.github.ben-manes.versions" version "0.42.0"
+    id "io.freefair.lombok" version "8.1.0"
+    id "org.owasp.dependencycheck" version "8.3.1"
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "com.github.ben-manes.versions" version "0.47.0"
     id 'se.patrikerdes.use-latest-versions' version '0.2.18'
-    id "org.sonarqube" version "3.4.0.2513"
+    id "org.sonarqube" version "4.3.0.3225"
     id "java"
 }
 
@@ -62,26 +62,27 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-core:5.3.23'
-    implementation 'org.springframework:spring-beans:5.3.23'
-    implementation 'org.springframework:spring-context:5.3.23'
-    implementation 'org.yaml:snakeyaml:1.33'
+    implementation 'org.springframework:spring-core:6.0.11'
+    implementation 'org.springframework:spring-beans:6.0.11'
+    implementation 'org.springframework:spring-context:6.0.11'
+    implementation 'org.yaml:snakeyaml:2.0'
     implementation 'org.ta4j:ta4j-core:0.15'
-    implementation 'com.google.code.gson:gson:2.9.1'
-    implementation 'org.json:json:20220924'
-    implementation ('net.dv8tion:JDA:5.0.0-alpha.21') {
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'org.json:json:20230618'
+    implementation ('net.dv8tion:JDA:5.0.0-beta.12') {
         exclude module: 'opus-java'
     }
-    implementation 'org.slf4j:slf4j-api:2.0.3'
-    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.19.0'
-    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
-    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
-    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.319'
-    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.319'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
-    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
-    testImplementation 'org.mockito:mockito-core:4.8.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.8.0'
+    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:3.0.0-alpha1'
+    implementation 'org.apache.logging.log4j:log4j-core:3.0.0-alpha1'
+    implementation 'org.apache.logging.log4j:log4j-api:3.0.0-alpha1'
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.518'
+    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.518'
+    implementation 'org.jsoup:jsoup:1.16.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.mockito:mockito-core:5.4.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.4.0'
 }
 
 group = 'com.etsubu.stonksbot'
