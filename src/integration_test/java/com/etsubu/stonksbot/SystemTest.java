@@ -48,6 +48,7 @@ public class SystemTest extends ListenerAdapter {
      */
     @BeforeAll
     public static void init() throws LoginException, InterruptedException {
+        assertFalse(Optional.ofNullable(System.getenv("oath2")).map(x -> !x.isEmpty()).orElse(false));
         System.setProperty("STONKSBOT_CONFIG_FILE", System.getProperty("user.dir") + "/src/integration_test/resources/config.yaml");
         System.setProperty("STONKSBOT_OATH", System.getenv("oath2"));
         Main.main(new String[]{});
