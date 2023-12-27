@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  */
 @Component
 public class VoteLinkCommand extends Command {
-    private static final Logger log = LoggerFactory.getLogger(AboutCommand.class);
+    private static final Logger log = LoggerFactory.getLogger(VoteLinkCommand.class);
 
     /**
      * Initializes the author command
@@ -62,9 +62,9 @@ public class VoteLinkCommand extends Command {
             log.error("Invalid votelink template '{}'", votelinkTemplate.get());
             return new CommandResult("There are no active vote polls configured for the server.", false);
         }
-        String[] tag = context.getSender().getAsTag().split("#");
+        String[] tag = context.getSender().getName().split("#");
         if (tag.length != 2) {
-            log.error("User tag format has changed '{}'", context.getSender().getAsTag());
+            log.error("User tag format has changed '{}'", context.getSender().getName());
             return new CommandResult("There are no active vote polls configured for the server.", false);
         }
         String personalized = replaceInstances(votelinkTemplate.get(), "{}", tag);

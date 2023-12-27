@@ -96,11 +96,11 @@ public class InderesRecommendations {
 
     private void notifyRecommendationChanges(Set<RecommendationChange> changes) {
         // Some heuristic check
-        if(changes.stream().filter(x -> x instanceof RemovedRecommendation).count() > 5) {
+        if(changes.stream().filter(RemovedRecommendation.class::isInstance).count() > 5) {
             log.error("Received unfollow for too many stocks. Skipping notify");
             return;
         }
-        if(changes.stream().filter(x -> x instanceof NewRecommendation).count() > 5) {
+        if(changes.stream().filter(NewRecommendation.class::isInstance).count() > 5) {
             log.error("Received follow for too many stocks. Skipping notify");
             return;
         }
@@ -151,6 +151,9 @@ public class InderesRecommendations {
     /* Every other minute */
     @Scheduled(cron = "2 0/2 * ? * *", zone = "Europe/Helsinki")
     public void invoke() {
+        if(!configLoader.getConfig().getInderes().getEnabled().equals("true")) {
+            return;
+        }
         if (failureTempCounter > 0) {
             log.info("Skipping inderes recommendation query due to exponential backoff. Counter={}", failureTempCounter);
             failureTempCounter--;

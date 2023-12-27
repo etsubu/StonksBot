@@ -21,7 +21,7 @@ import java.util.*;
 public class InderesConnectorImpl implements InderesConnector {
     private static final Logger log = LoggerFactory.getLogger(InderesConnectorImpl.class);
     private static final Gson gson = new Gson();
-    private static final String INDERES_RECOMMENDATION_URL = "https://www.inderes.fi/fi/rest/inderes_numbers_recommendations.json";
+    private static final String INDERES_RECOMMENDATION_URL = "https://classic.inderes.fi/fi/rest/inderes_numbers_recommendations.json";
     private final Map<String, RecommendationEntry> entries;
 
     public InderesConnectorImpl() {

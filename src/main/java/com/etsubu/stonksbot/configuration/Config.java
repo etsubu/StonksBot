@@ -14,6 +14,7 @@ public class Config {
     private S3Config s3;
     private FeatureConfig omxhNews;
     private FeatureConfig shareville;
+    private FeatureConfig inderes;
     private List<String> globalAdmins;
     private List<ServerConfig> servers;
 
@@ -42,6 +43,10 @@ public class Config {
 
     public FeatureConfig getShareville() {
         return Optional.ofNullable(shareville).orElseGet(() -> new FeatureConfig("false"));
+    }
+
+    public FeatureConfig getInderes() {
+        return Optional.ofNullable(inderes).orElseGet(() -> new FeatureConfig("false"));
     }
 
     public S3Config getS3() {
